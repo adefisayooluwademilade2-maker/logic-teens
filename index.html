@@ -413,7 +413,56 @@ function applyTeam(team) {
   document.getElementById('applicationText').textContent =
     'You selected ' + team + '. The application system will be connected when the secure application backend is added.';
 }
+
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA3rI1PVBHOGN24VLqgAKBiI50BkYlXW_o",
+  authDomain: "logic-teens.firebaseapp.com",
+  projectId: "logic-teens",
+  storageBucket: "logic-teens.firebasestorage.app",
+  messagingSenderId: "542931056170",
+  appId: "1:542931056170:web:7c9f7951bd5150618f3553"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// Check whether the visitor is logged in and verified.
+onAuthStateChanged(auth, user => {
+  if (!user || !user.emailVerified) {
+    window.location.replace("auth.html");
+    return;
+  }
+
+  document.body.style.visibility = "visible";
+});
+
+// Logout button
+document.getElementById("logoutButton").addEventListener("click", async () => {
+  const button = document.getElementById("logoutButton");
+
+  button.disabled = true;
+  button.textContent = "Logging out...";
+
+  try {
+    await signOut(auth);
+    window.location.replace("auth.html");
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = "↪ Logout";
+    alert("Logout failed. Please try again.");
+  }
+});
 </script>
 </body>
-  </html>
-  
+</html>
