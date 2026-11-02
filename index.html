@@ -482,7 +482,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
   // Set greeting using Nigeria's local time
-function updateTimeGreeting() {
+function updateTimeGreeting(user) {
   const hour = Number(
     new Intl.DateTimeFormat("en-GB", {
       hour: "2-digit",
@@ -499,14 +499,12 @@ function updateTimeGreeting() {
     greeting = "GOOD AFTERNOON";
   }
 
-  const userName = auth.currentUser?.displayName || "";
-const firstName = userName.trim().split(/\s+/)[0];
+  const userName = user?.displayName || "";
+  const firstName = userName.trim().split(/\s+/)[0];
 
-document.getElementById("timeGreeting").textContent =
-  firstName ? `${greeting}, ${firstName.toUpperCase()}` : greeting;
-}
-
-updateTimeGreeting();
+  document.getElementById("timeGreeting").textContent =
+    firstName ? `${greeting}, ${firstName.toUpperCase()}` : greeting;
+  }
 
 // Check whether the visitor is logged in and verified.
 onAuthStateChanged(auth, user => {
@@ -514,7 +512,7 @@ onAuthStateChanged(auth, user => {
     window.location.replace("auth.html");
     return;
   }
-
+updateTimeGreeting(user);
   document.body.style.visibility = "visible";
 });
 
