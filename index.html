@@ -499,7 +499,11 @@ function updateTimeGreeting() {
     greeting = "GOOD AFTERNOON";
   }
 
-  document.getElementById("timeGreeting").textContent = greeting;
+  const userName = auth.currentUser?.displayName || "";
+const firstName = userName.trim().split(/\s+/)[0];
+
+document.getElementById("timeGreeting").textContent =
+  firstName ? `${greeting}, ${firstName.toUpperCase()}` : greeting;
 }
 
 updateTimeGreeting();
