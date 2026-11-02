@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account Access</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;padding:24px 16px;
+  display:flex;align-items:center;justify-content:center;
+  background:#090a10;color:#f5f2eb;
+  font-family:Arial,sans-serif
+}
+.card{
+  width:100%;max-width:420px;background:#151722;
+  padding:28px 22px;border-radius:22px;
+  border:1px solid #292b38
+}
+.tabs{display:flex;background:#222432;padding:5px;border-radius:12px;margin-bottom:28px}
+.tabs button{
+  flex:1;padding:13px;border:0;border-radius:9px;
+  background:transparent;color:#b8b8c3;font-weight:bold
+}
+.tabs button.active{background:#c9a65e;color:#111}
+h1{font-size:27px;margin:0 0 12px}
+.intro{color:#b8b8c3;font-size:14px;line-height:1.6;margin-bottom:24px}
+label{display:block;margin:17px 0 8px;font-size:14px;color:#e4e1da}
+input{
+  width:100%;padding:14px;background:#202330;
+  border:1px solid #383b49;border-radius:10px;
+  color:white;font-size:15px;outline:none
+}
+input:focus{border-color:#c9a65e}
+.password{display:flex;gap:8px}
+.password input{flex:1;min-width:0}
+.show{
+  background:#303342;color:#eee;border:1px solid #44485a;
+  border-radius:9px;padding:0 12px
+}
+.forgot{text-align:right;margin-top:13px}
+a{color:#e3c477;text-decoration:none;font-size:13px}
+.submit{
+  width:100%;padding:15px;margin-top:22px;
+  border:0;border-radius:10px;background:#c9a65e;
+  color:#111;font-size:15px;font-weight:bold
+}
+.switch{text-align:center;color:#b8b8c3;font-size:13px;margin-top:22px}
+.message{
+  display:none;margin-top:16px;padding:12px;
+  border-radius:9px;background:#252a35;color:#e7d5a7;
+  font-size:13px;line-height:1.5
+}
+.hidden{display:none}
+button{cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="tabs">
+    <button id="signupTab" class="active" type="button">Sign Up</button>
+    <button id="loginTab" type="button">Login</button>
+  </div>
+
+  <h1 id="heading">Create your account</h1>
+  <p class="intro" id="intro">
+    Please use your real name when creating your account so we can identify you and connect you with the right people in our community.
+  </p>
+
+  <form id="authForm">
+    <div id="nameField">
+      <label for="fullName">Full name</label>
+      <input id="fullName" type="text" placeholder="Enter your real full name" autocomplete="name">
+    </div>
+
+    <label for="email">Email address</label>
+    <input id="email" type="email" placeholder="Enter your email address" required autocomplete="email">
+
+    <label for="password">Password</label>
+    <div class="password">
+      <input id="password" type="password" placeholder="Enter your password" required autocomplete="current-password">
+      <button class="show" id="showPassword" type="button">Show</button>
+    </div>
+
+    <div id="confirmField">
+      <label for="confirmPassword">Confirm password</label>
+      <input id="confirmPassword" type="password" placeholder="Confirm your password" autocomplete="new-password">
+    </div>
+
+    <div id="forgotArea" class="forgot hidden">
+      <a href="#" id="forgotLink">Forgot password?</a>
+    </div>
+
+    <button class="submit" id="submitButton" type="submit">Create Account</button>
+  </form>
+
+  <div class="switch" id="switchText">
+    Already have an account? <a href="#" id="switchLink">Login</a>
+  </div>
+
+  <div class="message" id="message"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  updateProfile,
+  setPersistence,
+  browserLocalPersistence,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA3rI1PVBHOGN24VLqgAKBiI50BkYlXW_o",
+  authDomain: "logic-teens.firebaseapp.com",
+  projectId: "logic-teens",
+  storageBucket: "logic-teens.firebasestorage.app",
+  messagingSenderId: "542931056170",
+  appId: "1:542931056170:web:7c9f7951bd5150618f3553"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+await setPersistence(auth, browserLocalPersistence);
+
+const $ = id => document.getElementById(id);
+let mode = "signup";
+
+function showMessage(text) {
+  $("message").textContent = text;
+  $("message").style.display = "block";
+}
+
+function clearMessage() {
+  $("message").style.display = "none";
+}
+
+function setMode(newMode) {
+  mode = newMode;
+  clearMessage();
+
+  const signup = mode === "signup";
+  $("signupTab").classList.toggle("active", signup);
+  $("loginTab").classList.toggle("active", !signup);
+  $("nameField").classList.toggle("hidden", !signup);
+  $("confirmField").classList.toggle("hidden", !signup);
+  $("forgotArea").classList.toggle("hidden", signup);
+
+  $("heading").textContent = signup ? "Create your account" : "Welcome back";
+
+  $("intro").textContent = signup
+    ? "Please use your real name when creating your account so we can identify you and connect you with the right people in our community."
+    : "Enter your details below to access your account.";
+
+  $("submitButton").textContent = signup ? "Create Account" : "Login";
+  $("switchText").innerHTML = signup
+    ? 'Already have an account? <a href="#" id="switchLink">Login</a>'
+    : 'Don’t have an account? <a href="#" id="switchLink">Sign Up</a>';
+
+  $("password").value = "";
+  $("confirmPassword").value = "";
+  $("password").type = "password";
+  $("showPassword").textContent = "Show";
+
+  $("switchLink").addEventListener("click", e => {
+    e.preventDefault();
+    setMode(signup ? "login" : "signup");
+  });
+}
+
+$("signupTab").addEventListener("click", () => setMode("signup"));
+$("loginTab").addEventListener("click", () => setMode("login"));
+
+$("showPassword").addEventListener("click", () => {
+  const input = $("password");
+  input.type = input.type === "password" ? "text" : "password";
+  $("showPassword").textContent = input.type === "password" ? "Show" : "Hide";
+});
+
+$("authForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  clearMessage();
+
+  const email = $("email").value.trim();
+  const password = $("password").value;
+  const button = $("submitButton");
+
+  button.disabled = true;
+  button.textContent = "Please wait...";
+
+  try {
+    if (mode === "signup") {
+      const fullName = $("fullName").value.trim();
+      const confirmPassword = $("confirmPassword").value;
+
+      if (!fullName) throw Error("Please enter your real full name.");
+      if (password.length < 6) throw Error("Your password must be at least 6 characters.");
+      if (password !== confirmPassword) throw Error("Your passwords do not match.");
+
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+
+      await updateProfile(result.user, { displayName: fullName });
+      await sendEmailVerification(result.user);
+      await signOut(auth);
+
+      showMessage("Account created! Please check your email and tap the verification link. Then return here and log in.");
+    } else {
+      const result = await signInWithEmailAndPassword(auth, email, password);
+
+      if (!result.user.emailVerified) {
+        await signOut(auth);
+        throw Error("Please verify your email first. Check your inbox for the verification link.");
+      }
+
+      window.location.href = "index.html";
+    }
+  } catch (error) {
+    const messages = {
+      "auth/email-already-in-use": "This email already has an account. Please log in.",
+      "auth/invalid-email": "Please enter a valid email address.",
+      "auth/weak-password": "Please choose a stronger password.",
+      "auth/invalid-credential": "Incorrect email or password.",
+      "auth/network-request-failed": "Network error. Please check your internet connection.",
+      "auth/too-many-requests": "Too many attempts. Please try again later."
+    };
+
+    showMessage(messages[error.code] || error.message || "Something went wrong. Please try again.");
+  } finally {
+    button.disabled = false;
+    button.textContent = mode === "signup" ? "Create Account" : "Login";
+  }
+});
+
+$("forgotLink").addEventListener("click", async e => {
+  e.preventDefault();
+  clearMessage();
+
+  const email = $("email").value.trim();
+
+  if (!email) {
+    showMessage("Enter your registered email address first.");
+    $("email").focus();
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    showMessage("If an account exists for this address, a password reset email has been sent. Check your inbox.");
+  } catch (error) {
+    if (error.code === "auth/invalid-email") {
+      showMessage("Please enter a valid email address.");
+    } else {
+      showMessage("We couldn't send the reset email. Please try again.");
+    }
+  }
+});
+
+onAuthStateChanged(auth, user => {
+  if (user && user.emailVerified) {
+    window.location.href = "index.html";
+  }
+});
+</script>
+
+</body>
+  </html>
+      
