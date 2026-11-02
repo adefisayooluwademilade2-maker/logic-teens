@@ -182,9 +182,12 @@ $("signupTab").addEventListener("click", () => setMode("signup"));
 $("loginTab").addEventListener("click", () => setMode("login"));
 
 $("showPassword").addEventListener("click", () => {
-  const input = $("password");
-  input.type = input.type === "password" ? "text" : "password";
-  $("showPassword").textContent = input.type === "password" ? "Show" : "Hide";
+  const show = $("password").type === "password";
+
+  $("password").type = show ? "text" : "password";
+  $("confirmPassword").type = show ? "text" : "password";
+
+  $("showPassword").textContent = show ? "Hide" : "Show";
 });
 
 $("authForm").addEventListener("submit", async e => {
