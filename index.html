@@ -456,7 +456,7 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
 
   try {
     await signOut(auth);
-    window.location.replace("auth.html");
+    window.location.replace("auth.html?mode=login");
   } catch (error) {
     button.disabled = false;
     button.textContent = "↪ Logout";
