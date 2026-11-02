@@ -476,6 +476,29 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
+  // Set greeting using Nigeria's local time
+function updateTimeGreeting() {
+  const hour = Number(
+    new Intl.DateTimeFormat("en-GB", {
+      hour: "2-digit",
+      hourCycle: "h23",
+      timeZone: "Africa/Lagos"
+    }).format(new Date())
+  );
+
+  let greeting = "GOOD EVENING";
+
+  if (hour < 12) {
+    greeting = "GOOD MORNING";
+  } else if (hour < 17) {
+    greeting = "GOOD AFTERNOON";
+  }
+
+  document.getElementById("timeGreeting").textContent = greeting;
+}
+
+updateTimeGreeting();
+
 // Check whether the visitor is logged in and verified.
 onAuthStateChanged(auth, user => {
   if (!user || !user.emailVerified) {
