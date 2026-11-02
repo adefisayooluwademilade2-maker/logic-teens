@@ -183,6 +183,7 @@ function setMode(newMode) {
     setMode(signup ? "login" : "signup");
   });
 }
+  setMode(mode);
 
 $("signupTab").addEventListener("click", () => setMode("signup"));
 $("loginTab").addEventListener("click", () => setMode("login"));
