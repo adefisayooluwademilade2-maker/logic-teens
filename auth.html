@@ -197,6 +197,7 @@ $("showPassword").addEventListener("click", () => {
 $("authForm").addEventListener("submit", async e => {
   e.preventDefault();
   clearMessage();
+  $("resendVerification").classList.add("hidden");
 
   const email = $("email").value.trim();
   const password = $("password").value;
@@ -217,23 +218,35 @@ $("authForm").addEventListener("submit", async e => {
       const result = await createUserWithEmailAndPassword(auth, email, password);
 
       await updateProfile(result.user, { displayName: fullName });
-      await sendEmailVerification(result.user);
+
+      try {
+        await sendEmailVerification(result.user);
+        showMessage("Your account has been created! Check your email and tap Verify Email. Then return here to log in.");
+      } catch (emailError) {
+        showMessage("Your account was created, but we couldn't send the verification email. Check your email address and use Resend Verification Email.");
+        $("resendVerification").classList.remove("hidden");
+      }
+
       await signOut(auth);
 
-      showMessage("Account created! Please check your email and tap the verification link. Then return here and log in.");
     } else {
       const result = await signInWithEmailAndPassword(auth, email, password);
 
+      await reload(result.user);
+
       if (!result.user.emailVerified) {
         await signOut(auth);
-        throw Error("Please verify your email first. Check your inbox for the verification link.");
+        showMessage("Your email is not verified yet. Check your inbox or request another verification email below.");
+        $("resendVerification").classList.remove("hidden");
+        return;
       }
 
       window.location.href = "index.html";
     }
+
   } catch (error) {
     const messages = {
-      "auth/email-already-in-use": "This email already has an account. Please log in.",
+      "auth/email-already-in-use": "This email already has an account. Log in or resend its verification email.",
       "auth/invalid-email": "Please enter a valid email address.",
       "auth/weak-password": "Please choose a stronger password.",
       "auth/invalid-credential": "Incorrect email or password.",
@@ -248,6 +261,38 @@ $("authForm").addEventListener("submit", async e => {
   }
 });
 
+  $("resendVerification").addEventListener("click", async () => {
+  clearMessage();
+
+  const email = $("email").value.trim();
+  const password = $("password").value;
+
+  if (!email || !password) {
+    showMessage("Enter your email and password first.");
+    return;
+  }
+
+  try {
+    const result = await signInWithEmailAndPassword(auth, email, password);
+
+    await reload(result.user);
+
+    if (result.user.emailVerified) {
+      await signOut(auth);
+      showMessage("Your email is already verified! You can now log in.");
+      $("resendVerification").classList.add("hidden");
+      return;
+    }
+
+    await sendEmailVerification(result.user);
+    await signOut(auth);
+
+    showMessage("A new verification email has been sent. Check your inbox and Spam folder.");
+  } catch (error) {
+    showMessage("We couldn't resend the email. Check your email and password, then try again.");
+  }
+});
+  
 $("forgotLink").addEventListener("click", async e => {
   e.preventDefault();
   clearMessage();
