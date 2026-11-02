@@ -101,7 +101,10 @@ button{cursor:pointer}
   </div>
 
   <div class="message" id="message"></div>
-</div>
+
+<button id="resendVerification" class="submit hidden" type="button">
+  Resend Verification Email
+</button>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
@@ -115,8 +118,9 @@ import {
   updateProfile,
   setPersistence,
   browserLocalPersistence,
-  onAuthStateChanged,
-  signOut
+    onAuthStateChanged,
+  signOut,
+  reload
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
 const firebaseConfig = {
