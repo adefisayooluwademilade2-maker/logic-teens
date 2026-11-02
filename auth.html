@@ -139,8 +139,9 @@ const auth = getAuth(app);
 await setPersistence(auth, browserLocalPersistence);
 
 const $ = id => document.getElementById(id);
-let mode = "signup";
-
+let mode = new URLSearchParams(window.location.search).get("mode") === "login"
+  ? "login"
+  : "signup";
 function showMessage(text) {
   $("message").textContent = text;
   $("message").style.display = "block";
