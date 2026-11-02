@@ -129,6 +129,14 @@ footer {text-align:center;color:#77778a;font-size:11px;padding:25px}
   display: block;
   margin: auto;
   }
+  .nav-btn.active {
+  color: #d6b779;
+}
+
+.nav-btn.active .nav-icon svg {
+  stroke-width: 2.2;
+  filter: drop-shadow(0 0 5px rgba(214,183,121,.25));
+         }
 </style>
 </head>
 <body>
@@ -279,23 +287,57 @@ footer {text-align:center;color:#77778a;font-size:11px;padding:25px}
 </div>
 
 <nav class="bottom-nav">
-  <button class="nav-btn active" data-page="home" onclick="openPage('home')">
-    <span class="nav-icon">⌂</span>Home
-  </button>
-  <button class="nav-btn" data-page="event" onclick="openPage('event')">
-    <span class="nav-icon">▦</span>Event
-  </button>
-  <button class="nav-btn" data-page="connect" onclick="openPage('connect')">
-    <span class="nav-icon">♡</span>Connect
-  </button>
-  <button class="nav-btn" data-page="bible" onclick="openPage('bible')">
-    <span class="nav-icon">▤</span>Bible
-  </button>
-  <button class="nav-btn" data-page="ministry" onclick="openPage('ministry')">
-    <span class="nav-icon">✧</span>Ministry Team
-  </button>
-</nav>
 
+  <button class="nav-btn active" data-page="home" onclick="openPage('home')">
+    <span class="nav-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/>
+      </svg>
+    </span>
+    Home
+  </button>
+
+  <button class="nav-btn" data-page="event" onclick="openPage('event')">
+    <span class="nav-icon">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="16" rx="2"/>
+        <path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h7"/>
+      </svg>
+    </span>
+    Event
+  </button>
+
+  <button class="nav-btn" data-page="connect" onclick="openPage('connect')">
+    <span class="nav-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="10" cy="7" r="4"/>
+        <path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </span>
+    Connect
+  </button>
+
+  <button class="nav-btn" data-page="bible" onclick="openPage('bible')">
+    <span class="nav-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 7v14M12 7C9 4 5 4 3 5v14c3-1 6-1 9 2M12 7c3-3 7-3 9-2v14c-3-1-6-1-9 2"/>
+      </svg>
+    </span>
+    Bible
+  </button>
+
+  <button class="nav-btn" data-page="ministry" onclick="openPage('ministry')">
+    <span class="nav-icon">
+      <svg viewBox="0 0 24 24">
+        <circle cx="9" cy="8" r="3"/>
+        <path d="M3 21v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6M18 15a5 5 0 0 1 3 4v2"/>
+      </svg>
+    </span>
+    Ministry Team
+  </button>
+
+</nav>
 <footer>LOGIC TEENS CHURCH LOUNGE · GROW • CONNECT • BECOME</footer>
 
 <script>
