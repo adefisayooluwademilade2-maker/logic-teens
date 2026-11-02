@@ -320,11 +320,6 @@ $("forgotLink").addEventListener("click", async e => {
   }
 });
 
-onAuthStateChanged(auth, user => {
-  if (user && user.emailVerified) {
-    window.location.href = "index.html";
-  }
-});
 </script>
 
 </body>
