@@ -1,0 +1,321 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090a12">
+<title>LOGIC Teens Church Lounge</title>
+<style>
+:root {
+  --bg:#090a12;
+  --card:#141622;
+  --card2:#1b1d2c;
+  --white:#f5f3f8;
+  --muted:#9999aa;
+  --gold:#d6b779;
+  --purple:#8880bd;
+  --line:#292b3b;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--white);
+  font-family:Arial,sans-serif;
+  padding-bottom:90px;
+}
+button {font:inherit;cursor:pointer}
+header {
+  height:68px;
+  padding:0 19px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid var(--line);
+  position:sticky;
+  top:0;
+  z-index:5;
+  background:rgba(9,10,18,.96);
+}
+.brand {font-size:20px;font-weight:800;letter-spacing:2px}
+.brand span {color:var(--gold)}
+.header-actions {display:flex;gap:12px}
+.icon-btn {
+  width:40px;height:40px;border-radius:13px;
+  border:1px solid var(--line);
+  background:var(--card);color:white;font-size:19px;
+}
+main {max-width:650px;margin:auto;padding:22px 17px}
+.page {display:none}
+.page.active {display:block}
+.eyebrow {
+  color:var(--gold);font-size:11px;
+  letter-spacing:2px;font-weight:bold;
+}
+h1 {font-size:27px;margin:9px 0}
+h2 {font-size:19px;margin:27px 0 14px}
+.subtitle {color:var(--muted);font-size:14px;line-height:1.6}
+.hero {
+  padding:25px 21px;border-radius:22px;
+  background:linear-gradient(135deg,#20233a,#171526 65%,#302543);
+  border:1px solid #343047;
+  margin:18px 0 25px;
+}
+.hero h1 {font-size:29px;line-height:1.2}
+.hero p {color:#c3c0d0;line-height:1.6;font-size:14px}
+.tagline {color:var(--gold);font-size:11px;letter-spacing:2px;font-weight:bold}
+.grid {
+  display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
+}
+.tile {
+  min-height:125px;padding:17px;
+  background:var(--card);border:1px solid var(--line);
+  border-radius:17px;text-align:left;color:white;
+}
+.tile .emoji {font-size:25px;display:block;margin-bottom:13px}
+.tile strong {font-size:14px;display:block}
+.tile small {display:block;color:var(--muted);margin-top:6px;font-size:11px}
+.panel {
+  background:var(--card);border:1px solid var(--line);
+  padding:18px;border-radius:17px;margin-bottom:12px;
+}
+.panel p {color:var(--muted);font-size:13px;line-height:1.6}
+.event-date {color:var(--gold);font-size:11px;letter-spacing:1px}
+.empty {text-align:center;padding:35px 15px;color:var(--muted)}
+input,textarea,select {
+  width:100%;padding:13px;margin:8px 0 14px;
+  border:1px solid var(--line);border-radius:11px;
+  background:#0f111b;color:white;
+}
+.primary {
+  background:var(--gold);color:#17130b;
+  border:0;padding:13px 18px;border-radius:11px;
+  font-weight:bold;width:100%;
+}
+.bottom-nav {
+  position:fixed;bottom:0;left:0;right:0;
+  display:grid;grid-template-columns:repeat(5,1fr);
+  background:#11121c;border-top:1px solid var(--line);
+  padding:9px 4px calc(9px + env(safe-area-inset-bottom));
+  z-index:10;
+}
+.nav-btn {
+  border:0;background:none;color:var(--muted);
+  display:flex;flex-direction:column;align-items:center;
+  gap:5px;font-size:10px;padding:5px 0;
+}
+.nav-btn .nav-icon {font-size:20px}
+.nav-btn.active {color:var(--gold)}
+.menu {
+  display:none;position:fixed;inset:0;z-index:20;
+  background:rgba(0,0,0,.65);
+}
+.menu.open {display:block}
+.menu-card {
+  position:absolute;right:0;top:0;bottom:0;
+  width:min(280px,82%);background:#141622;
+  padding:25px 20px;
+}
+.menu-card h2 {margin-top:35px}
+.menu-item {
+  width:100%;padding:16px;margin:6px 0;
+  text-align:left;color:white;background:var(--card2);
+  border:1px solid var(--line);border-radius:12px;
+}
+.close-menu {float:right}
+footer {text-align:center;color:#77778a;font-size:11px;padding:25px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">LOGIC<span>.</span></div>
+  <div class="header-actions">
+    <button class="icon-btn" aria-label="Notifications">♧</button>
+    <button class="icon-btn" id="menuOpen" aria-label="Open menu">☰</button>
+  </div>
+</header>
+
+<main>
+  <section class="page active" id="home">
+    <div class="eyebrow">WELCOME TO LOGIC</div>
+    <div class="hero">
+      <div class="tagline">GROW • CONNECT • BECOME</div>
+      <h1>A place to grow, belong and become.</h1>
+      <p>Your faith journey is better when you grow together. Welcome to the LOGIC Teens Church Lounge.</p>
+    </div>
+
+    <h2>Your journey</h2>
+    <div class="grid">
+      <button class="tile" onclick="openPage('bible')">
+        <span class="emoji">📖</span>
+        <strong>Daily Devotionals</strong>
+        <small>Grow in God's word</small>
+      </button>
+      <button class="tile" onclick="openPage('bible')">
+        <span class="emoji">✦</span>
+        <strong>Bible Quiz</strong>
+        <small>Learn and test yourself</small>
+      </button>
+      <button class="tile" onclick="openPage('connect')">
+        <span class="emoji">🤝</span>
+        <strong>Teens Community</strong>
+        <small>Connect with others</small>
+      </button>
+      <button class="tile" onclick="openPage('event')">
+        <span class="emoji">📅</span>
+        <strong>Events</strong>
+        <small>See what's happening</small>
+      </button>
+    </div>
+
+    <h2>Upcoming at LOGIC</h2>
+    <div class="panel">
+      <div class="event-date">COMING UP</div>
+      <strong>Events and gatherings</strong>
+      <p>Stay connected with upcoming LOGIC Teens activities.</p>
+      <button class="primary" onclick="openPage('event')">View Events</button>
+    </div>
+
+    <h2>Keep growing</h2>
+    <div class="panel">
+      <strong>Grow in faith. Build connections.</strong>
+      <p>Discover opportunities to learn, connect and become who God created you to be.</p>
+    </div>
+  </section>
+
+  <section class="page" id="event">
+    <div class="eyebrow">LOGIC COMMUNITY</div>
+    <h1>Events</h1>
+    <p class="subtitle">Stay up to date with what's happening at LOGIC Teens.</p>
+    <div class="empty">Upcoming events will appear here.</div>
+  </section>
+
+  <section class="page" id="connect">
+    <div class="eyebrow">YOU BELONG HERE</div>
+    <h1>Connect</h1>
+    <p class="subtitle">A place for teens to connect and grow together.</p>
+    <div class="panel">
+      <strong>Teens Community</strong>
+      <p>Community conversations will appear here.</p>
+    </div>
+  </section>
+
+  <section class="page" id="bible">
+    <div class="eyebrow">GROW IN THE WORD</div>
+    <h1>Bible</h1>
+    <p class="subtitle">Build your faith through God's word.</p>
+    <div class="panel">
+      <strong>Daily Devotionals</strong>
+      <p>Daily devotional content will appear here.</p>
+    </div>
+    <div class="panel">
+      <strong>Bible Quiz</strong>
+      <p>Bible quizzes will appear here.</p>
+    </div>
+  </section>
+
+  <section class="page" id="ministry">
+    <div class="eyebrow">SERVE AT LOGIC</div>
+    <h1>Ministry Team</h1>
+    <p class="subtitle">Explore the teams and departments at LOGIC Teens.</p>
+    <div class="panel">
+      <strong>Ushers</strong>
+      <p>Help welcome and guide people at church gatherings.</p>
+      <button class="primary" onclick="applyTeam('Ushers')">Apply to join</button>
+    </div>
+    <div class="panel">
+      <strong>Media</strong>
+      <p>Be part of the team supporting media and communication.</p>
+      <button class="primary" onclick="applyTeam('Media')">Apply to join</button>
+    </div>
+    <div class="panel">
+      <strong>Singers / Choir</strong>
+      <p>Use your voice to serve through music.</p>
+      <button class="primary" onclick="applyTeam('Singers / Choir')">Apply to join</button>
+    </div>
+    <div id="applicationMessage" class="panel" hidden>
+      <strong>Application selected</strong>
+      <p id="applicationText"></p>
+    </div>
+  </section>
+
+  <section class="page" id="profile">
+    <div class="eyebrow">YOUR ACCOUNT</div>
+    <h1>Profile</h1>
+    <div class="panel">
+      <p>Your profile information will appear here.</p>
+    </div>
+  </section>
+
+  <section class="page" id="settings">
+    <div class="eyebrow">PREFERENCES</div>
+    <h1>Settings</h1>
+    <div class="panel">
+      <p>Account and app settings will appear here.</p>
+    </div>
+  </section>
+</main>
+
+<div class="menu" id="menu">
+  <div class="menu-card">
+    <button class="icon-btn close-menu" id="menuClose">✕</button>
+    <h2>LOGIC Menu</h2>
+    <button class="menu-item" onclick="openPage('profile')">♙ &nbsp; Profile</button>
+    <button class="menu-item" onclick="openPage('settings')">⚙ &nbsp; Settings</button>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-page="home" onclick="openPage('home')">
+    <span class="nav-icon">⌂</span>Home
+  </button>
+  <button class="nav-btn" data-page="event" onclick="openPage('event')">
+    <span class="nav-icon">▦</span>Event
+  </button>
+  <button class="nav-btn" data-page="connect" onclick="openPage('connect')">
+    <span class="nav-icon">♡</span>Connect
+  </button>
+  <button class="nav-btn" data-page="bible" onclick="openPage('bible')">
+    <span class="nav-icon">▤</span>Bible
+  </button>
+  <button class="nav-btn" data-page="ministry" onclick="openPage('ministry')">
+    <span class="nav-icon">✧</span>Ministry Team
+  </button>
+</nav>
+
+<footer>LOGIC TEENS CHURCH LOUNGE · GROW • CONNECT • BECOME</footer>
+
+<script>
+function openPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.page === page);
+  });
+
+  document.getElementById('menu').classList.remove('open');
+  window.scrollTo(0,0);
+}
+
+document.getElementById('menuOpen').onclick = () =>
+  document.getElementById('menu').classList.add('open');
+
+document.getElementById('menuClose').onclick = () =>
+  document.getElementById('menu').classList.remove('open');
+
+document.getElementById('menu').onclick = e => {
+  if(e.target.id === 'menu') e.currentTarget.classList.remove('open');
+};
+
+function applyTeam(team) {
+  document.getElementById('applicationMessage').hidden = false;
+  document.getElementById('applicationText').textContent =
+    'You selected ' + team + '. The application system will be connected when the secure application backend is added.';
+}
+</script>
+</body>
+  </html>
+  
