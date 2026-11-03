@@ -1463,6 +1463,10 @@ const storage = getStorage(app);
     showProfilePreview();
 
     closeProfileEditor();
+    setProfileAvatar(
+  document.getElementById("profileAvatar"),
+  photoURL
+);
     alert("Profile saved successfully!");
 
     } catch (error) {
