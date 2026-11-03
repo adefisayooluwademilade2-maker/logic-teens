@@ -1672,6 +1672,29 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+  window.saveNotificationSettingsToFirebase = async function() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const settings = {
+    enabled: document.getElementById("masterNotifications").checked,
+    churchAnnouncements: document.getElementById("churchAnnouncements").checked,
+    bibleNotifications: document.getElementById("bibleNotifications").checked,
+    eventReminders: document.getElementById("eventReminders").checked,
+    ministryUpdates: document.getElementById("ministryUpdates").checked
+  };
+
+  try {
+    await setDoc(
+      doc(db, "users", user.uid),
+      { notificationSettings: settings },
+      { merge: true }
+    );
+  } catch (error) {
+    console.error("Notification settings error:", error);
+  }
+};
+
 window.openEmailChange = function() {
   document.getElementById("profileEditor").hidden = true;
   document.getElementById("emailChangePanel").hidden = false;
