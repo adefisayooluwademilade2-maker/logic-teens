@@ -1174,13 +1174,154 @@ document.getElementById("profilePictureInput")
 </script>
 
 
-  <section class="page" id="settings">
-    <div class="eyebrow">PREFERENCES</div>
-    <h1>Settings</h1>
-    <div class="panel">
-      <p>Account and app settings will appear here.</p>
-    </div>
-  </section>
+  
+<!-- MAIN SETTINGS PAGE -->
+<section class="page" id="settings">
+  <div class="eyebrow">PREFERENCES</div>
+  <h1>Settings</h1>
+  <p class="subtitle">Manage your preferences and get support.</p>
+
+  <button class="panel menu-item" style="width:100%;text-align:left;margin-top:18px"
+    onclick="openPage('notificationSettings')">
+    🔔 &nbsp; Notifications &nbsp; ›
+  </button>
+
+  <button class="panel menu-item" style="width:100%;text-align:left;margin-top:12px"
+    onclick="openPage('privacySettings')">
+    🛡 &nbsp; Privacy & Safety &nbsp; ›
+  </button>
+
+  <button class="panel menu-item" style="width:100%;text-align:left;margin-top:12px"
+    onclick="openPage('supportSettings')">
+    ℹ &nbsp; Information & Support &nbsp; ›
+  </button>
+</section>
+
+<!-- NOTIFICATIONS PAGE -->
+<section class="page" id="notificationSettings">
+  <button class="menu-item" onclick="openPage('settings')">← Back to Settings</button>
+  <div class="eyebrow">PREFERENCES</div>
+  <h1>Notifications</h1>
+
+  <div class="panel" style="margin-top:18px">
+    <label style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <span>
+        <strong>Notifications</strong>
+        <small style="display:block;color:#aaa;margin-top:5px">
+          Turn all notifications on or off.
+        </small>
+      </span>
+      <input id="masterNotifications" type="checkbox"
+        style="width:22px;height:22px"
+        onchange="toggleAllNotificationSettings(this.checked)">
+    </label>
+  </div>
+
+  <h3 style="margin-top:25px">Choose what you receive</h3>
+
+  <div class="panel">
+    <label style="display:flex;justify-content:space-between;align-items:center;margin:12px 0">
+      Church announcements
+      <input class="notification-option" id="churchAnnouncements"
+        type="checkbox" style="width:20px;height:20px"
+        onchange="saveNotificationPreference('churchAnnouncements',this.checked)">
+    </label>
+
+    <label style="display:flex;justify-content:space-between;align-items:center;margin:18px 0">
+      Bible verse notifications
+      <input class="notification-option" id="bibleNotifications"
+        type="checkbox" style="width:20px;height:20px"
+        onchange="saveNotificationPreference('bibleNotifications',this.checked)">
+    </label>
+
+    <label style="display:flex;justify-content:space-between;align-items:center;margin:18px 0">
+      Event reminders
+      <input class="notification-option" id="eventReminders"
+        type="checkbox" style="width:20px;height:20px"
+        onchange="saveNotificationPreference('eventReminders',this.checked)">
+    </label>
+
+    <label style="display:flex;justify-content:space-between;align-items:center;margin:12px 0">
+      Ministry updates
+      <input class="notification-option" id="ministryUpdates"
+        type="checkbox" style="width:20px;height:20px"
+        onchange="saveNotificationPreference('ministryUpdates',this.checked)">
+    </label>
+  </div>
+</section>
+
+<!-- PRIVACY AND SAFETY PAGE -->
+<section class="page" id="privacySettings">
+  <button class="menu-item" onclick="openPage('settings')">← Back to Settings</button>
+  <div class="eyebrow">SAFETY</div>
+  <h1>Privacy & Safety</h1>
+
+  <div class="panel" style="margin-top:18px">
+    <p>Report a problem or user</p>
+    <p>Community guidelines</p>
+  </div>
+</section>
+
+<!-- INFORMATION AND SUPPORT PAGE -->
+<section class="page" id="supportSettings">
+  <button class="menu-item" onclick="openPage('settings')">← Back to Settings</button>
+  <div class="eyebrow">INFORMATION</div>
+  <h1>Information & Support</h1>
+
+  <div class="panel" style="margin-top:18px">
+    <p>About LOGIC Teens</p>
+    <p>Contact the church</p>
+    <p>Help and support</p>
+    <p>Terms of use</p>
+    <p>Privacy policy</p>
+    <p>App version</p>
+  </div>
+</section>
+
+<script>
+const notificationKeys = [
+  "churchAnnouncements",
+  "bibleNotifications",
+  "eventReminders",
+  "ministryUpdates"
+];
+
+function loadNotificationSettings() {
+  const master = document.getElementById("masterNotifications");
+  if (!master) return;
+
+  master.checked =
+    localStorage.getItem("logicNotificationsEnabled") !== "false";
+
+  notificationKeys.forEach(key => {
+    const input = document.getElementById(key);
+    input.checked =
+      localStorage.getItem("logicNotification_" + key) !== "false";
+  });
+
+  updateNotificationControls();
+}
+
+function updateNotificationControls() {
+  const master = document.getElementById("masterNotifications");
+
+  notificationKeys.forEach(key => {
+    document.getElementById(key).disabled = !master.checked;
+  });
+}
+
+function toggleAllNotificationSettings(enabled) {
+  localStorage.setItem("logicNotificationsEnabled", enabled);
+  updateNotificationControls();
+}
+
+function saveNotificationPreference(key, enabled) {
+  localStorage.setItem("logicNotification_" + key, enabled);
+}
+
+loadNotificationSettings();
+</script>
+
 </main>
 
 <div class="menu" id="menu">
