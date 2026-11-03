@@ -1502,52 +1502,52 @@ onAuthStateChanged(auth, async user => {
     window.location.replace("auth.html");
     return;
   }
+
   window.logicCurrentUser = user;
 
   try {
     const profileRef = doc(db, "users", user.uid);
     const profileSnap = await getDoc(profileRef);
 
-    if (profileSnap.exists()) {
-      const data = profileSnap.data();
+    const data = profileSnap.exists()
+      ? profileSnap.data()
+      : {};
 
-      document.getElementById("profileDisplayName").textContent =
-        data.fullName || user.displayName || "Member";
+    const photoURL = data.photoURL || user.photoURL || "";
+    const fullName = data.fullName || user.displayName || "";
+    const username = data.username || "";
+    const about = data.about || "";
 
-      document.getElementById("profileDisplayAbout").textContent =
-        data.about || "Tell us something about yourself.";
+    window.logicProfileData = {
+      fullName,
+      username,
+      about,
+      photoURL
+    };
 
-      document.getElementById("editFullName").value =
-        data.fullName || user.displayName || "";
+    document.getElementById("profileDisplayName").textContent =
+      fullName || "Member";
 
-      document.getElementById("editUsername").value =
-        data.username || "";
+    document.getElementById("profileDisplayUsername").textContent =
+      username ? "@" + username : "";
 
-      document.getElementById("editAbout").value =
-        data.about || "";
+    document.getElementById("profileDisplayAbout").textContent =
+      about || "Tell us something about yourself.";
 
-      document.getElementById("editEmail").value =
-        user.email || "";
+    document.getElementById("editFullName").value = fullName;
+    document.getElementById("editUsername").value = username;
+    document.getElementById("editAbout").value = about;
+    document.getElementById("editEmail").value = user.email || "";
 
-      const photoURL = data.photoURL || user.photoURL;
+    setProfileAvatar(
+      document.getElementById("profileAvatar"),
+      photoURL
+    );
 
-      if (photoURL) {
-        document.getElementById("profileAvatar").innerHTML =
-          `<img src="${photoURL}" alt="Profile picture">`;
-
-        document.getElementById("editAvatarPreview").innerHTML =
-          `<img src="${photoURL}" alt="Profile picture">`;
-      }
-    } else {
-      document.getElementById("profileDisplayName").textContent =
-        user.displayName || "Member";
-
-      document.getElementById("editFullName").value =
-        user.displayName || "";
-
-      document.getElementById("editEmail").value =
-        user.email || "";
-    }
+    setProfileAvatar(
+      document.getElementById("editAvatarPreview"),
+      photoURL
+    );
 
   } catch (error) {
     console.error("Profile loading error:", error);
