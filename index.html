@@ -1250,6 +1250,21 @@ function showDailyVerse() {
 }
 
 showDailyVerse();
+
+  // RESTORE MENU BUTTONS
+document.getElementById("menuOpen").addEventListener("click", () => {
+  document.getElementById("menu").classList.add("open");
+});
+
+document.getElementById("menuClose").addEventListener("click", () => {
+  document.getElementById("menu").classList.remove("open");
+});
+
+document.getElementById("menu").addEventListener("click", event => {
+  if (event.target.id === "menu") {
+    document.getElementById("menu").classList.remove("open");
+  }
+});
   
 </script>
 
@@ -1693,7 +1708,35 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
       console.error("Bible chapter error:", error);
     }
   }
+  
+// OPEN DAILY VERSE IN KJV
+window.openDailyVerse = async function() {
+  const verse = window.logicDailyVerse;
+  if (!verse) return;
 
+  openPage("bible");
+
+  try {
+    await loadVersions();
+
+    const match = verse.reference.match(/^(.+?)\s+(\d+):(\d+)$/);
+    if (!match) throw new Error("Invalid Bible reference.");
+
+    const bookName = match[1].toLowerCase();
+
+    const book = books.find(item =>
+      (item.commonName || item.name || "").toLowerCase() === bookName
+    );
+
+    if (!book) throw new Error("Bible book not found.");
+
+    await loadChapter(book, Number(match[2]), Number(match[3]));
+
+  } catch (error) {
+    console.error("Daily verse opening error:", error);
+  }
+};
+  
   versionSelect.addEventListener("change", loadBooks);
 
   reading.hidden = true;
