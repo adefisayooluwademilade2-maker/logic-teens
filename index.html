@@ -1926,6 +1926,22 @@ onAuthStateChanged(auth, async user => {
       ? profileSnap.data()
       : {};
 
+    const savedNotifications = data.notificationSettings;
+
+if (savedNotifications) {
+  document.getElementById("masterNotifications").checked =
+    savedNotifications.enabled !== false;
+
+  notificationKeys.forEach(key => {
+    if (typeof savedNotifications[key] === "boolean") {
+      document.getElementById(key).checked =
+        savedNotifications[key];
+    }
+  });
+
+  window.updateNotificationControls?.();
+    }
+
     const photoURL = data.photoURL || user.photoURL || "";
     const fullName = data.fullName || user.displayName || "";
     const username = data.username || "";
