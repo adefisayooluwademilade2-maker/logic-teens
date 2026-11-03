@@ -838,8 +838,12 @@ body.profile-editing #profileEditor[hidden] {
       </div>
 
       <h2 class="profile-name" id="profileDisplayName">
-        Your Name
-      </h2>
+  Your Name
+</h2>
+
+<div id="profileDisplayUsername"
+  style="color:#aaa5bd;font-size:14px;margin-top:-5px;margin-bottom:12px">
+</div>
 
       <div class="profile-badges">
         <span class="profile-badge member-badge"
@@ -940,13 +944,23 @@ body.profile-editing #profileEditor[hidden] {
     </div>
 
     <div class="edit-field">
-      <label>Email Address</label>
-      <input id="editEmail"
-        type="email"
-        placeholder="Email address"
-        disabled>
-    </div>
+  <label>Email Address</label>
 
+  <div style="display:flex;align-items:center;gap:10px">
+    <input id="editEmail"
+      type="email"
+      placeholder="Email address"
+      disabled
+      style="flex:1;margin:0">
+
+    <button type="button"
+      onclick="openEmailChange()"
+      aria-label="Change email"
+      style="padding:12px 16px;color:#d6b779">
+      ✎
+    </button>
+  </div>
+    </div>
 
     <div class="edit-field">
       <label>About Me</label>
@@ -971,43 +985,138 @@ body.profile-editing #profileEditor[hidden] {
 </section>
 
 <script>
-let profilePhoto = "";
+window.profilePhotoFile = null;
+let profilePhotoPreviewURL = "";
+
+function renderSavedAvatar() {
+  const preview = document.getElementById("editAvatarPreview");
+  const data = window.logicProfileData || {};
+  const user = window.logicCurrentUser;
+
+  const photoURL = data.photoURL || user?.photoURL || "";
+
+  preview.innerHTML = photoURL
+    ? '<img src="' + photoURL + '" alt="Profile picture">'
+    : "♙";
+}
 
 function openProfileEditor() {
   const user = window.logicCurrentUser;
+  const data = window.logicProfileData || {};
 
   document.getElementById("profileMain").hidden = true;
   document.getElementById("profileEditor").hidden = false;
-
   document.body.classList.add("profile-editing");
 
   document.getElementById("editFullName").value =
-    user?.displayName || "";
+    data.fullName || user?.displayName || "";
+
+  document.getElementById("editUsername").value =
+    data.username || "";
+
+  document.getElementById("editAbout").value =
+    data.about || "";
+<script>
+let profilePhoto = "";
+let originalProfileValues = {};
+
+function showProfilePreview() {
+  const name = document.getElementById("editFullName").value;
+  const username = document.getElementById("editUsername").value;
+  const about = document.getElementById("editAbout").value;
+
+  document.getElementById("profileDisplayName").textContent =
+    name || "Member";
+
+  document.getElementById("profileDisplayUsername").textContent =
+    username ? "@" + username : "";
+
+  document.getElementById("profileDisplayAbout").textContent =
+    about || "Tell us something about yourself.";
+}
+
+function openProfileEditor() {
+  const user = window.logicCurrentUser;
+  const data = window.logicProfileData || {};
+
+  document.getElementById("profileMain").hidden = true;
+  document.getElementById("profileEditor").hidden = false;
+  document.body.classList.add("profile-editing");
+
+  document.getElementById("editFullName").value =
+    data.fullName || user?.displayName || "";
+
+  document.getElementById("editUsername").value =
+    data.username || "";
 
   document.getElementById("editEmail").value =
     user?.email || "";
 
-  const about = document.getElementById("profileDisplayAbout")
-    .textContent.trim();
-
   document.getElementById("editAbout").value =
-    about === "Tell us something about yourself." ? "" : about;
+    data.about || "";
 
-  const currentAvatar = document.getElementById("profileAvatar");
+  originalProfileValues = {
+    fullName: document.getElementById("editFullName").value,
+    username: document.getElementById("editUsername").value,
+    about: document.getElementById("editAbout").value
+  };
+
+  profilePhoto = "";
+
+  document.getElementById("profilePictureInput").value = "";
+
+  const photoURL = data.photoURL || user?.photoURL || "";
+
   const preview = document.getElementById("editAvatarPreview");
-  const currentImage = currentAvatar.querySelector("img");
 
-  preview.innerHTML = currentImage
-    ? '<img src="' + currentImage.src + '" alt="Profile picture">'
+  preview.innerHTML = photoURL
+    ? '<img src="' + photoURL + '" alt="Profile picture">'
     : "♙";
 }
 
 function closeProfileEditor() {
+  document.getElementById("editFullName").value =
+    originalProfileValues.fullName || "";
+
+  document.getElementById("editUsername").value =
+    originalProfileValues.username || "";
+
+  document.getElementById("editAbout").value =
+    originalProfileValues.about || "";
+
+  document.getElementById("profilePictureInput").value = "";
+
+  profilePhoto = "";
+
+  showProfilePreview();
+
+  const user = window.logicCurrentUser;
+  const data = window.logicProfileData || {};
+  const photoURL = data.photoURL || user?.photoURL || "";
+
+  document.getElementById("profileAvatar").innerHTML =
+    photoURL
+      ? '<img src="' + photoURL + '" alt="Profile picture">'
+      : "♙";
+
+  document.getElementById("editAvatarPreview").innerHTML =
+    photoURL
+      ? '<img src="' + photoURL + '" alt="Profile picture">'
+      : "♙";
+
   document.getElementById("profileEditor").hidden = true;
   document.getElementById("profileMain").hidden = false;
-
   document.body.classList.remove("profile-editing");
 }
+
+document.getElementById("editFullName")
+  .addEventListener("input", showProfilePreview);
+
+document.getElementById("editUsername")
+  .addEventListener("input", showProfilePreview);
+
+document.getElementById("editAbout")
+  .addEventListener("input", showProfilePreview);
 
 document.getElementById("profilePictureInput")
   .addEventListener("change", function() {
@@ -1022,28 +1131,17 @@ document.getElementById("profilePictureInput")
       return;
     }
 
-    const imageURL = URL.createObjectURL(file);
+    profilePhoto = URL.createObjectURL(file);
 
-    profilePhoto = imageURL;
+    const imageHTML =
+      '<img src="' + profilePhoto + '" alt="Profile picture">';
 
-    const preview = document.getElementById("editAvatarPreview");
-    const avatar = document.getElementById("profileAvatar");
+    document.getElementById("editAvatarPreview").innerHTML =
+      imageHTML;
 
-    preview.innerHTML = "";
-    avatar.innerHTML = "";
-
-    const previewImage = document.createElement("img");
-    previewImage.src = imageURL;
-    previewImage.alt = "Profile picture";
-
-    const avatarImage = document.createElement("img");
-    avatarImage.src = imageURL;
-    avatarImage.alt = "Profile picture";
-
-    preview.appendChild(previewImage);
-    avatar.appendChild(avatarImage);
+    document.getElementById("profileAvatar").innerHTML =
+      imageHTML;
   });
-
 </script>
 
 
