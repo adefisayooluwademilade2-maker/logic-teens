@@ -1465,11 +1465,13 @@ const storage = getStorage(app);
     closeProfileEditor();
     alert("Profile saved successfully!");
 
-  } catch (error) {
-    console.error(error);
-    alert("Could not save profile. Please try again.");
+    } catch (error) {
+    console.error("Profile save error:", error);
+    alert(
+      "Save failed:\n" +
+      (error.code || error.message || "Unknown error")
+    );
   }
-};
   
   // Set greeting using Nigeria's local time
 function updateTimeGreeting(user) {
