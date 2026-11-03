@@ -742,6 +742,47 @@ body.bible-open header {
   </div>
 
   <!-- EDIT PROFILE -->
+  <script>
+let profilePhoto = "";
+
+function openProfileEditor() {
+  document.getElementById("profileMain").hidden = true;
+  document.getElementById("profileEditor").hidden = false;
+
+  document.getElementById("editFullName").value =
+    document.getElementById("profileDisplayName").textContent.trim();
+
+  document.getElementById("editAbout").value =
+    document.getElementById("profileDisplayAbout").textContent.trim();
+}
+
+function closeProfileEditor() {
+  document.getElementById("profileEditor").hidden = true;
+  document.getElementById("profileMain").hidden = false;
+}
+
+document.getElementById("profilePictureInput")
+.addEventListener("change", function() {
+  const file = this.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    profilePhoto = e.target.result;
+
+    ["profileAvatar", "editAvatarPreview"].forEach(id => {
+      document.getElementById(id).innerHTML =
+        `<img src="${profilePhoto}" alt="Profile picture">`;
+    });
+  };
+
+  reader.readAsDataURL(file);
+});
+  </script>
+</section>
+
+  <!-- EDIT PROFILE -->
   <div id="profileEditor" hidden>
 
     <h2 class="profile-section-title"
@@ -761,7 +802,7 @@ body.bible-open header {
 
       <button type="button"
         onclick="document.getElementById('profilePictureInput').click()">
-        📷 Change Picture
+        Change Picture
       </button>
     </div>
 
@@ -795,11 +836,6 @@ body.bible-open header {
     </div>
 
     <div class="edit-field">
-      <label>Date of Birth</label>
-      <input id="editBirthday" type="date">
-    </div>
-
-    <div class="edit-field">
       <label>About Me</label>
       <textarea id="editAbout"
         placeholder="Tell us about yourself..."></textarea>
@@ -822,6 +858,8 @@ body.bible-open header {
 </section>
 
 <script>
+let profilePhoto = "";
+
 function openProfileEditor() {
   document.getElementById("profileMain").hidden = true;
   document.getElementById("profileEditor").hidden = false;
@@ -855,16 +893,18 @@ function saveProfilePreview() {
 }
 
 document.getElementById("profilePictureInput")
-  .addEventListener("change", function () {
+  .addEventListener("change", function() {
     const file = this.files[0];
     if (!file) return;
 
     const reader = new FileReader();
 
-    reader.onload = function (event) {
+    reader.onload = function(e) {
+      profilePhoto = e.target.result;
+
       ["profileAvatar", "editAvatarPreview"].forEach(id => {
         document.getElementById(id).innerHTML =
-          '<img src="' + event.target.result + '" alt="Profile picture">';
+          '<img src="' + profilePhoto + '" alt="Profile picture">';
       });
     };
 
