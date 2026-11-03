@@ -1703,6 +1703,71 @@ const db = getFirestore(app);
   }
 };
 
+window.startNotificationListener = function(user) {
+  const notificationList = document.getElementById("notificationList");
+  const badge = document.getElementById("unreadNotificationCount");
+
+  const notificationsRef = collection(
+    db, "users", user.uid, "notifications"
+  );
+
+  const notificationsQuery = query(
+    notificationsRef,
+    orderBy("createdAt", "desc")
+  );
+
+  onSnapshot(notificationsQuery, snapshot => {
+    notificationList.innerHTML = "";
+    let unread = 0;
+
+    if (snapshot.empty) {
+      notificationList.innerHTML =
+        '<div class="empty">You’re all caught up.</div>';
+    }
+
+    snapshot.forEach(notificationDoc => {
+      const item = notificationDoc.data();
+      const id = notificationDoc.id;
+
+      if (item.read !== true) unread++;
+
+      const card = document.createElement("div");
+      card.className = "panel";
+
+      const title = document.createElement("strong");
+      title.textContent = item.title || "LOGIC Teens";
+
+      const message = document.createElement("p");
+      message.textContent = item.message || "";
+
+      const status = document.createElement("small");
+      status.textContent = item.read === true ? "Read" : "Unread";
+
+      card.append(title, message, status);
+
+      if (item.read !== true) {
+        const button = document.createElement("button");
+        button.className = "primary";
+        button.textContent = "Mark as read";
+
+        button.onclick = async () => {
+          await updateDoc(
+            doc(db, "users", user.uid, "notifications", id),
+            { read: true }
+          );
+        };
+
+        card.appendChild(button);
+      }
+
+      notificationList.appendChild(card);
+    });
+
+    badge.textContent = unread;
+    badge.hidden = unread === 0;
+  });
+};
+  
 window.openEmailChange = function() {
   document.getElementById("profileEditor").hidden = true;
   document.getElementById("emailChangePanel").hidden = false;
