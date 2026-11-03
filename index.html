@@ -1388,7 +1388,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
   window.saveProfilePreview = async function() {
   const user = auth.currentUser;
 
@@ -1420,12 +1419,34 @@ const storage = getStorage(app);
   try {
     let photoURL = original.photoURL || "";
 
-    if (file) {
-      const photoRef = ref(storage, "profilePictures/" + user.uid);
-      await uploadBytes(photoRef, file);
-      photoURL = await getDownloadURL(photoRef);
+        if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error("Image must be 5 MB or smaller.");
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "logic_profile_photos");
+
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/ivarkuzn/image/upload",
+        {
+          method: "POST",
+          body: formData
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.error?.message || "Image upload failed."
+        );
+      }
+
+      photoURL = result.secure_url;
       updates.photoURL = photoURL;
-    }
+  }
 
     if (name && name !== original.fullName) {
       await updateProfile(user, { displayName: name });
