@@ -1409,10 +1409,18 @@ function updateNotificationControls() {
 function toggleAllNotificationSettings(enabled) {
   localStorage.setItem("logicNotificationsEnabled", enabled);
   updateNotificationControls();
+
+  if (window.saveNotificationSettingsToFirebase) {
+    window.saveNotificationSettingsToFirebase();
+  }
 }
 
 function saveNotificationPreference(key, enabled) {
   localStorage.setItem("logicNotification_" + key, enabled);
+
+  if (window.saveNotificationSettingsToFirebase) {
+    window.saveNotificationSettingsToFirebase();
+  }
 }
 
 loadNotificationSettings();
