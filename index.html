@@ -665,6 +665,33 @@ body.bible-open header {
       background: transparent;
       color: #f5f3f8;
     }
+    #profileEditor button {
+  border: 1px solid #303345;
+  border-radius: 12px;
+  padding: 13px 20px;
+  background: #1b1d2c;
+  color: #f5f3ff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#profileEditor .save-profile {
+  background: #7655e8;
+  border-color: #7655e8;
+  color: white;
+  width: 100%;
+  margin-top: 12px;
+}
+
+#profileEditor .cancel-edit {
+  width: 100%;
+  margin-top: 10px;
+}
+
+#profileEditor .edit-avatar button {
+  margin-top: 10px;
+      }
   </style>
 
   <!-- MAIN PROFILE -->
@@ -749,13 +776,21 @@ function openProfileEditor() {
   document.getElementById("profileMain").hidden = true;
   document.getElementById("profileEditor").hidden = false;
 
+  const user = window.logicCurrentUser;
+
   document.getElementById("editFullName").value =
-    document.getElementById("profileDisplayName").textContent.trim();
+    user?.displayName || "";
+
+  document.getElementById("editEmail").value =
+    user?.email || "";
+
+  const about = document.getElementById("profileDisplayAbout")
+    .textContent.trim();
 
   document.getElementById("editAbout").value =
-    document.getElementById("profileDisplayAbout").textContent.trim();
-}
-
+    about === "Tell us something about yourself." ? "" : about;
+    }
+    
 function closeProfileEditor() {
   document.getElementById("profileEditor").hidden = true;
   document.getElementById("profileMain").hidden = false;
@@ -784,6 +819,12 @@ document.getElementById("profilePictureInput")
 
   <!-- EDIT PROFILE -->
   <div id="profileEditor" hidden>
+    <button type="button"
+  class="cancel-edit"
+  onclick="closeProfileEditor()"
+  style="margin-bottom:18px;width:auto">
+  ← Back to Profile
+    </button>
 
     <h2 class="profile-section-title"
       style="font-size:23px;margin-top:0">
@@ -1157,6 +1198,7 @@ onAuthStateChanged(auth, async user => {
     window.location.replace("auth.html");
     return;
   }
+  window.logicCurrentUser = user;
 
   try {
     const profileRef = doc(db, "users", user.uid);
