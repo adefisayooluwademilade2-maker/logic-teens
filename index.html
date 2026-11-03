@@ -154,6 +154,64 @@ input,textarea,select {
   text-align:left;color:white;background:var(--card2);
   border:1px solid var(--line);border-radius:12px;
 }
+  
+/* SETTINGS TOGGLE SWITCHES */
+#masterNotifications,
+.notification-option {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 48px !important;
+  height: 27px;
+  min-width: 48px;
+  border-radius: 30px;
+  background: #454552;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  transition: background .2s;
+  flex-shrink: 0;
+}
+
+#masterNotifications::before,
+.notification-option::before {
+  content: "";
+  position: absolute;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: white;
+  top: 3px;
+  left: 3px;
+  transition: transform .2s;
+}
+
+#masterNotifications:checked,
+.notification-option:checked {
+  background: #008751;
+}
+
+#masterNotifications:checked::before,
+.notification-option:checked::before {
+  transform: translateX(21px);
+}
+
+#masterNotifications:disabled,
+.notification-option:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+/* SETTINGS BACK ARROW */
+.settings-back {
+  background: transparent;
+  border: none;
+  color: #d6b779;
+  font-size: 25px;
+  padding: 5px 0;
+  margin: 0 0 12px;
+  cursor: pointer;
+}
+  
 .close-menu {float:right}
 footer {text-align:center;color:#77778a;font-size:11px;padding:25px}
   .icon-btn svg {
