@@ -984,8 +984,6 @@ body.profile-editing #profileEditor[hidden] {
 
 </section>
 
-}
-
 <script>
 window.profilePhotoFile = null;
 let profilePhotoPreviewURL = "";
@@ -1399,6 +1397,7 @@ const db = getFirestore(app);
 const storage = getStorage(app);
   window.saveProfilePreview = async function() {
   const user = auth.currentUser;
+
   if (!user) {
     alert("Please log in again.");
     return;
@@ -1407,42 +1406,61 @@ const storage = getStorage(app);
   const name = document.getElementById("editFullName").value.trim();
   const username = document.getElementById("editUsername").value.trim();
   const about = document.getElementById("editAbout").value.trim();
-  const file = document.getElementById("profilePictureInput").files[0];
+  const file = window.profilePhotoFile;
 
-  if (!name) {
-    alert("Please enter your full name.");
-    return;
+  const updates = {};
+  const original = originalProfileValues;
+
+  if (name && name !== original.fullName) {
+    updates.fullName = name;
+  }
+
+  if (username !== original.username) {
+    updates.username = username;
+  }
+
+  if (about !== original.about) {
+    updates.about = about;
   }
 
   try {
-    let photoURL = user.photoURL || "";
+    let photoURL = original.photoURL || "";
 
     if (file) {
       const photoRef = ref(storage, "profilePictures/" + user.uid);
       await uploadBytes(photoRef, file);
       photoURL = await getDownloadURL(photoRef);
+      updates.photoURL = photoURL;
     }
 
-    await updateProfile(user, {
-      displayName: name,
-      photoURL: photoURL
-    });
-
-    await setDoc(doc(db, "users", user.uid), {
-      fullName: name,
-      username: username,
-      about: about,
-      photoURL: photoURL
-    }, { merge: true });
-
-    document.getElementById("profileDisplayName").textContent = name;
-    document.getElementById("profileDisplayAbout").textContent =
-      about || "Tell us something about yourself.";
-
-    if (photoURL) {
-      document.getElementById("profileAvatar").innerHTML =
-        '<img src="' + photoURL + '" alt="Profile picture">';
+    if (name && name !== original.fullName) {
+      await updateProfile(user, { displayName: name });
     }
+
+    if (file) {
+      await updateProfile(user, { photoURL });
+    }
+
+    if (Object.keys(updates).length === 0) {
+      alert("No changes to save.");
+      return;
+    }
+
+    await setDoc(doc(db, "users", user.uid), updates, { merge: true });
+
+    window.logicProfileData = {
+      ...(window.logicProfileData || {}),
+      ...updates
+    };
+
+    originalProfileValues = {
+      fullName: name || original.fullName,
+      username,
+      about,
+      photoURL
+    };
+
+    showProfilePreview();
 
     closeProfileEditor();
     alert("Profile saved successfully!");
@@ -1452,7 +1470,6 @@ const storage = getStorage(app);
     alert("Could not save profile. Please try again.");
   }
 };
-
   
   // Set greeting using Nigeria's local time
 function updateTimeGreeting(user) {
