@@ -1215,7 +1215,6 @@ const storage = getStorage(app);
 
   const name = document.getElementById("editFullName").value.trim();
   const username = document.getElementById("editUsername").value.trim();
-  const phone = document.getElementById("editPhone").value.trim();
   const about = document.getElementById("editAbout").value.trim();
   const file = document.getElementById("profilePictureInput").files[0];
 
@@ -1241,7 +1240,6 @@ const storage = getStorage(app);
     await setDoc(doc(db, "users", user.uid), {
       fullName: name,
       username: username,
-      phone: phone,
       about: about,
       photoURL: photoURL
     }, { merge: true });
@@ -1316,9 +1314,6 @@ onAuthStateChanged(auth, async user => {
 
       document.getElementById("editUsername").value =
         data.username || "";
-
-      document.getElementById("editPhone").value =
-        data.phone || "";
 
       document.getElementById("editAbout").value =
         data.about || "";
