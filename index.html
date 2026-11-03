@@ -2047,6 +2047,7 @@ if (savedNotifications) {
     console.error("Profile loading error:", error);
   }
 
+window.startNotificationListener(user);
   updateTimeGreeting(user);
   document.body.style.visibility = "visible";
 });
