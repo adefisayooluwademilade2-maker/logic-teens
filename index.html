@@ -300,16 +300,13 @@ body.bible-open header {
     <div class="hero word-card">
   <div class="tagline">WORD FOR TODAY</div>
 
-  <h1 id="dailyVerseTitle">Be Strong and Courageous</h1>
+<h1 id="dailyVerseTitle">Loading today's word...</h1>
 
-  <p id="dailyVerseText">
-    Be strong and courageous. Do not be afraid; do not be discouraged,
-    for the Lord your God will be with you wherever you go.
-  </p>
+<p id="dailyVerseText">Loading today's Bible verse...</p>
 
-  <div class="verse-reference" id="dailyVerseReference">
-    Joshua 1:9 (NIV)
-  </div>
+<div class="verse-reference" id="dailyVerseReference">
+  KJV
+</div>
 
   <button class="read-bible-btn primary" onclick="openDailyVerse()">
     Read in Bible
@@ -410,8 +407,9 @@ body.bible-open header {
 
   <div class="bible-controls">
     <select id="bibleVersion">
-      <option value="NLT">NLT</option>
+  <option value="KJV">KJV</option>
     </select>
+    
   </div>
 
   <div id="bibleBooks"></div>
@@ -1134,39 +1132,125 @@ document.getElementById("profilePictureInput")
 <footer>LOGIC TEENS CHURCH LOUNGE · GROW • CONNECT • BECOME</footer>
 
 <script>
-function openPage(page) {
-    if (document.body.classList.contains("profile-editing")) {
+function openPage(page, options = {}) {
+  if (document.body.classList.contains("profile-editing")) {
     closeProfileEditor();
-    }
-  document.querySelectorAll ('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(page).classList.add('active');
+  }
 
-  document.body.classList.toggle('bible-open', page === 'bible');
+  const target = document.getElementById(page);
+  if (!target) return;
 
-  document.querySelectorAll('.nav-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.page === page);
+  document.querySelectorAll(".page").forEach(p =>
+    p.classList.remove("active")
+  );
+
+  target.classList.add("active");
+
+  document.body.classList.toggle("bible-open", page === "bible");
+
+  document.querySelectorAll(".nav-btn").forEach(button => {
+    button.classList.toggle("active", button.dataset.page === page);
   });
 
-  document.getElementById('menu').classList.remove('open');
-  window.scrollTo(0,0);
+  document.getElementById("menu").classList.remove("open");
+
+  if (!options.skipHistory) {
+    history.pushState({ logicPage: page }, "", "#" + page);
+  }
+
+  window.scrollTo(0, 0);
 }
 
-document.getElementById('menuOpen').onclick = () =>
-  document.getElementById('menu').classList.add('open');
+// Restore the last section after refreshing
+const savedPage = location.hash.replace("#", "");
+const validPages = [...document.querySelectorAll(".page")]
+  .map(section => section.id);
 
-document.getElementById('menuClose').onclick = () =>
-  document.getElementById('menu').classList.remove('open');
+const startingPage = validPages.includes(savedPage)
+  ? savedPage
+  : "home";
 
-document.getElementById('menu').onclick = e => {
-  if(e.target.id === 'menu') e.currentTarget.classList.remove('open');
-};
+openPage(startingPage, { skipHistory: true });
 
+history.replaceState(
+  { logicPage: startingPage },
+  "",
+  "#" + startingPage
+);
+
+// Keep the user inside the lounge when using phone Back
+history.pushState({ logicPage: startingPage }, "", "#" + startingPage);
+
+window.addEventListener("popstate", () => {
+  openPage("home", { skipHistory: true });
+
+  history.pushState({ logicPage: "home" }, "", "#home");
+});
 function applyTeam(team) {
   document.getElementById('applicationMessage').hidden = false;
   document.getElementById('applicationText').textContent =
     'You selected ' + team + '. The application system will be connected when the secure application backend is added.';
 }
 
+// DAILY KJV WORD
+const dailyVerses = [
+  {
+    title: "Be Strong and Courageous",
+    text: "Have not I commanded thee? Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee whithersoever thou goest.",
+    reference: "Joshua 1:9"
+  },
+  {
+    title: "God Is Our Strength",
+    text: "God is our refuge and strength, a very present help in trouble.",
+    reference: "Psalm 46:1"
+  },
+  {
+    title: "Trust in the Lord",
+    text: "Trust in the LORD with all thine heart; and lean not unto thine own understanding.",
+    reference: "Proverbs 3:5"
+  },
+  {
+    title: "God Loves You",
+    text: "We love him, because he first loved us.",
+    reference: "1 John 4:19"
+  },
+  {
+    title: "Walk by Faith",
+    text: "For we walk by faith, not by sight.",
+    reference: "2 Corinthians 5:7"
+  },
+  {
+    title: "God Gives Peace",
+    text: "Thou wilt keep him in perfect peace, whose mind is stayed on thee: because he trusteth in thee.",
+    reference: "Isaiah 26:3"
+  },
+  {
+    title: "The Lord Is My Shepherd",
+    text: "The LORD is my shepherd; I shall not want.",
+    reference: "Psalm 23:1"
+  }
+];
+
+function showDailyVerse() {
+  const today = new Date();
+  const dayNumber = Math.floor(
+    Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) / 86400000
+  );
+
+  const verse = dailyVerses[
+    ((dayNumber % dailyVerses.length) + dailyVerses.length) % dailyVerses.length
+  ];
+
+  document.getElementById("dailyVerseTitle").textContent = verse.title;
+  document.getElementById("dailyVerseText").textContent = verse.text;
+  document.getElementById("dailyVerseReference").textContent =
+    verse.reference + " (KJV)";
+
+  window.logicDailyVerse = verse;
+}
+
+showDailyVerse();
+  
 </script>
 
 <script type="module">
@@ -1378,12 +1462,7 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
   const controls = document.querySelector("#bible .bible-controls");
 
   const wanted = [
-    ["KJV", "King James Version"],
-    ["NIV", "New International Version"],
-    ["NLT", "New Living Translation"],
-    ["ERV", "Easy-to-Read Version"],
-    ["NKJV", "New King James Version"],
-    ["ESV", "English Standard Version"]
+    ["KJV", "King James Version"]
   ];
 
   let translations = [];
@@ -1453,9 +1532,8 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
         o.textContent === "NLT"
       );
 
-      versionSelect.value = nlt
-        ? nlt.value
-        : versionSelect.options[0].value;
+      versionSelect.value = 
+      versionSelect.options[0].value;
 
       await loadBooks();
 
@@ -1534,7 +1612,7 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
     }
   }
 
-  async function loadChapter(book, number) {
+  async function loadChapter(book, number,targetVerse) {
     reading.hidden = false;
     booksArea.hidden = true;
 
@@ -1575,6 +1653,7 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
 
         if (item.type === "verse") {
           const paragraph = document.createElement("p");
+          paragraph.id = "bible-verse-" + item.number;
 
           const verseNumber = document.createElement("sup");
           verseNumber.textContent = item.number + " ";
@@ -1593,6 +1672,19 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
 
       if (!count) {
         throw new Error("No verses were returned.");
+      }
+
+      if (targetVerse) {
+  const verseElement = document.getElementById(
+    "bible-verse-" + targetVerse
+  );
+
+  if (verseElement) {
+    verseElement.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
       }
 
     } catch (error) {
