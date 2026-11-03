@@ -899,64 +899,6 @@ body.profile-editing #profileEditor[hidden] {
   </div>
 
   <!-- EDIT PROFILE -->
-  <script>
-let profilePhoto = "";
-
-function openProfileEditor() {
-  document.getElementById("profileMain").hidden = true;
-  document.getElementById("profileEditor").hidden = false;
-
-  const user = window.logicCurrentUser;
-
-  document.getElementById("editFullName").value =
-    user?.displayName || "";
-
-  document.getElementById("editEmail").value =
-    user?.email || "";
-
-  const about = document.getElementById("profileDisplayAbout")
-    .textContent.trim();
-
-  document.getElementById("editAbout").value =preview.innerHTML
-    about === "Tell us something about yourself." ? "" : about;
-
-  const currentAvatar = document.getElementById("profileAvatar");
-  const preview = document.getElementById("editAvatarPreview");
-  const currentImage = currentAvatar.querySelector("img");
-
-  preview.innerHTML = currentImage
-    ? '<img src="' + currentImage.src + '" alt="Profile picture">'
-    : "♙";
-  
-    }
-    
-function closeProfileEditor() {
-  document.getElementById("profileEditor").hidden = true;
-  document.getElementById("profileMain").hidden = false;
-}
-
-document.getElementById("profilePictureInput")
-.addEventListener("change", function() {
-  const file = this.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-
-  reader.onload = function(e) {
-    profilePhoto = e.target.result;
-
-    ["profileAvatar", "editAvatarPreview"].forEach(id => {
-      document.getElementById(id).innerHTML =
-        `<img src="${profilePhoto}" alt="Profile picture">`;
-    });
-  };
-
-  reader.readAsDataURL(file);
-});
-  </script>
-</section>
-
-  <!-- EDIT PROFILE -->
   <div id="profileEditor" hidden>
   <button type="button"
   class="profile-back-button"
