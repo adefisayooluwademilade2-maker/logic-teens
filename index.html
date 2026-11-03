@@ -982,6 +982,43 @@ body.profile-editing #profileEditor[hidden] {
 
   </div>
 
+  <div id="emailChangePanel" hidden
+  style="background:#141622;border:1px solid #292c3d;border-radius:16px;padding:18px;margin-top:15px">
+
+  <h3 style="margin-top:0">Change Email Address</h3>
+
+  <p style="color:#aaa;font-size:13px">
+    Confirm your current password and enter your new email address.
+  </p>
+
+  <label>Current Password</label>
+  <input id="emailCurrentPassword"
+    type="password"
+    placeholder="Enter current password"
+    autocomplete="current-password">
+
+  <label>New Email Address</label>
+  <input id="newEmailAddress"
+    type="email"
+    placeholder="Enter new email"
+    autocomplete="email">
+
+  <button type="button"
+    class="save-profile"
+    onclick="submitEmailChange()">
+    Verify & Change Email
+  </button>
+
+  <button type="button"
+    class="cancel-edit"
+    onclick="closeEmailChange()">
+    Cancel
+  </button>
+
+  <p id="emailChangeMessage"
+    style="font-size:13px;color:#d6b779"></p>
+  </div>
+
 </section>
 
 <script>
