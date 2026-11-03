@@ -1428,6 +1428,83 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+window.openEmailChange = function() {
+  document.getElementById("profileEditor").hidden = true;
+  document.getElementById("emailChangePanel").hidden = false;
+  document.getElementById("emailChangeMessage").textContent = "";
+};
+
+window.closeEmailChange = function() {
+  document.getElementById("emailChangePanel").hidden = true;
+  document.getElementById("profileEditor").hidden = false;
+  document.getElementById("emailCurrentPassword").value = "";
+  document.getElementById("newEmailAddress").value = "";
+  document.getElementById("emailChangeMessage").textContent = "";
+};
+
+window.submitEmailChange = async function() {
+  const user = auth.currentUser;
+  const password = document.getElementById("emailCurrentPassword").value;
+  const newEmail = document.getElementById("newEmailAddress").value.trim();
+  const message = document.getElementById("emailChangeMessage");
+
+  if (!user) {
+    message.textContent = "Please log in again.";
+    return;
+  }
+
+  if (!password || !newEmail) {
+    message.textContent = "Enter your password and new email.";
+    return;
+  }
+
+  if (newEmail.toLowerCase() === user.email.toLowerCase()) {
+    message.textContent = "This is already your current email.";
+    return;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+    message.textContent = "Enter a valid email address.";
+    return;
+  }
+
+  try {
+    message.textContent = "Verifying your account...";
+
+    const credential = EmailAuthProvider.credential(
+      user.email,
+      password
+    );
+
+    await reauthenticateWithCredential(user, credential);
+
+    await verifyBeforeUpdateEmail(user, newEmail);
+
+    message.textContent =
+      "Verification email sent! Open your new email inbox and click the verification link to complete the change.";
+
+    document.getElementById("emailCurrentPassword").value = "";
+
+  } catch (error) {
+    console.error("Email change error:", error);
+
+    if (error.code === "auth/wrong-password" ||
+        error.code === "auth/invalid-credential") {
+      message.textContent = "Your current password is incorrect.";
+    } else if (error.code === "auth/email-already-in-use") {
+      message.textContent = "This email is already being used.";
+    } else if (error.code === "auth/invalid-email") {
+      message.textContent = "That email address is invalid.";
+    } else if (error.code === "auth/requires-recent-login") {
+      message.textContent = "Please log out and log in again, then retry.";
+    } else {
+      message.textContent =
+        error.message || "Unable to change email. Please try again.";
+    }
+  }
+};
+  
   window.saveProfilePreview = async function() {
   const user = auth.currentUser;
 
