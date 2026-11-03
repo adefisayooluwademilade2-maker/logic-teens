@@ -645,15 +645,16 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
 </script>
 
 
+
 <script>
 (function () {
   const API = "https://bible.helloao.org/api";
-
   const versionSelect = document.getElementById("bibleVersion");
   const booksArea = document.getElementById("bibleBooks");
   const reading = document.getElementById("bibleReading");
+  const controls = document.querySelector("#bible .bible-controls");
 
-  const wantedVersions = [
+  const wanted = [
     ["KJV", "King James Version"],
     ["NIV", "New International Version"],
     ["NLT", "New Living Translation"],
@@ -662,18 +663,40 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
     ["ESV", "English Standard Version"]
   ];
 
+  let translations = [];
   let books = [];
-  let expandedBook = null;
+  let currentBook = null;
+
+  // Chapter selector at the top left
+  const chapterMenuButton = document.createElement("button");
+  chapterMenuButton.type = "button";
+  chapterMenuButton.textContent = "Choose chapter ▾";
+  chapterMenuButton.style.cssText =
+    "padding:10px 12px;border:1px solid #343047;" +
+    "border-radius:12px;background:linear-gradient(135deg,#20233a,#171526);" +
+    "color:#f5f3f8;font-size:13px;";
+
+  controls.insertBefore(chapterMenuButton, versionSelect);
+  controls.style.display = "flex";
+  controls.style.alignItems = "center";
+  controls.style.gap = "9px";
+
+  chapterMenuButton.onclick = () => {
+    const showingBooks = !booksArea.hidden;
+    booksArea.hidden = showingBooks;
+    reading.hidden = !showingBooks;
+    chapterMenuButton.textContent =
+      showingBooks
+        ? (currentBook ? currentBook.label + " ▾" : "Choose chapter ▾")
+        : "Choose chapter ▾";
+  };
 
   async function getJSON(url) {
     const response = await fetch(url);
-    if (!response.ok) throw new Error("Bible data unavailable");
+    if (!response.ok) {
+      throw new Error("Could not load " + url);
+    }
     return response.json();
-  }
-
-  function getList(data, key) {
-    const value = data[key] || data;
-    return Array.isArray(value) ? value : Object.values(value);
   }
 
   async function loadVersions() {
@@ -682,63 +705,62 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
         API + "/available_translations.json"
       );
 
-      const translations = getList(data, "translations");
-
+      translations = data.translations || [];
       versionSelect.innerHTML = "";
 
-      const available = wantedVersions.map(([short, full]) => {
-        const found = translations.find(item => {
-          const values = [
-            item.id,
-            item.shortName,
-            item.abbreviation,
-            item.name,
-            item.englishName
-          ].filter(Boolean).map(value =>
-            String(value).toLowerCase()
-          );
+      wanted.forEach(([short, full]) => {
+        const found = translations.find(t =>
+          String(t.shortName || "").toUpperCase() === short ||
+          String(t.englishName || "").toLowerCase() === full.toLowerCase()
+        );
 
-          return values.includes(short.toLowerCase()) ||
-                 values.includes(full.toLowerCase());
-        });
+        if (!found) return;
 
-        return found ? { short, full, id: found.id } : null;
-      }).filter(Boolean);
-
-      if (!available.length) {
-        throw new Error("Requested translations not found");
-      }
-
-      available.forEach(item => {
         const option = document.createElement("option");
-        option.value = item.id;
-        option.textContent = item.short;
+        option.value = found.id;
+        option.textContent = short;
         versionSelect.appendChild(option);
       });
 
-      const preferred = available.find(v => v.short === "NLT")
-                      || available[0];
+      if (!versionSelect.options.length) {
+        throw new Error("None of the requested versions are available.");
+      }
 
-      versionSelect.value = preferred.id;
+      const nlt = [...versionSelect.options].find(o =>
+        o.textContent === "NLT"
+      );
+
+      versionSelect.value = nlt
+        ? nlt.value
+        : versionSelect.options[0].value;
+
       await loadBooks();
 
     } catch (error) {
-      booksArea.textContent =
-        "Unable to load Bible versions. Please try again.";
+      booksArea.hidden = false;
+      booksArea.textContent = "Unable to load Bible versions.";
+      console.error(error);
     }
   }
 
   async function loadBooks() {
+    booksArea.hidden = false;
+    reading.hidden = true;
+    chapterMenuButton.textContent = "Choose chapter ▾";
+    chapterMenuButton.style.display = "block";
     booksArea.textContent = "Loading books...";
-    reading.textContent = "Select a book and chapter to begin reading.";
-    expandedBook = null;
+    reading.innerHTML = "";
+    currentBook = null;
 
     try {
       const data = await getJSON(
-        `${API}/${versionSelect.value}/books.json`
+        API + "/" + versionSelect.value + "/books.json"
       );
 
-      books = getList(data, "books");
+      books = data.books || [];
+
+      if (!books.length) throw new Error("No books returned.");
+
       booksArea.innerHTML = "";
 
       books.forEach(book => {
@@ -746,109 +768,121 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
 
         const name = document.createElement("button");
         name.type = "button";
-        name.textContent = book.commonName || book.name;
+        name.textContent = book.commonName || book.name || book.id;
         name.style.cssText =
           "display:block;width:100%;text-align:left;" +
           "padding:13px 2px;background:transparent;" +
           "border:0;color:#f5f3f8;font-size:16px;" +
           "font-weight:500;";
 
-        const chapters = document.createElement("div");
-        chapters.className = "chapter-grid";
-        chapters.style.display = "none";
+        const grid = document.createElement("div");
+        grid.className = "chapter-grid";
+        grid.style.display = "none";
 
         name.onclick = () => {
-          if (expandedBook === book.id) {
-            expandedBook = null;
-            chapters.style.display = "none";
-            return;
-          }
-
           document.querySelectorAll(
             "#bibleBooks .chapter-grid"
-          ).forEach(grid => grid.style.display = "none");
+          ).forEach(g => g.style.display = "none");
 
-          expandedBook = book.id;
-          chapters.style.display = "grid";
-          chapters.innerHTML = "";
+          grid.innerHTML = "";
+          grid.style.display = "grid";
 
-          for (let i = 1; i <= book.numberOfChapters; i++) {
+          for (let n = 1; n <= book.numberOfChapters; n++) {
             const chapterButton = document.createElement("button");
-            chapterButton.textContent = i;
+            chapterButton.type = "button";
+            chapterButton.textContent = n;
 
             chapterButton.onclick = () => {
-              chapters.querySelectorAll("button").forEach(button =>
-                button.classList.remove("selected")
-              );
-
-              chapterButton.classList.add("selected");
-              loadChapter(book.id, i);
+              loadChapter(book, n);
             };
 
-            chapters.appendChild(chapterButton);
+            grid.appendChild(chapterButton);
           }
         };
 
         wrapper.appendChild(name);
-        wrapper.appendChild(chapters);
+        wrapper.appendChild(grid);
         booksArea.appendChild(wrapper);
       });
 
     } catch (error) {
-      booksArea.textContent = "Unable to load books.";
+      booksArea.textContent = "Unable to load Bible books.";
+      console.error(error);
     }
   }
 
-  async function loadChapter(bookId, chapterNumber) {
+  async function loadChapter(book, number) {
+    reading.hidden = false;
+    booksArea.hidden = true;
+
+    currentBook = {
+      id: book.id,
+      label: (book.commonName || book.name) + " " + number
+    };
+
+    chapterMenuButton.textContent = currentBook.label + " ▾";
     reading.textContent = "Loading chapter...";
 
     try {
       const data = await getJSON(
-        `${API}/${versionSelect.value}/${bookId}/${chapterNumber}.json`
+        API + "/" + versionSelect.value + "/" +
+        book.id + "/" + number + ".simple.json"
       );
+
+      const verses = data.chapter && data.chapter.content;
+
+      if (!Array.isArray(verses)) {
+        throw new Error("The chapter has no readable content.");
+      }
 
       reading.innerHTML = "";
 
-      let paragraph = document.createElement("p");
+      const heading = document.createElement("h2");
+      heading.textContent = currentBook.label;
+      reading.appendChild(heading);
 
-      function finishParagraph() {
-        if (paragraph.textContent.trim()) {
-          reading.appendChild(paragraph);
-        }
-        paragraph = document.createElement("p");
-      }
+      let count = 0;
 
-      data.chapter.content.forEach(item => {
+      verses.forEach(item => {
         if (item.type === "heading") {
-          finishParagraph();
-
-          const heading = document.createElement("h3");
-          heading.textContent = item.text;
-          reading.appendChild(heading);
+          const subheading = document.createElement("h3");
+          subheading.textContent = item.text || "";
+          reading.appendChild(subheading);
         }
 
         if (item.type === "verse") {
-          const number = document.createElement("sup");
-          number.textContent = item.number + " ";
-          number.style.color = "#d6b779";
-          number.style.fontWeight = "bold";
+          const paragraph = document.createElement("p");
 
-          paragraph.appendChild(number);
+          const verseNumber = document.createElement("sup");
+          verseNumber.textContent = item.number + " ";
+          verseNumber.style.color = "#d6b779";
+          verseNumber.style.fontWeight = "bold";
+
+          paragraph.appendChild(verseNumber);
           paragraph.appendChild(
-            document.createTextNode(item.text + " ")
+            document.createTextNode(item.text || "")
           );
+
+          reading.appendChild(paragraph);
+          count++;
         }
       });
 
-      finishParagraph();
+      if (!count) {
+        throw new Error("No verses were returned.");
+      }
 
     } catch (error) {
       reading.textContent =
-        "Unable to load this chapter. Please try again.";
+        "This chapter could not be loaded. Please try again.";
+      console.error("Bible chapter error:", error);
     }
   }
 
   versionSelect.addEventListener("change", loadBooks);
+
+  reading.hidden = true;
+  booksArea.hidden = false;
 
   loadVersions();
 })();
