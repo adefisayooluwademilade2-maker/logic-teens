@@ -299,17 +299,30 @@ footer {text-align:center;color:#77778a;font-size:11px;padding:25px}
   </section>
 
   <section class="page" id="bible">
-    <div class="eyebrow">GROW IN THE WORD</div>
-    <h1>Bible</h1>
-    <p class="subtitle">Build your faith through God's word.</p>
-    <div class="panel">
-      <strong>Daily Devotionals</strong>
-      <p>Daily devotional content will appear here.</p>
-    </div>
-    <div class="panel">
-      <strong>Bible Quiz</strong>
-      <p>Bible quizzes will appear here.</p>
-    </div>
+  <div class="eyebrow">GROW IN THE WORD</div>
+  <h1>Holy Bible</h1>
+  <p class="subtitle">Read and explore God's Word.</p>
+
+  <div class="panel">
+    <label for="bibleVersion">Bible version</label>
+    <select id="bibleVersion">
+      <option value="BSB">Berean Standard Bible</option>
+    </select>
+
+    <label for="bibleBook">Book</label>
+    <select id="bibleBook">
+      <option value="">Loading books...</option>
+    </select>
+
+    <label for="bibleChapter">Chapter</label>
+    <select id="bibleChapter">
+      <option value="1">Chapter 1</option>
+    </select>
+  </div>
+
+  <div class="panel" id="bibleReading">
+    <p>Choose a book and chapter to begin reading.</p>
+  </div>
   </section>
 
   <section class="page" id="ministry">
@@ -533,5 +546,122 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
   }
 });
 </script>
+  
+<script>
+(function () {
+  const API = "https://bible.helloao.org/api";
+  const version = document.getElementById("bibleVersion");
+  const bookSelect = document.getElementById("bibleBook");
+  const chapterSelect = document.getElementById("bibleChapter");
+  const reading = document.getElementById("bibleReading");
+
+  let books = [];
+
+  async function loadBooks() {
+    try {
+      reading.textContent = "Loading Bible books...";
+
+      const response = await fetch(
+        `${API}/${version.value}/books.json`
+      );
+
+      if (!response.ok) throw new Error("Could not load books");
+
+      const data = await response.json();
+      books = data.books || data;
+
+      bookSelect.innerHTML = "";
+
+      books.forEach(book => {
+        const option = document.createElement("option");
+        option.value = book.id;
+        option.textContent = book.commonName || book.name;
+        bookSelect.appendChild(option);
+      });
+
+      updateChapters();
+    } catch (error) {
+      reading.textContent =
+        "Unable to load Bible books. Please check your internet connection and try again.";
+    }
+  }
+
+  function updateChapters() {
+    const book = books.find(b => b.id === bookSelect.value);
+    if (!book) return;
+
+    chapterSelect.innerHTML = "";
+
+    for (let i = 1; i <= book.numberOfChapters; i++) {
+      const option = document.createElement("option");
+      option.value = i;
+      option.textContent = "Chapter " + i;
+      chapterSelect.appendChild(option);
+    }
+
+    loadChapter();
+  }
+
+  async function loadChapter() {
+    if (!bookSelect.value || !chapterSelect.value) return;
+
+    reading.textContent = "Loading chapter...";
+
+    try {
+      const url =
+        `${API}/${version.value}/${bookSelect.value}/${chapterSelect.value}.simple.json`;
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Chapter unavailable");
+
+      const data = await response.json();
+
+      reading.innerHTML = "";
+
+      const heading = document.createElement("h2");
+      heading.textContent =
+        `${data.book.commonName || data.book.name} ${data.chapter.number}`;
+      reading.appendChild(heading);
+
+      data.chapter.content.forEach(item => {
+        if (item.type === "heading") {
+          const subheading = document.createElement("h3");
+          subheading.textContent = item.text;
+          reading.appendChild(subheading);
+        }
+
+        if (item.type === "verse") {
+          const paragraph = document.createElement("p");
+          paragraph.style.lineHeight = "1.9";
+          paragraph.style.marginBottom = "14px";
+
+          const number = document.createElement("sup");
+          number.textContent = item.number + " ";
+          number.style.color = "#d6b779";
+          number.style.fontWeight = "bold";
+
+          paragraph.appendChild(number);
+          paragraph.appendChild(
+            document.createTextNode(item.text)
+          );
+
+          reading.appendChild(paragraph);
+        }
+      });
+
+    } catch (error) {
+      reading.textContent =
+        "Unable to load this chapter. Please try again.";
+    }
+  }
+
+  bookSelect.addEventListener("change", updateChapters);
+  chapterSelect.addEventListener("change", loadChapter);
+  version.addEventListener("change", loadBooks);
+
+  loadBooks();
+})();
+</script>
+  
 </body>
 </html>
