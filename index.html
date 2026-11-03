@@ -692,7 +692,102 @@ body.bible-open header {
 #profileEditor .edit-avatar button {
   margin-top: 10px;
       }
+
+    
+/* EDIT PROFILE FINAL DESIGN */
+
+body.profile-editing header button {
+  display: none !important;
+}
+
+#profileEditor {
+  background: #141622;
+  border: 1px solid #292c3d;
+  border-radius: 20px;
+  padding: 18px;
+  margin-top: 0;
+}
+
+#profileEditor .profile-back-button {
+  display: block;
+  background: transparent;
+  border: none;
+  color: #c5b5ff;
+  padding: 5px 0;
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+}
+
+#profileEditor .profile-section-title {
+  text-align: center;
+  margin-top: 0;
+}
+
+#profileEditor .edit-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+}
+
+#profileEditor #editAvatarPreview {
+  width: 115px;
+  height: 115px;
+  min-width: 115px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #25283a;
+  border: 3px solid #7655e8;
+  font-size: 42px;
+}
+
+#profileEditor #editAvatarPreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+#profileEditor .edit-avatar button {
+  background: #25283a;
+  color: white;
+  border: 1px solid #383b50;
+  border-radius: 30px;
+  padding: 12px 22px;
+}
+
+#profileEditor .save-profile {
+  display: block;
+  width: 100%;
+  background: #7655e8;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 15px;
+  font-weight: 700;
+  margin-top: 18px;
+}
+
+#profileEditor .cancel-edit {
+  display: block;
+  width: 100%;
+  background: #25283a;
+  color: white;
+  border: 1px solid #383b50;
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 10px;
+  }
+    
+    
   </style>
+  
 
   <!-- MAIN PROFILE -->
   <div id="profileMain">
@@ -787,8 +882,17 @@ function openProfileEditor() {
   const about = document.getElementById("profileDisplayAbout")
     .textContent.trim();
 
-  document.getElementById("editAbout").value =
+  document.getElementById("editAbout").value =preview.innerHTML
     about === "Tell us something about yourself." ? "" : about;
+
+  const currentAvatar = document.getElementById("profileAvatar");
+  const preview = document.getElementById("editAvatarPreview");
+  const currentImage = currentAvatar.querySelector("img");
+
+  preview.innerHTML = currentImage
+    ? '<img src="' + currentImage.src + '" alt="Profile picture">'
+    : "♙";
+  
     }
     
 function closeProfileEditor() {
@@ -819,11 +923,11 @@ document.getElementById("profilePictureInput")
 
   <!-- EDIT PROFILE -->
   <div id="profileEditor" hidden>
-    <button type="button"
-  class="cancel-edit"
-  onclick="closeProfileEditor()"
+  <button type="button"
+  class="profile-back-button"
+  onclick="closeProfileEditor()">
   ←
-    </button>
+  </button>
 
     <h2 class="profile-section-title"
       style="font-size:23px;margin-top:0">
@@ -895,41 +999,50 @@ document.getElementById("profilePictureInput")
 let profilePhoto = "";
 
 function openProfileEditor() {
+  const user = window.logicCurrentUser;
+
   document.getElementById("profileMain").hidden = true;
   document.getElementById("profileEditor").hidden = false;
 
+  document.body.classList.add("profile-editing");
+
   document.getElementById("editFullName").value =
-    document.getElementById("profileDisplayName").textContent.trim();
+    user?.displayName || "";
+
+  document.getElementById("editEmail").value =
+    user?.email || "";
+
+  const about = document.getElementById("profileDisplayAbout")
+    .textContent.trim();
 
   document.getElementById("editAbout").value =
-    document.getElementById("profileDisplayAbout").textContent.trim();
+    about === "Tell us something about yourself." ? "" : about;
+
+  const currentAvatar = document.getElementById("profileAvatar");
+  const preview = document.getElementById("editAvatarPreview");
+  const currentImage = currentAvatar.querySelector("img");
+
+  preview.innerHTML = currentImage
+    ? '<img src="' + currentImage.src + '" alt="Profile picture">'
+    : "♙";
 }
 
 function closeProfileEditor() {
   document.getElementById("profileEditor").hidden = true;
   document.getElementById("profileMain").hidden = false;
-}
 
-function saveProfilePreview() {
-  const name = document.getElementById("editFullName").value.trim();
-  const about = document.getElementById("editAbout").value.trim();
-
-  if (!name) {
-    alert("Please enter your full name.");
-    return;
-  }
-
-  document.getElementById("profileDisplayName").textContent = name;
-  document.getElementById("profileDisplayAbout").textContent =
-    about || "Tell us something about yourself.";
-
-  closeProfileEditor();
+  document.body.classList.remove("profile-editing");
 }
 
 document.getElementById("profilePictureInput")
   .addEventListener("change", function() {
     const file = this.files[0];
     if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image.");
+      return;
+    }
 
     const reader = new FileReader();
 
@@ -944,6 +1057,7 @@ document.getElementById("profilePictureInput")
 
     reader.readAsDataURL(file);
   });
+
 </script>
 
 
