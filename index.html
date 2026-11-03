@@ -984,41 +984,25 @@ body.profile-editing #profileEditor[hidden] {
 
 </section>
 
+}
+
 <script>
 window.profilePhotoFile = null;
 let profilePhotoPreviewURL = "";
-
-function renderSavedAvatar() {
-  const preview = document.getElementById("editAvatarPreview");
-  const data = window.logicProfileData || {};
-  const user = window.logicCurrentUser;
-
-  const photoURL = data.photoURL || user?.photoURL || "";
-
-  preview.innerHTML = photoURL
-    ? '<img src="' + photoURL + '" alt="Profile picture">'
-    : "♙";
-}
-
-function openProfileEditor() {
-  const user = window.logicCurrentUser;
-  const data = window.logicProfileData || {};
-
-  document.getElementById("profileMain").hidden = true;
-  document.getElementById("profileEditor").hidden = false;
-  document.body.classList.add("profile-editing");
-
-  document.getElementById("editFullName").value =
-    data.fullName || user?.displayName || "";
-
-  document.getElementById("editUsername").value =
-    data.username || "";
-
-  document.getElementById("editAbout").value =
-    data.about || "";
-<script>
-let profilePhoto = "";
 let originalProfileValues = {};
+
+function setProfileAvatar(element, url) {
+  element.innerHTML = "";
+
+  if (url) {
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = "Profile picture";
+    element.appendChild(img);
+  } else {
+    element.textContent = "♙";
+  }
+}
 
 function showProfilePreview() {
   const name = document.getElementById("editFullName").value;
@@ -1058,20 +1042,23 @@ function openProfileEditor() {
   originalProfileValues = {
     fullName: document.getElementById("editFullName").value,
     username: document.getElementById("editUsername").value,
-    about: document.getElementById("editAbout").value
+    about: document.getElementById("editAbout").value,
+    photoURL: data.photoURL || user?.photoURL || ""
   };
 
-  profilePhoto = "";
+  window.profilePhotoFile = null;
 
   document.getElementById("profilePictureInput").value = "";
 
-  const photoURL = data.photoURL || user?.photoURL || "";
+  if (profilePhotoPreviewURL) {
+    URL.revokeObjectURL(profilePhotoPreviewURL);
+    profilePhotoPreviewURL = "";
+  }
 
-  const preview = document.getElementById("editAvatarPreview");
-
-  preview.innerHTML = photoURL
-    ? '<img src="' + photoURL + '" alt="Profile picture">'
-    : "♙";
+  setProfileAvatar(
+    document.getElementById("editAvatarPreview"),
+    originalProfileValues.photoURL
+  );
 }
 
 function closeProfileEditor() {
@@ -1086,23 +1073,24 @@ function closeProfileEditor() {
 
   document.getElementById("profilePictureInput").value = "";
 
-  profilePhoto = "";
+  window.profilePhotoFile = null;
+
+  if (profilePhotoPreviewURL) {
+    URL.revokeObjectURL(profilePhotoPreviewURL);
+    profilePhotoPreviewURL = "";
+  }
 
   showProfilePreview();
 
-  const user = window.logicCurrentUser;
-  const data = window.logicProfileData || {};
-  const photoURL = data.photoURL || user?.photoURL || "";
+  setProfileAvatar(
+    document.getElementById("profileAvatar"),
+    originalProfileValues.photoURL
+  );
 
-  document.getElementById("profileAvatar").innerHTML =
-    photoURL
-      ? '<img src="' + photoURL + '" alt="Profile picture">'
-      : "♙";
-
-  document.getElementById("editAvatarPreview").innerHTML =
-    photoURL
-      ? '<img src="' + photoURL + '" alt="Profile picture">'
-      : "♙";
+  setProfileAvatar(
+    document.getElementById("editAvatarPreview"),
+    originalProfileValues.photoURL
+  );
 
   document.getElementById("profileEditor").hidden = true;
   document.getElementById("profileMain").hidden = false;
@@ -1120,7 +1108,6 @@ document.getElementById("editAbout")
 
 document.getElementById("profilePictureInput")
   .addEventListener("change", function() {
-
     const file = this.files && this.files[0];
 
     if (!file) return;
@@ -1131,16 +1118,23 @@ document.getElementById("profilePictureInput")
       return;
     }
 
-    profilePhoto = URL.createObjectURL(file);
+    window.profilePhotoFile = file;
 
-    const imageHTML =
-      '<img src="' + profilePhoto + '" alt="Profile picture">';
+    if (profilePhotoPreviewURL) {
+      URL.revokeObjectURL(profilePhotoPreviewURL);
+    }
 
-    document.getElementById("editAvatarPreview").innerHTML =
-      imageHTML;
+    profilePhotoPreviewURL = URL.createObjectURL(file);
 
-    document.getElementById("profileAvatar").innerHTML =
-      imageHTML;
+    setProfileAvatar(
+      document.getElementById("editAvatarPreview"),
+      profilePhotoPreviewURL
+    );
+
+    setProfileAvatar(
+      document.getElementById("profileAvatar"),
+      profilePhotoPreviewURL
+    );
   });
 </script>
 
