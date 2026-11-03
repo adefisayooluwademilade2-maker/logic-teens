@@ -1365,9 +1365,12 @@ import {
   getAuth,
   onAuthStateChanged,
   signOut,
-  updateProfile
+  updateProfile,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  verifyBeforeUpdateEmail
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-
+  
 import {
   getFirestore,
   doc,
