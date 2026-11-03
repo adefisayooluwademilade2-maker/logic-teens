@@ -667,11 +667,10 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
   }
 });
 </script>
-  
+
 <script>
 (function () {
   const API = "https://bible.helloao.org/api";
-
   const version = document.getElementById("bibleVersion");
   const bookSelect = document.getElementById("bibleBook");
   const chapterGrid = document.getElementById("chapterGrid");
@@ -679,14 +678,46 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
 
   let books = [];
 
+  async function loadVersions() {
+    try {
+      const response = await fetch(`${API}/available_translations.json`);
+      if (!response.ok) throw new Error();
+
+      const data = await response.json();
+      const translations = data.translations || data;
+
+      version.innerHTML = "";
+
+      translations.forEach(item => {
+        const id = item.id;
+        if (!id) return;
+
+        const option = document.createElement("option");
+        option.value = id;
+        option.textContent =
+          item.name || item.englishName || item.shortName || id;
+
+        version.appendChild(option);
+      });
+
+      if ([...version.options].some(o => o.value === "BSB")) {
+        version.value = "BSB";
+      }
+
+      await loadBooks();
+    } catch (error) {
+      reading.textContent = "Unable to load Bible versions.";
+    }
+  }
+
   async function loadBooks() {
     try {
-      reading.textContent = "Loading Bible books...";
+      reading.textContent = "Loading books...";
+      chapterGrid.innerHTML = "";
 
       const response = await fetch(
         `${API}/${version.value}/books.json`
       );
-
       if (!response.ok) throw new Error();
 
       const data = await response.json();
@@ -701,9 +732,12 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
         bookSelect.appendChild(option);
       });
 
+      const genesis = books.find(b => b.id === "GEN");
+      if (genesis) bookSelect.value = "GEN";
+
       showChapters();
     } catch (error) {
-      reading.textContent = "Unable to load Bible books. Check your internet connection.";
+      reading.textContent = "Unable to load books.";
     }
   }
 
@@ -717,20 +751,19 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
       const button = document.createElement("button");
       button.textContent = i;
 
-      button.addEventListener("click", () => {
+      button.onclick = () => {
         chapterGrid.querySelectorAll("button").forEach(b =>
           b.classList.remove("selected")
         );
-
         button.classList.add("selected");
         loadChapter(i);
-      });
+      };
 
       chapterGrid.appendChild(button);
     }
 
-    const firstChapter = chapterGrid.querySelector("button");
-    if (firstChapter) firstChapter.click();
+    const first = chapterGrid.querySelector("button");
+    if (first) first.click();
   }
 
   async function loadChapter(chapter) {
@@ -738,7 +771,7 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
 
     try {
       const url =
-        `${API}/${version.value}/${bookSelect.value}/${chapter}.simple.json`;
+        `${API}/${version.value}/${bookSelect.value}/${chapter}.json`;
 
       const response = await fetch(url);
       if (!response.ok) throw new Error();
@@ -747,24 +780,27 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
 
       reading.innerHTML = "";
 
-      const heading = document.createElement("h2");
-      heading.textContent =
+      const title = document.createElement("h2");
+      title.textContent =
         `${data.book.commonName || data.book.name} ${data.chapter.number}`;
-
-      reading.appendChild(heading);
+      reading.appendChild(title);
 
       let paragraph = document.createElement("p");
 
+      function finishParagraph() {
+        if (paragraph.textContent.trim()) {
+          reading.appendChild(paragraph);
+        }
+        paragraph = document.createElement("p");
+      }
+
       data.chapter.content.forEach(item => {
         if (item.type === "heading") {
-          if (paragraph.textContent.trim()) {
-            reading.appendChild(paragraph);
-            paragraph = document.createElement("p");
-          }
+          finishParagraph();
 
-          const subheading = document.createElement("h3");
-          subheading.textContent = item.text;
-          reading.appendChild(subheading);
+          const heading = document.createElement("h3");
+          heading.textContent = item.text;
+          reading.appendChild(heading);
         }
 
         if (item.type === "verse") {
@@ -780,9 +816,7 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
         }
       });
 
-      if (paragraph.textContent.trim()) {
-        reading.appendChild(paragraph);
-      }
+      finishParagraph();
 
     } catch (error) {
       reading.textContent = "Unable to load this chapter. Please try again.";
@@ -792,9 +826,10 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
   bookSelect.addEventListener("change", showChapters);
   version.addEventListener("change", loadBooks);
 
-  loadBooks();
+  loadVersions();
 })();
 </script>
+
   
 </body>
 </html>
