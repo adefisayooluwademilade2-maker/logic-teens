@@ -262,9 +262,6 @@ input,textarea,select {
 #notificationDetails.active {
   min-height: calc(100vh - 24px);
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
 }
 
 #notificationDetails .settings-back {
@@ -277,50 +274,22 @@ input,textarea,select {
 }
 
 .notification-detail-card {
-  width: 85%;
-  max-width: 280px;
-  margin: 65px auto 0;
-  padding: 12px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 15px;
-}
-
-.notification-detail-card h1 {
-  font-size: 16px;
-  margin: 0 0 7px;
-}
-
-.notification-detail-card p {
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--muted);
-  margin: 0;
-  }
-
-#notificationDetails .settings-back {
   position: absolute;
   top: 0;
-  left: 0;
-  margin: 0;
-  padding: 0;
-  font-size: 23px;
-}
-
-.notification-detail-card {
-  width: 85%;
-  max-width: 280px;
-  margin: 0 auto;
-  padding: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  max-width: 250px;
+  padding: 10px;
   background: #101d17;
   border: 1px solid #22c55e;
   border-radius: 15px;
-  box-shadow: 0 0 12px rgba(34, 197, 94, 0.35);
+  box-shadow: 0 0 12px rgba(34,197,94,.35);
 }
 
 .notification-detail-card h1 {
-  font-size: 16px;
-  margin: 0 0 7px;
+  font-size: 15px;
+  margin: 0 0 6px;
 }
 
 .notification-detail-card p {
