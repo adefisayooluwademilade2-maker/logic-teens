@@ -263,9 +263,40 @@ input,textarea,select {
   min-height: calc(100vh - 24px);
   position: relative;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: flex-start;
 }
+
+#notificationDetails .settings-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  font-size: 23px;
+}
+
+.notification-detail-card {
+  width: 85%;
+  max-width: 280px;
+  margin: 65px auto 0;
+  padding: 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 15px;
+}
+
+.notification-detail-card h1 {
+  font-size: 16px;
+  margin: 0 0 7px;
+}
+
+.notification-detail-card p {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 0;
+  }
 
 #notificationDetails .settings-back {
   position: absolute;
