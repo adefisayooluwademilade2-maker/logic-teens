@@ -2599,6 +2599,25 @@ onAuthStateChanged(auth, async user => {
   window.loadTeamApplicationStatus(user);
 
   try {
+    
+    const adminRef = doc(db, "admins", user.uid);
+    const adminSnap = await getDoc(adminRef);
+
+    const adminData = adminSnap.exists()
+      ? adminSnap.data()
+      : {};
+
+    window.logicIsAdmin = adminSnap.exists();
+    window.logicAdminRole = adminData.role || "member";
+    window.logicCanManageAdmins =
+      adminData.canManageAdmins === true;
+
+    document.getElementById("memberHomeTiles").hidden =
+      window.logicIsAdmin;
+
+    document.getElementById("adminHomeTiles").hidden =
+      !window.logicIsAdmin;
+  
     const profileRef = doc(db, "users", user.uid);
     const profileSnap = await getDoc(profileRef);
 
