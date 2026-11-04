@@ -946,7 +946,7 @@ body.admin-user #ministry .ministry-actions {
     }
   </style>
 
-  <button class="directory-back" onclick="openPage('ministry')">←</button>
+<button class="directory-back" onclick="openPage('home')">←</button>
 
   <div class="directory-heading">
     <div class="eyebrow">LOGIC TEENS COMMUNITY</div>
@@ -964,8 +964,8 @@ body.admin-user #ministry .ministry-actions {
 </section>
 
 <section class="page" id="ministryMemberProfile">
-  <button class="directory-back" onclick="openPage('ministryDirectory')">←</button>
-
+  <button class="directory-back" onclick="window.closeMinistryMemberProfile()">←</button>
+  
   <div class="directory-heading">
     <div class="eyebrow">LOGIC TEENS COMMUNITY</div>
     <h1>Member Profile</h1>
@@ -1008,14 +1008,25 @@ body.admin-user #ministry .ministry-actions {
 
   <div class="grid" style="margin-top:22px">
 
+   
     <div class="tile">
-      <span class="emoji">👥</span>
+      <span style="display:block;width:27px;height:27px;margin-bottom:13px;color:var(--gold)">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="8" r="3"/>
+          <path d="M3 21v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6M18 15a5 5 0 0 1 3 4v2"/>
+        </svg>
+      </span>
       <strong id="dashboardMemberCount">—</strong>
       <small>Total Members</small>
     </div>
 
     <div class="tile">
-      <span class="emoji">📋</span>
+      <span style="display:block;width:27px;height:27px;margin-bottom:13px;color:var(--gold)">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="3" width="14" height="18" rx="2"/>
+          <path d="M9 8h6M9 12h6M9 16h4"/>
+        </svg>
+      </span>
       <strong id="dashboardApplicationCount">—</strong>
       <small>Pending Applications</small>
     </div>
@@ -1025,38 +1036,100 @@ body.admin-user #ministry .ministry-actions {
   <h2>Management</h2>
 
   <button class="panel" type="button" onclick="openPage('adminApplications'); loadAdminApplications()">
-  <strong>📋 Team Applications</strong>
-  <p>Review, approve and reject ministry team applications.</p>
+    <strong>
+      <svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:middle;margin-right:8px" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="3" width="14" height="18" rx="2"/>
+        <path d="M9 8h6M9 12h6M9 16h4"/>
+      </svg>
+      Team Applications
+    </strong>
+    <p>Review, approve and reject ministry team applications.</p>
   </button>
 
   <div class="panel">
-    <strong>👥 Manage Members</strong>
+    <strong>
+      <svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:middle;margin-right:8px" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="8" r="3"/>
+        <path d="M3 21v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6"/>
+      </svg>
+      Manage Members
+    </strong>
     <p>View approved members and manage their membership.</p>
   </div>
 
   <div class="panel">
-    <strong>🏢 Departments</strong>
+    <strong>
+      <svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:middle;margin-right:8px" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14M9 10h1M14 10h1M9 14h1M14 14h1"/>
+      </svg>
+      Departments
+    </strong>
     <p>Manage department members, Team Leaders and responsibilities.</p>
   </div>
 
   <div class="panel">
-    <strong>📅 Events</strong>
+    <strong>
+      <svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:middle;margin-right:8px" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="16" rx="2"/>
+        <path d="M16 3v4M8 3v4M3 10h18"/>
+      </svg>
+      Events
+    </strong>
     <p>Create, edit and publish LOGIC Teens events.</p>
   </div>
 
   <div class="panel">
-    <strong>🔔 Announcements</strong>
+    <strong>
+      <svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:middle;margin-right:8px" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>
+      </svg>
+      Announcements
+    </strong>
     <p>Send important announcements to members.</p>
   </div>
 
   <div class="panel">
-    <strong>🛡️ Admin Management</strong>
+    <strong>
+      <svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:middle;margin-right:8px" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"/>
+        <path d="m9 12 2 2 4-4"/>
+      </svg>
+      Admin Management
+    </strong>
     <p>Manage who is authorised to administer LOGIC Teens.</p>
   </div>
 
 </section>
   
-  <section class="page" id="adminApplications">
+  
+<section class="page" id="adminApplications">
+  <style>
+    #adminApplications {
+      text-align: left;
+    }
+
+    #adminApplications #adminApplicationList {
+      width: 100%;
+      text-align: left;
+      margin-top: 20px;
+    }
+
+    #adminApplications #adminApplicationList .panel {
+      background: #141622;
+      border: 1px solid #292b3b;
+      text-align: left;
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    #adminApplications .directory-empty {
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      padding: 18px 0;
+      text-align: left;
+    }
+  </style>
 
   <button class="directory-back" onclick="openPage('adminDashboard')">←</button>
 
@@ -1069,8 +1142,8 @@ body.admin-user #ministry .ministry-actions {
       <h3>Loading applications...</h3>
     </div>
   </div>
+</section>
 
-  </section>
 
 <section class="page" id="adminApprovedMembers">
 
@@ -1088,22 +1161,59 @@ body.admin-user #ministry .ministry-actions {
 
 </section>
   
+
 <script>
+  window.logicCurrentDepartment = "";
+  window.logicMemberProfileReturnPage = "ministryDirectory";
+
   window.openMinistryDirectory = function(department) {
-  document.getElementById("directoryDepartmentName").textContent = department;
-  openPage("ministryDirectory");
+    window.logicCurrentDepartment = department;
 
-  if (window.loadDepartmentMembers) {
-    window.loadDepartmentMembers(department);
-  }
-};
+    document.getElementById("directoryDepartmentName").textContent =
+      department;
 
-  window.openMinistryMemberProfile = function(member) {
+    openPage("ministryDirectory");
+
+    if (window.loadDepartmentMembers) {
+      window.loadDepartmentMembers(department);
+    }
+  };
+
+  window.openMinistryMemberProfile = async function(member) {
+    const currentPage = document.querySelector(".page.active")?.id;
+
+    window.logicMemberProfileReturnPage =
+      currentPage === "adminApprovedMembers"
+        ? "adminApprovedMembers"
+        : "ministryDirectory";
+
+    let profile = {};
+
+    if (member.userId) {
+      try {
+        const profileSnap = await getDoc(
+          doc(db, "users", member.userId)
+        );
+
+        if (profileSnap.exists()) {
+          profile = profileSnap.data();
+        }
+      } catch (error) {
+        console.warn("Member profile details unavailable:", error);
+      }
+    }
+
     document.getElementById("directoryMemberPhoto").src =
-      member.photoURL || "https://www.gravatar.com/avatar/?d=mp";
+      profile.photoURL ||
+      member.photoURL ||
+      "https://www.gravatar.com/avatar/?d=mp";
 
     document.getElementById("directoryMemberName").textContent =
-      member.fullName || member.username || "LOGIC Teens Member";
+      profile.fullName ||
+      member.fullName ||
+      profile.username ||
+      member.username ||
+      "LOGIC Teens Member";
 
     document.getElementById("directoryMemberRole").textContent =
       member.role || "Team Member";
@@ -1115,11 +1225,29 @@ body.admin-user #ministry .ministry-actions {
       member.responsibility || "Not assigned yet";
 
     document.getElementById("directoryMemberAbout").textContent =
-      member.about || "No introduction added.";
+      profile.about ||
+      member.about ||
+      "No introduction added.";
 
     openPage("ministryMemberProfile");
   };
+
+  window.closeMinistryMemberProfile = function() {
+    const returnPage = window.logicMemberProfileReturnPage;
+
+    openPage(returnPage);
+
+    if (returnPage === "adminApprovedMembers") {
+      window.loadAdminApprovedMembers();
+    } else if (
+      returnPage === "ministryDirectory" &&
+      window.logicCurrentDepartment
+    ) {
+      window.loadDepartmentMembers(window.logicCurrentDepartment);
+    }
+  };
 </script>
+
   
   
 <section class="page" id="profile">
@@ -2647,14 +2775,17 @@ const db = getFirestore(app);
   }
 };
 
+
 window.removeAdminMember = async function(memberId, memberName) {
   if (!window.logicIsAdmin) {
-    alert("You are not authorised to remove members.");
+    window.logicNotify("You are not authorised to remove members.");
     return;
   }
 
-  const confirmed = confirm(
-    `Are you sure you want to remove ${memberName || "this member"} from the approved department members?`
+  const confirmed = await window.logicConfirm(
+    `Are you sure you want to remove ${memberName || "this member"} from the approved department members?`,
+    "Remove member?",
+    "Remove"
   );
 
   if (!confirmed) return;
@@ -2662,16 +2793,17 @@ window.removeAdminMember = async function(memberId, memberName) {
   try {
     await deleteDoc(doc(db, "departmentMembers", memberId));
 
-    alert("Member removed successfully.");
+    window.logicNotify("Member removed successfully.");
 
     await window.loadAdminApprovedMembers();
     await window.loadAdminHomeCounts();
 
   } catch (error) {
     console.error("Remove member error:", error);
-    alert("Could not remove this member. Please try again.");
+    window.logicNotify("Could not remove this member. Please try again.");
   }
 };
+
   
   window.loadAdminHomeCounts = async function() {
   try {
@@ -2804,11 +2936,12 @@ list.appendChild(card);
   }
 };
 
+
 window.approveTeamApplication = async function(applicationId) {
   const admin = auth.currentUser;
 
   if (!admin || !window.logicIsAdmin) {
-    alert("You are not authorised to approve applications.");
+    window.logicNotify("You are not authorised to approve applications.");
     return;
   }
 
@@ -2817,25 +2950,44 @@ window.approveTeamApplication = async function(applicationId) {
     const applicationSnap = await getDoc(applicationRef);
 
     if (!applicationSnap.exists()) {
-      alert("Application not found.");
+      window.logicNotify("Application not found.");
       return;
     }
 
     const application = applicationSnap.data();
 
     if (application.status !== "pending") {
-      alert("This application has already been reviewed.");
+      window.logicNotify("This application has already been reviewed.");
       return;
     }
 
-    const batch = writeBatch(db);
+    let memberProfile = {};
 
+    try {
+      const profileSnap = await getDoc(
+        doc(db, "users", application.userId)
+      );
+
+      if (profileSnap.exists()) {
+        memberProfile = profileSnap.data();
+      }
+    } catch (profileError) {
+      console.warn("Could not load member profile:", profileError);
+    }
+
+    const batch = writeBatch(db);
     const memberRef = doc(db, "departmentMembers", applicationId);
 
     batch.set(memberRef, {
       userId: application.userId,
-      fullName: application.memberName || "LOGIC Teens Member",
+      fullName:
+        memberProfile.fullName ||
+        application.memberName ||
+        "LOGIC Teens Member",
+      username: memberProfile.username || "",
       email: application.email || "",
+      photoURL: memberProfile.photoURL || "",
+      about: memberProfile.about || "",
       department: application.team,
       status: "approved",
       role: "Team Member",
@@ -2862,22 +3014,23 @@ window.approveTeamApplication = async function(applicationId) {
 
     await batch.commit();
 
-    alert("Application approved successfully.");
-    window.loadAdminApplications();
-    window.loadAdminHomeCounts();
+    window.logicNotify("Application approved successfully.");
+    await window.loadAdminApplications();
+    await window.loadAdminHomeCounts();
 
   } catch (error) {
     console.error("Application approval error:", error);
-    alert("Could not approve this application. Please try again.");
+    window.logicNotify("Could not approve this application. Please try again.");
   }
 };
+
 
 
 window.rejectTeamApplication = async function(applicationId) {
   const admin = auth.currentUser;
 
   if (!admin || !window.logicIsAdmin) {
-    alert("You are not authorised to reject applications.");
+    window.logicNotify("You are not authorised to reject applications.");
     return;
   }
 
@@ -2886,16 +3039,24 @@ window.rejectTeamApplication = async function(applicationId) {
     const applicationSnap = await getDoc(applicationRef);
 
     if (!applicationSnap.exists()) {
-      alert("Application not found.");
+      window.logicNotify("Application not found.");
       return;
     }
 
     const application = applicationSnap.data();
 
     if (application.status !== "pending") {
-      alert("This application has already been reviewed.");
+      window.logicNotify("This application has already been reviewed.");
       return;
     }
+
+    const confirmed = await window.logicConfirm(
+      "Are you sure you want to reject this member's application?",
+      "Reject application?",
+      "Reject"
+    );
+
+    if (!confirmed) return;
 
     const batch = writeBatch(db);
 
@@ -2918,15 +3079,16 @@ window.rejectTeamApplication = async function(applicationId) {
 
     await batch.commit();
 
-    alert("Application rejected.");
-    window.loadAdminApplications();
-    window.loadAdminHomeCounts();
+    window.logicNotify("Application rejected successfully.");
+    await window.loadAdminApplications();
+    await window.loadAdminHomeCounts();
 
   } catch (error) {
     console.error("Application rejection error:", error);
-    alert("Could not reject this application. Please try again.");
+    window.logicNotify("Could not reject this application. Please try again.");
   }
 };
+
   
   window.applyTeam = async function(team, button) {
   const user = auth.currentUser;
@@ -3204,11 +3366,12 @@ window.submitEmailChange = async function() {
   }
 };
   
-  window.saveProfilePreview = async function() {
+  
+window.saveProfilePreview = async function() {
   const user = auth.currentUser;
 
   if (!user) {
-    alert("Please log in again.");
+    window.logicNotify("Please log in again.");
     return;
   }
 
@@ -3235,7 +3398,7 @@ window.submitEmailChange = async function() {
   try {
     let photoURL = original.photoURL || "";
 
-        if (file) {
+    if (file) {
       if (file.size > 5 * 1024 * 1024) {
         throw new Error("Image must be 5 MB or smaller.");
       }
@@ -3262,7 +3425,7 @@ window.submitEmailChange = async function() {
 
       photoURL = result.secure_url;
       updates.photoURL = photoURL;
-  }
+    }
 
     if (name && name !== original.fullName) {
       await updateProfile(user, { displayName: name });
@@ -3273,7 +3436,7 @@ window.submitEmailChange = async function() {
     }
 
     if (Object.keys(updates).length === 0) {
-      alert("No changes to save.");
+      window.logicNotify("No changes to save.");
       return;
     }
 
@@ -3292,22 +3455,23 @@ window.submitEmailChange = async function() {
     };
 
     showProfilePreview();
-
     closeProfileEditor();
-    setProfileAvatar(
-  document.getElementById("profileAvatar"),
-  photoURL
-);
-    alert("Profile saved successfully!");
 
-    } catch (error) {
+    setProfileAvatar(
+      document.getElementById("profileAvatar"),
+      photoURL
+    );
+
+    window.logicNotify("Profile saved successfully!");
+
+  } catch (error) {
     console.error("Profile save error:", error);
-    alert(
-      "Save failed:\n" +
-      (error.code || error.message || "Unknown error")
+    window.logicNotify(
+      "Save failed: " + (error.code || error.message || "Please try again.")
     );
   }
 };
+
   
   // Set greeting using Nigeria's local time
 function updateTimeGreeting(user) {
@@ -3452,7 +3616,7 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
   } catch (error) {
     button.disabled = false;
     button.textContent = "↪ Logout";
-    alert("Logout failed. Please try again.");
+    window.logicNotify("Logout failed. Please try again.");
   }
 });
 </script>
