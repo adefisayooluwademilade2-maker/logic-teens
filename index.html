@@ -2465,6 +2465,41 @@ const db = getFirestore(app);
   }
 };
 
+  window.loadAdminHomeCounts = async function() {
+  try {
+    const membersQuery = query(
+      collection(db, "departmentMembers"),
+      where("status", "==", "approved")
+    );
+
+    const applicationsQuery = query(
+      collection(db, "teamApplications"),
+      where("status", "==", "pending")
+    );
+
+    const [membersSnapshot, applicationsSnapshot] =
+      await Promise.all([
+        getDocs(membersQuery),
+        getDocs(applicationsQuery)
+      ]);
+
+    document.getElementById("adminMemberCount").textContent =
+      membersSnapshot.size;
+
+    document.getElementById("adminApplicationCount").textContent =
+      applicationsSnapshot.size;
+
+    document.getElementById("dashboardMemberCount").textContent =
+      membersSnapshot.size;
+
+    document.getElementById("dashboardApplicationCount").textContent =
+      applicationsSnapshot.size;
+
+  } catch (error) {
+    console.error("Admin homepage counts error:", error);
+  }
+};
+
 window.loadAdminApplications = async function() {
   const list = document.getElementById("adminApplicationList");
 
