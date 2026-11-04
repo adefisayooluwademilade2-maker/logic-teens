@@ -274,29 +274,33 @@ input,textarea,select {
 }
 
 .notification-detail-card {
-  width: fit-content;
-  max-width: 250px;
-  margin: 0 auto;
-  padding: 9px 12px;
-  background: #102719;
-  border: 1px solid #22c55e;
-  border-radius: 12px;
-  box-shadow: 0 0 8px rgba(34,197,94,.25);
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 90px);
+  padding: 7px 16px;
+  background: #003b1d;
+  border: 1px solid #087f3c;
+  border-radius: 999px;
+  box-shadow: 0 0 9px rgba(34,197,94,.2);
   text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .notification-detail-card h1 {
-  font-size: 14px;
-  color: #86efac;
-  margin: 0 0 5px;
+  font-size: 13px;
+  color: #22c55e;
+  margin: 0 0 3px;
 }
 
 .notification-detail-card p {
   font-size: 11px;
-  line-height: 1.4;
-  color: #d1fae5;
+  line-height: 1.35;
+  color: #22c55e;
   margin: 0;
-}
+  }
   
 .close-menu {float:right}
 footer {text-align:center;color:#77778a;font-size:11px;padding:25px}
