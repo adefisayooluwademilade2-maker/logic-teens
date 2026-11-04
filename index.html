@@ -1860,7 +1860,12 @@ window.startNotificationListener = function(user) {
     db, "users", user.uid, "notifications"
   );
 
-  onSnapshot(notificationsRef, snapshot => {
+  const notificationsQuery = query(
+  notificationsRef,
+  orderBy("createdAt", "desc")
+);
+
+onSnapshot(notificationsQuery, snapshot => {
     notificationList.innerHTML = "";
     let unread = 0;
 
