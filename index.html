@@ -255,6 +255,47 @@ input,textarea,select {
   margin: 0 0 12px;
   cursor: pointer;
 }
+  body.notification-detail-open main {
+  padding: 12px 17px;
+}
+
+#notificationDetails.active {
+  min-height: calc(100vh - 24px);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#notificationDetails .settings-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  font-size: 23px;
+}
+
+.notification-detail-card {
+  width: 100%;
+  max-width: 380px;
+  padding: 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 15px;
+}
+
+.notification-detail-card h1 {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+
+.notification-detail-card p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0;
+  }
   
 .close-menu {float:right}
 footer {text-align:center;color:#77778a;font-size:11px;padding:25px}
