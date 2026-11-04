@@ -1765,6 +1765,11 @@ window.startNotificationListener = function(user) {
 
     badge.textContent = unread;
     badge.hidden = unread === 0;
+    }, error => {
+    console.error("Notification error:", error);
+    notificationList.innerHTML =
+      '<div class="empty">Could not load notifications: ' +
+      error.message + '</div>';
   });
 };
   
