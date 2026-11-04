@@ -74,6 +74,9 @@ header {
 main {max-width:650px;margin:auto;padding:22px 17px}
 .page {display:none}
 .page.active {display:block}
+  [hidden] {
+  display: none !important;
+  }
 .eyebrow {
   color:var(--gold);font-size:11px;
   letter-spacing:2px;font-weight:bold;
@@ -132,6 +135,24 @@ h2 {font-size:19px;margin:27px 0 14px}
 .tile .emoji {font-size:25px;display:block;margin-bottom:13px}
 .tile strong {font-size:14px;display:block}
 .tile small {display:block;color:var(--muted);margin-top:6px;font-size:11px}
+  .admin-home-grid .admin-tile-icon {
+  width: 27px;
+  height: 27px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 13px;
+  color: var(--gold);
+}
+
+.admin-home-grid .admin-tile-icon svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .panel {
   background:var(--card);border:1px solid var(--line);
   padding:18px;border-radius:17px;margin-bottom:12px;
@@ -485,8 +506,6 @@ body.notification-detail-open .bottom-nav {
     Read in Bible
   </button>
     </div>
-
-    <h2>Your journey</h2>
     
 <!-- NORMAL MEMBER HOMEPAGE -->
 <div class="grid" id="memberHomeTiles">
@@ -516,24 +535,42 @@ body.notification-detail-open .bottom-nav {
 </div>
 
 <!-- ADMIN HOMEPAGE -->
-<div class="grid" id="adminHomeTiles" hidden>
+<div class="grid admin-home-grid" id="adminHomeTiles" hidden>
+
   <button class="tile" onclick="openPage('adminDashboard')">
-    <span class="emoji">👥</span>
+    <span class="admin-tile-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="10" cy="7" r="4"/>
+        <path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </span>
     <strong id="adminMemberCount">0</strong>
     <small>Approved Members</small>
   </button>
 
   <button class="tile" onclick="openPage('adminDashboard')">
-    <span class="emoji">📋</span>
+    <span class="admin-tile-icon">
+      <svg viewBox="0 0 24 24">
+        <rect x="4" y="3" width="16" height="18" rx="2"/>
+        <path d="M8 8h8M8 12h8M8 16h5"/>
+      </svg>
+    </span>
     <strong id="adminApplicationCount">0</strong>
     <small>Pending Applications</small>
   </button>
 
   <button class="tile" onclick="openPage('adminDashboard')">
-    <span class="emoji">🛡️</span>
+    <span class="admin-tile-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 3 20 7v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4Z"/>
+        <path d="m9 12 2 2 4-4"/>
+      </svg>
+    </span>
     <strong>Open Admin Dashboard</strong>
     <small>Manage LOGIC Teens</small>
   </button>
+
 </div>
 
     <h2>Upcoming at LOGIC</h2>
