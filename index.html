@@ -1756,6 +1756,60 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+  window.applyTeam = async function(team, button) {
+  const user = auth.currentUser;
+
+  if (!user) {
+    alert("Please sign in first.");
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Sending...";
+
+  try {
+    const teamId = team.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    const applicationRef = doc(db, "teamApplications", user.uid + "_" + teamId);
+    const existing = await getDoc(applicationRef);
+
+    if (existing.exists()) {
+      button.textContent = "Request sent";
+      return;
+    }
+
+    const notificationRef = doc(
+      collection(db, "users", user.uid, "notifications")
+    );
+
+    const batch = writeBatch(db);
+
+    batch.set(applicationRef, {
+      userId: user.uid,
+      memberName: window.logicProfileData?.fullName || user.displayName || "Member",
+      email: user.email || "",
+      team: team,
+      status: "pending",
+      createdAt: serverTimestamp()
+    });
+
+    batch.set(notificationRef, {
+      title: "Ministry Team Request",
+      message: `Your request to join the ${team} team has been received. Please wait while an admin reviews your application.`,
+      read: false,
+      createdAt: serverTimestamp()
+    });
+
+    await batch.commit();
+
+    button.textContent = "Request sent";
+
+  } catch (error) {
+    console.error("Team application error:", error);
+    button.disabled = false;
+    button.textContent = "Apply to join";
+    alert("Your request couldn't be sent. Please try again.");
+  }
+};
 
   window.saveNotificationSettingsToFirebase = async function() {
   const user = auth.currentUser;
