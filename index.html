@@ -3157,6 +3157,9 @@ onAuthStateChanged(auth, async user => {
 
     document.getElementById("adminHomeTiles").hidden =
       !window.logicIsAdmin;
+    if (window.logicIsAdmin) {
+  await window.loadAdminHomeCounts();
+  }
   
     const profileRef = doc(db, "users", user.uid);
     const profileSnap = await getDoc(profileRef);
