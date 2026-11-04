@@ -1791,10 +1791,10 @@ const db = getFirestore(app);
     const existing = await getDoc(applicationRef);
 
     if (existing.exists()) {
-      button.textContent = "Request sent";
-      return;
-    }
-
+  button.textContent = "Request sent";
+  button.disabled = true;
+  return;
+  }
     const notificationRef = doc(
       collection(db, "users", user.uid, "notifications")
     );
@@ -1826,6 +1826,36 @@ const db = getFirestore(app);
     button.disabled = false;
     button.textContent = "Apply to join";
     alert("Your request couldn't be sent. Please try again.");
+  }
+};
+
+  window.loadTeamApplicationStatus = async function(user) {
+  const buttons = document.querySelectorAll(
+    '#ministry button[onclick^="applyTeam("]'
+  );
+
+  for (const button of buttons) {
+    const match = button.getAttribute("onclick").match(
+      /applyTeam\('([^']+)'/
+    );
+
+    if (!match) continue;
+
+    const team = match[1];
+    const teamId = team.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+    const applicationRef = doc(
+      db,
+      "teamApplications",
+      user.uid + "_" + teamId
+    );
+
+    const applicationSnap = await getDoc(applicationRef);
+
+    if (applicationSnap.exists()) {
+      button.textContent = "Request sent";
+      button.disabled = true;
+    }
   }
 };
 
@@ -2157,6 +2187,7 @@ onAuthStateChanged(auth, async user => {
   }
 
   window.logicCurrentUser = user;
+  window.loadTeamApplicationStatus(user);
 
   try {
     const profileRef = doc(db, "users", user.uid);
