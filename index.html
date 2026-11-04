@@ -953,6 +953,66 @@ body.notification-detail-open .bottom-nav {
   </div>
 </section>
 
+  
+<section class="page" id="adminDashboard">
+
+  <button class="directory-back" onclick="openPage('home')">←</button>
+
+  <div class="eyebrow">LOGIC TEENS MANAGEMENT</div>
+  <h1>Admin Dashboard</h1>
+  <p class="subtitle">Manage the LOGIC Teens Church Lounge.</p>
+
+  <div class="grid" style="margin-top:22px">
+
+    <div class="tile">
+      <span class="emoji">👥</span>
+      <strong id="dashboardMemberCount">—</strong>
+      <small>Total Members</small>
+    </div>
+
+    <div class="tile">
+      <span class="emoji">📋</span>
+      <strong id="dashboardApplicationCount">—</strong>
+      <small>Pending Applications</small>
+    </div>
+
+  </div>
+
+  <h2>Management</h2>
+
+  <div class="panel">
+    <strong>📋 Team Applications</strong>
+    <p>Review, approve and reject ministry team applications.</p>
+  </div>
+
+  <div class="panel">
+    <strong>👥 Manage Members</strong>
+    <p>View approved members and manage their membership.</p>
+  </div>
+
+  <div class="panel">
+    <strong>🏢 Departments</strong>
+    <p>Manage department members, Team Leaders and responsibilities.</p>
+  </div>
+
+  <div class="panel">
+    <strong>📅 Events</strong>
+    <p>Create, edit and publish LOGIC Teens events.</p>
+  </div>
+
+  <div class="panel">
+    <strong>🔔 Announcements</strong>
+    <p>Send important announcements to members.</p>
+  </div>
+
+  <div class="panel">
+    <strong>🛡️ Admin Management</strong>
+    <p>Manage who is authorised to administer LOGIC Teens.</p>
+  </div>
+
+</section>
+  
+  
 <script>
   window.openMinistryDirectory = function(department) {
     document.getElementById("directoryDepartmentName").textContent = department;
