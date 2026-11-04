@@ -2398,11 +2398,36 @@ window.loadAdminApplications = async function() {
       team.textContent = "Department: " + (application.team || "Not specified");
 
       const status = document.createElement("small");
-      status.textContent = "Pending review";
-      status.style.color = "var(--gold)";
+status.textContent = "Pending review";
+status.style.color = "var(--gold)";
+status.style.display = "block";
+status.style.marginTop = "8px";
 
-      card.append(name, team, status);
-      list.appendChild(card);
+const actions = document.createElement("div");
+actions.style.cssText = `
+  display:flex;
+  gap:10px;
+  margin-top:16px;
+`;
+
+const approveButton = document.createElement("button");
+approveButton.textContent = "Approve";
+approveButton.className = "primary";
+approveButton.style.flex = "1";
+approveButton.onclick = () =>
+  approveTeamApplication(applicationDoc.id);
+
+const rejectButton = document.createElement("button");
+rejectButton.textContent = "Reject";
+rejectButton.style.flex = "1";
+rejectButton.style.background = "#30202a";
+rejectButton.style.color = "#ff9b9b";
+rejectButton.onclick = () =>
+  rejectTeamApplication(applicationDoc.id);
+
+actions.append(approveButton, rejectButton);
+card.append(name, team, status, actions);
+list.appendChild(card);
     });
 
   } catch (error) {
