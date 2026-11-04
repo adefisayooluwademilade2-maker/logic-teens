@@ -2354,6 +2354,69 @@ const db = getFirestore(app);
     `;
   }
 };
+
+window.loadAdminApplications = async function() {
+  const list = document.getElementById("adminApplicationList");
+
+  list.innerHTML = `
+    <div class="directory-empty">
+      <h3>Loading applications...</h3>
+    </div>
+  `;
+
+  try {
+    const applicationsQuery = query(
+      collection(db, "teamApplications"),
+      where("status", "==", "pending")
+    );
+
+    const snapshot = await getDocs(applicationsQuery);
+
+    list.innerHTML = "";
+
+    if (snapshot.empty) {
+      list.innerHTML = `
+        <div class="directory-empty">
+          <h3>No pending applications</h3>
+          <p>New ministry team requests will appear here.</p>
+        </div>
+      `;
+      return;
+    }
+
+    snapshot.forEach(applicationDoc => {
+      const application = applicationDoc.data();
+
+      const card = document.createElement("div");
+      card.className = "panel";
+      card.style.marginBottom = "14px";
+
+      const name = document.createElement("strong");
+      name.textContent = application.memberName || "LOGIC Teens Member";
+
+      const team = document.createElement("p");
+      team.textContent = "Department: " + (application.team || "Not specified");
+
+      const status = document.createElement("small");
+      status.textContent = "Pending review";
+      status.style.color = "var(--gold)";
+
+      card.append(name, team, status);
+      list.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error("Applications loading error:", error);
+
+    list.innerHTML = `
+      <div class="directory-empty">
+        <h3>Couldn't load applications</h3>
+        <p>Please try again later.</p>
+      </div>
+    `;
+  }
+};
+  
   window.applyTeam = async function(team, button) {
   const user = auth.currentUser;
 
