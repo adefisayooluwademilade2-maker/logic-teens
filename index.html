@@ -137,6 +137,18 @@ h2 {font-size:19px;margin:27px 0 14px}
   padding:18px;border-radius:17px;margin-bottom:12px;
 }
 .panel p {color:var(--muted);font-size:13px;line-height:1.6}
+  .notification-read-btn {
+  display: block;
+  margin: 12px 0 0 auto;
+  width: auto;
+  padding: 7px 13px;
+  background: #1b1d2c;
+  color: var(--gold);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  }
 .event-date {color:var(--gold);font-size:11px;letter-spacing:1px}
 .empty {text-align:center;padding:35px 15px;color:var(--muted)}
 input,textarea,select {
@@ -1745,7 +1757,7 @@ window.startNotificationListener = function(user) {
 
       if (item.read !== true) {
         const button = document.createElement("button");
-        button.className = "primary";
+        button.className = "notification-read-btn";
         button.textContent = "Mark as read";
 
         button.onclick = async () => {
