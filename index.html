@@ -3718,8 +3718,16 @@ onAuthStateChanged(auth, async user => {
     const profileSnap = await getDoc(profileRef);
 
     const data = profileSnap.exists()
-      ? profileSnap.data()
-      : {};
+  ? profileSnap.data()
+  : {};
+
+await setDoc(profileRef, {
+  fullName: data.fullName || user.displayName || "",
+  email: user.email || "",
+  photoURL: data.photoURL || user.photoURL || "",
+  username: data.username || "",
+  about: data.about || ""
+}, { merge: true });
 
     const savedNotifications = data.notificationSettings;
 
