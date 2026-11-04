@@ -2083,6 +2083,159 @@ loadNotificationSettings();
   </button>
 
 </nav>
+
+
+<style>
+  #logicConfirmOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(0,0,0,.72);
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+  }
+
+  #logicConfirmOverlay.show {
+    display: flex;
+  }
+
+  .logic-confirm-card {
+    width: 100%;
+    max-width: 360px;
+    background: #141622;
+    border: 1px solid #292b3b;
+    border-radius: 18px;
+    padding: 23px 20px;
+    box-shadow: 0 18px 55px rgba(0,0,0,.4);
+  }
+
+  .logic-confirm-card h3 {
+    color: white;
+    font-size: 17px;
+    margin: 0 0 10px;
+  }
+
+  .logic-confirm-card p {
+    color: #a4a5b5;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0 0 22px;
+  }
+
+  .logic-confirm-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .logic-confirm-actions button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  #logicConfirmCancel {
+    background: #1b1d2c;
+    color: white;
+    border: 1px solid #36384a;
+  }
+
+  #logicConfirmAccept {
+    background: #d6b779;
+    color: #090a12;
+    border: 0;
+  }
+
+  #logicToast {
+    position: fixed;
+    z-index: 100000;
+    left: 50%;
+    bottom: 95px;
+    transform: translate(-50%, 15px);
+    width: max-content;
+    max-width: calc(100% - 40px);
+    background: #1b1d2c;
+    color: white;
+    border: 1px solid #36384a;
+    border-radius: 12px;
+    padding: 13px 17px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: .2s ease;
+    text-align: center;
+  }
+
+  #logicToast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+</style>
+
+<div id="logicConfirmOverlay">
+  <div class="logic-confirm-card">
+    <h3 id="logicConfirmTitle">Please confirm</h3>
+    <p id="logicConfirmMessage"></p>
+    <div class="logic-confirm-actions">
+      <button id="logicConfirmCancel" type="button">Cancel</button>
+      <button id="logicConfirmAccept" type="button">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div id="logicToast"></div>
+
+<script>
+  window.logicConfirm = function(message, title = "Are you sure?", acceptText = "Confirm") {
+    return new Promise(resolve => {
+      const overlay = document.getElementById("logicConfirmOverlay");
+      const titleElement = document.getElementById("logicConfirmTitle");
+      const messageElement = document.getElementById("logicConfirmMessage");
+      const cancelButton = document.getElementById("logicConfirmCancel");
+      const acceptButton = document.getElementById("logicConfirmAccept");
+
+      titleElement.textContent = title;
+      messageElement.textContent = message;
+      acceptButton.textContent = acceptText;
+      overlay.classList.add("show");
+
+      function finish(result) {
+        overlay.classList.remove("show");
+        cancelButton.removeEventListener("click", cancel);
+        acceptButton.removeEventListener("click", accept);
+        resolve(result);
+      }
+
+      function cancel() {
+        finish(false);
+      }
+
+      function accept() {
+        finish(true);
+      }
+
+      cancelButton.addEventListener("click", cancel);
+      acceptButton.addEventListener("click", accept);
+    });
+  };
+
+  window.logicNotify = function(message) {
+    const toast = document.getElementById("logicToast");
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    clearTimeout(window.logicToastTimer);
+    window.logicToastTimer = setTimeout(() => {
+      toast.classList.remove("show");
+    }, 2800);
+  };
+</script>
+  
+  
 <footer>LOGIC TEENS CHURCH LOUNGE · GROW • CONNECT • BECOME</footer>
 
 <script>
