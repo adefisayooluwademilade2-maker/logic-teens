@@ -1706,7 +1706,7 @@ const db = getFirestore(app);
 window.startNotificationListener = function(user) {
   const notificationList = document.getElementById("notificationList");
   const badge = document.getElementById("unreadNotificationCount");
-  notificationList.innerHTML = "Checking notifications...";e
+  notificationList.innerHTML = "Checking notifications...";
 
   const notificationsRef = collection(
     db, "users", user.uid, "notifications"
