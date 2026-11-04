@@ -611,28 +611,140 @@ body.notification-detail-open .bottom-nav {
 </section>
   
   <section class="page" id="ministry">
+
   <div class="eyebrow">SERVE AT LOGIC</div>
   <h1>Ministry Team</h1>
-  <p class="subtitle">Explore the teams and departments at LOGIC Teens.</p>
+  <p class="subtitle">Discover our departments, meet the people serving, and find your place at LOGIC Teens.</p>
 
-  <div class="panel">
-    <strong>Ushers</strong>
-    <p>Help welcome and guide people at church gatherings.</p>
-    <button class="primary" onclick="applyTeam('Ushers', this)">Apply to join</button>
+  <style>
+    #ministry .ministry-card {
+      background:linear-gradient(135deg,#191b2b,#141622);
+      border:1px solid #292b3b;
+      border-radius:17px;
+      padding:17px;
+      margin:15px 0;
+    }
+
+    #ministry .ministry-card-top {
+      display:flex;
+      align-items:center;
+      gap:13px;
+    }
+
+    #ministry .ministry-icon {
+      width:49px;
+      height:49px;
+      flex-shrink:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#292541;
+      border-radius:14px;
+      font-size:23px;
+    }
+
+    #ministry .ministry-info {
+      flex:1;
+      min-width:0;
+    }
+
+    #ministry .ministry-info strong {
+      font-size:15px;
+      display:block;
+    }
+
+    #ministry .ministry-info p {
+      color:#9999aa;
+      font-size:12px;
+      line-height:1.5;
+      margin:5px 0 0;
+    }
+
+    #ministry .ministry-divider {
+      height:1px;
+      background:#292b3b;
+      margin:15px 0;
+    }
+
+    #ministry .ministry-card .primary {
+      padding:11px;
+      font-size:13px;
+    }
+  </style>
+
+  <div class="ministry-card">
+    <div class="ministry-card-top">
+      <div class="ministry-icon">🎧</div>
+      <div class="ministry-info">
+        <strong>Logic Teens Sound (LTS)</strong>
+        <p>Serve through sound and audio support.</p>
+      </div>
+    </div>
+    <div class="ministry-divider"></div>
+    <button class="primary" onclick="applyTeam('Logic Teens Sound (LTS)', this)">Apply to join</button>
   </div>
 
-  <div class="panel">
-    <strong>Media</strong>
-    <p>Be part of the team supporting media and communication.</p>
-    <button class="primary" onclick="applyTeam('Media', this)">Apply to join</button>
+  <div class="ministry-card">
+    <div class="ministry-card-top">
+      <div class="ministry-icon">🤝</div>
+      <div class="ministry-info">
+        <strong>Ushering Department</strong>
+        <p>Welcome and assist people during gatherings.</p>
+      </div>
+    </div>
+    <div class="ministry-divider"></div>
+    <button class="primary" onclick="applyTeam('Ushering Department', this)">Apply to join</button>
   </div>
 
-  <div class="panel">
-    <strong>Singers / Choir</strong>
-    <p>Use your voice to serve through music.</p>
-    <button class="primary" onclick="applyTeam('Singers / Choir', this)">Apply to join</button>
+  <div class="ministry-card">
+    <div class="ministry-card-top">
+      <div class="ministry-icon">📱</div>
+      <div class="ministry-info">
+        <strong>Social Media Department</strong>
+        <p>Help share and communicate the LOGIC Teens message.</p>
+      </div>
+    </div>
+    <div class="ministry-divider"></div>
+    <button class="primary" onclick="applyTeam('Social Media Department', this)">Apply to join</button>
   </div>
-  </section>
+
+  <div class="ministry-card">
+    <div class="ministry-card-top">
+      <div class="ministry-icon">⚙️</div>
+      <div class="ministry-info">
+        <strong>Technical Department</strong>
+        <p>Support the technical needs of church activities.</p>
+      </div>
+    </div>
+    <div class="ministry-divider"></div>
+    <button class="primary" onclick="applyTeam('Technical Department', this)">Apply to join</button>
+  </div>
+
+  <div class="ministry-card">
+    <div class="ministry-card-top">
+      <div class="ministry-icon">🛡️</div>
+      <div class="ministry-info">
+        <strong>Logic Teens SWAT Department</strong>
+        <p>Serve and support the work of LOGIC Teens.</p>
+      </div>
+    </div>
+    <div class="ministry-divider"></div>
+    <button class="primary" onclick="applyTeam('Logic Teens SWAT Department', this)">Apply to join</button>
+  </div>
+
+  <div class="ministry-card">
+    <div class="ministry-card-top">
+      <div class="ministry-icon">📋</div>
+      <div class="ministry-info">
+        <strong>Planning Committee</strong>
+        <p>Help plan and coordinate LOGIC Teens activities.</p>
+      </div>
+    </div>
+    <div class="ministry-divider"></div>
+    <button class="primary" onclick="applyTeam('Planning Committee', this)">Apply to join</button>
+  </div>
+
+</section>
 
   
 <section class="page" id="profile">
