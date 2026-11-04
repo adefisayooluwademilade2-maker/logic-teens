@@ -466,6 +466,12 @@ body.bible-open header {
     <div class="empty">You're all caught up.</div>
   </div>
 </section>
+
+  <section class="page" id="notificationDetails">
+  <button class="settings-back" onclick="openPage('notifications')">← Back</button>
+  <h1 id="notificationDetailTitle"></h1>
+  <p id="notificationDetailMessage" style="white-space:pre-wrap;line-height:1.8"></p>
+  </section>
   
   <section class="page" id="connect">
     <div class="eyebrow">YOU BELONG HERE</div>
@@ -1718,15 +1724,12 @@ const db = getFirestore(app);
 window.startNotificationListener = function(user) {
   const notificationList = document.getElementById("notificationList");
   const badge = document.getElementById("unreadNotificationCount");
-  notificationList.innerHTML = "Checking notifications...";
 
   const notificationsRef = collection(
     db, "users", user.uid, "notifications"
   );
 
-  const notificationsQuery = notificationsRef;
-
-  onSnapshot(notificationsQuery, snapshot => {
+  onSnapshot(notificationsRef, snapshot => {
     notificationList.innerHTML = "";
     let unread = 0;
 
@@ -1738,44 +1741,56 @@ window.startNotificationListener = function(user) {
     snapshot.forEach(notificationDoc => {
       const item = notificationDoc.data();
       const id = notificationDoc.id;
+      const isRead = item.read === true;
 
-      if (item.read !== true) unread++;
+      if (!isRead) unread++;
 
       const card = document.createElement("div");
       card.className = "panel";
+      card.style.cursor = "pointer";
 
       const title = document.createElement("strong");
-      title.textContent = item.title || "LOGIC Teens";
+      title.textContent = item.title || "Notification";
 
       const message = document.createElement("p");
       message.textContent = item.message || "";
 
-      const status = document.createElement("small");
-      status.textContent = item.read === true ? "Read" : "Unread";
+      card.append(title, message);
 
-      card.append(title, message, status);
+      const button = document.createElement("button");
+      button.className = "notification-read-btn";
+      button.textContent = isRead ? "Read" : "Mark as read";
+      button.disabled = isRead;
 
-      if (item.read !== true) {
-        const button = document.createElement("button");
-        button.className = "notification-read-btn";
-        button.textContent = "Mark as read";
+      button.onclick = async (event) => {
+        event.stopPropagation();
+        if (isRead) return;
 
-        button.onclick = async () => {
-          await updateDoc(
-            doc(db, "users", user.uid, "notifications", id),
-            { read: true }
-          );
-        };
+        await updateDoc(
+          doc(db, "users", user.uid, "notifications", id),
+          { read: true }
+        );
+      };
 
-        card.appendChild(button);
-      }
+      card.appendChild(button);
+
+      card.onclick = () => {
+        document.getElementById("notificationDetailTitle").textContent =
+          item.title || "Notification";
+
+        document.getElementById("notificationDetailMessage").textContent =
+          item.message || "";
+
+        openPage("notificationDetails");
+      };
 
       notificationList.appendChild(card);
     });
 
     badge.textContent = unread;
     badge.hidden = unread === 0;
-    }, error => {
+
+  }, error => {
     console.error("Notification error:", error);
     notificationList.innerHTML =
       '<div class="empty">Could not load notifications: ' +
