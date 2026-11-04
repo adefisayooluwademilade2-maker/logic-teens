@@ -2371,6 +2371,100 @@ const db = getFirestore(app);
   }
 };
 
+  window.loadAdminApprovedMembers = async function() {
+  const list = document.getElementById("adminApprovedMemberList");
+
+  list.innerHTML = `
+    <div class="directory-empty">
+      <h3>Loading approved members...</h3>
+    </div>
+  `;
+
+  try {
+    const membersQuery = query(
+      collection(db, "departmentMembers"),
+      where("status", "==", "approved")
+    );
+
+    const snapshot = await getDocs(membersQuery);
+
+    list.innerHTML = "";
+
+    if (snapshot.empty) {
+      list.innerHTML = `
+        <div class="directory-empty">
+          <h3>No approved members yet</h3>
+          <p>Approved department members will appear here.</p>
+        </div>
+      `;
+      return;
+    }
+
+    snapshot.forEach(memberDoc => {
+      const member = memberDoc.data();
+
+      const card = document.createElement("button");
+      card.type = "button";
+      card.style.cssText = `
+        display:flex;
+        align-items:center;
+        gap:13px;
+        width:100%;
+        padding:14px 0;
+        background:transparent;
+        border:0;
+        border-bottom:1px solid var(--line);
+        color:white;
+        text-align:left;
+      `;
+
+      const photo = document.createElement("img");
+      photo.src = member.photoURL || "https://www.gravatar.com/avatar/?d=mp";
+      photo.style.cssText = `
+        width:48px;
+        height:48px;
+        border-radius:50%;
+        object-fit:cover;
+      `;
+
+      const info = document.createElement("div");
+      info.style.flex = "1";
+
+      const name = document.createElement("strong");
+      name.textContent = member.fullName || "LOGIC Teens Member";
+
+      const department = document.createElement("div");
+      department.textContent = member.department || "Department not assigned";
+      department.style.cssText =
+        "color:var(--gold);font-size:11px;margin-top:5px";
+
+      const role = document.createElement("div");
+      role.textContent = member.role || "Team Member";
+      role.style.cssText =
+        "color:var(--muted);font-size:12px;margin-top:4px";
+
+      info.append(name, department, role);
+      card.append(photo, info);
+
+      card.onclick = () => {
+        window.openMinistryMemberProfile(member);
+      };
+
+      list.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error("Approved members error:", error);
+
+    list.innerHTML = `
+      <div class="directory-empty">
+        <h3>Couldn't load approved members</h3>
+        <p>Please try again later.</p>
+      </div>
+    `;
+  }
+};
+
 window.loadAdminApplications = async function() {
   const list = document.getElementById("adminApplicationList");
 
