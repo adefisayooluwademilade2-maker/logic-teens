@@ -1356,17 +1356,17 @@ document.getElementById("profilePictureInput")
 
   <button class="panel menu-item" style="width:100%;text-align:left;margin-top:18px"
     onclick="openPage('notificationSettings')">
-    🔔 &nbsp; Notifications &nbsp; ›
+     &nbsp; Notifications &nbsp; ›
   </button>
 
   <button class="panel menu-item" style="width:100%;text-align:left;margin-top:12px"
     onclick="openPage('privacySettings')">
-    🛡 &nbsp; Privacy & Safety &nbsp; ›
+     &nbsp; Privacy & Safety &nbsp; ›
   </button>
 
   <button class="panel menu-item" style="width:100%;text-align:left;margin-top:12px"
     onclick="openPage('supportSettings')">
-    ℹ &nbsp; Information & Support &nbsp; ›
+     &nbsp; Information & Support &nbsp; ›
   </button>
 </section>
 
@@ -1639,11 +1639,6 @@ window.addEventListener("popstate", () => {
 
   history.pushState({ logicPage: "home" }, "", "#home");
 });
-function applyTeam(team) {
-  document.getElementById('applicationMessage').hidden = false;
-  document.getElementById('applicationText').textContent =
-    'You selected ' + team + '. The application system will be connected when the secure application backend is added.';
-}
 
 // DAILY KJV WORD
 const dailyVerses = [
