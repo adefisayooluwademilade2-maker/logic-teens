@@ -537,7 +537,7 @@ body.notification-detail-open .bottom-nav {
 <!-- ADMIN HOMEPAGE -->
 <div class="grid admin-home-grid" id="adminHomeTiles" hidden>
 
-  <button class="tile" onclick="openPage('adminDashboard')">
+  <button class="tile" onclick="openPage('adminApprovedMembers'); loadAdminApprovedMembers()">
     <span class="admin-tile-icon">
       <svg viewBox="0 0 24 24">
         <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -549,7 +549,7 @@ body.notification-detail-open .bottom-nav {
     <small>Approved Members</small>
   </button>
 
-  <button class="tile" onclick="openPage('adminDashboard')">
+  <button class="tile" onclick="openPage('adminApplications'); loadAdminApplications()">
     <span class="admin-tile-icon">
       <svg viewBox="0 0 24 24">
         <rect x="4" y="3" width="16" height="18" rx="2"/>
@@ -1072,6 +1072,22 @@ body.admin-user #ministry .ministry-actions {
   </div>
 
   </section>
+
+<section class="page" id="adminApprovedMembers">
+
+  <button class="directory-back" onclick="openPage('home')">←</button>
+
+  <div class="eyebrow">LOGIC TEENS MANAGEMENT</div>
+  <h1>Approved Members</h1>
+  <p class="subtitle">View members approved to serve in LOGIC Teens departments.</p>
+
+  <div id="adminApprovedMemberList">
+    <div class="directory-empty">
+      <h3>Loading members...</h3>
+    </div>
+  </div>
+
+</section>
   
 <script>
   window.openMinistryDirectory = function(department) {
@@ -2419,9 +2435,18 @@ approveButton.onclick = () =>
 
 const rejectButton = document.createElement("button");
 rejectButton.textContent = "Reject";
-rejectButton.style.flex = "1";
-rejectButton.style.background = "#30202a";
-rejectButton.style.color = "#ff9b9b";
+rejectButton.style.cssText = `
+  flex:1;
+  padding:12px 16px;
+  background:#7f252d;
+  color:#ffffff;
+  border:0;
+  outline:none;
+  border-radius:11px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+`;
 rejectButton.onclick = () =>
   rejectTeamApplication(applicationDoc.id);
 
