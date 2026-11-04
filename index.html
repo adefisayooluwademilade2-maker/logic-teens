@@ -2656,6 +2656,7 @@ window.approveTeamApplication = async function(applicationId) {
 
     alert("Application approved successfully.");
     window.loadAdminApplications();
+    window.loadAdminHomeCounts();
 
   } catch (error) {
     console.error("Application approval error:", error);
