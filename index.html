@@ -1954,7 +1954,7 @@ document.getElementById("profilePictureInput")
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      alert("Please select an image.");
+      window.logicNotify("Please select an image.");
       this.value = "";
       return;
     }
@@ -3094,7 +3094,7 @@ window.rejectTeamApplication = async function(applicationId) {
   const user = auth.currentUser;
 
   if (!user) {
-    alert("Please sign in first.");
+    window.logicNotify("Please sign in first.");
     return;
   }
 
@@ -3142,7 +3142,7 @@ window.rejectTeamApplication = async function(applicationId) {
     console.error("Team application error:", error);
     button.disabled = false;
     button.textContent = "Apply to join";
-    alert("Your request couldn't be sent. Please try again.");
+    window.logicNotify("Your request couldn't be sent. Please try again.");
   }
 };
 
