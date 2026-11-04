@@ -149,6 +149,13 @@ h2 {font-size:19px;margin:27px 0 14px}
   font-size: 12px;
   font-weight: 600;
   }
+  .notification-read-btn:disabled {
+  background: #090a12;
+  color: #77778a;
+  border-color: #292b3b;
+  opacity: 0.65;
+  cursor: not-allowed;
+  }
 .event-date {color:var(--gold);font-size:11px;letter-spacing:1px}
 .empty {text-align:center;padding:35px 15px;color:var(--muted)}
 input,textarea,select {
@@ -299,6 +306,11 @@ footer {text-align:center;color:#77778a;font-size:11px;padding:25px}
   /* Hide the top header only while reading the Bible */
 body.bible-open header {
   display: none;
+}
+  body.notification-detail-open header,
+body.notification-detail-open footer,
+body.notification-detail-open .bottom-nav {
+  display: none !important;
 }
 
 /* Remove the line above bottom navigation */
@@ -458,7 +470,7 @@ body.bible-open header {
   </section>
 
 <section class="page" id="notifications">
-  <button class="settings-back" onclick="openPage('home')" aria-label="Back">←</button>
+  <button class="settings-back" onclick="openPage('notifications')" aria-label="Back">←</button>
   <div class="eyebrow">STAY CONNECTED</div>
   <h1>Notifications</h1>
 
@@ -1537,6 +1549,10 @@ function openPage(page, options = {}) {
   target.classList.add("active");
 
   document.body.classList.toggle("bible-open", page === "bible");
+  document.body.classList.toggle(
+  "notification-detail-open",
+  page === "notificationDetails"
+);
 
   document.querySelectorAll(".nav-btn").forEach(button => {
     button.classList.toggle("active", button.dataset.page === page);
@@ -1774,15 +1790,22 @@ window.startNotificationListener = function(user) {
 
       card.appendChild(button);
 
-      card.onclick = () => {
-        document.getElementById("notificationDetailTitle").textContent =
-          item.title || "Notification";
+      card.onclick = async () => {
+  if (!isRead) {
+    await updateDoc(
+      doc(db, "users", user.uid, "notifications", id),
+      { read: true }
+    );
+  }
 
-        document.getElementById("notificationDetailMessage").textContent =
-          item.message || "";
+  document.getElementById("notificationDetailTitle").textContent =
+    item.title || "Notification";
 
-        openPage("notificationDetails");
-      };
+  document.getElementById("notificationDetailMessage").textContent =
+    item.message || "";
+
+  openPage("notificationDetails");
+};
 
       notificationList.appendChild(card);
     });
