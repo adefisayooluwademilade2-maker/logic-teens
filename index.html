@@ -745,7 +745,180 @@ body.notification-detail-open .bottom-nav {
   </div>
 
 </section>
+  
 
+<section class="page" id="ministryDirectory">
+  <style>
+    #ministryDirectory .directory-back,
+    #ministryMemberProfile .directory-back {
+      background: transparent;
+      border: 0;
+      color: var(--text, #fff);
+      font-size: 15px;
+      padding: 8px 0;
+      margin-bottom: 18px;
+    }
+
+    #ministryDirectory .directory-heading,
+    #ministryMemberProfile .directory-heading {
+      margin-bottom: 20px;
+    }
+
+    #ministryDirectory .directory-heading h1,
+    #ministryMemberProfile .directory-heading h1 {
+      margin: 5px 0;
+    }
+
+    #ministryDirectory .directory-empty {
+      background: var(--card, #141622);
+      border: 1px solid var(--line, #292b3b);
+      border-radius: 16px;
+      padding: 28px 18px;
+      text-align: center;
+      margin-top: 18px;
+    }
+
+    #ministryDirectory .directory-empty-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    #ministryDirectory .directory-empty p {
+      color: #a4a5b5;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 0;
+    }
+
+    #ministryMemberProfile .member-profile-card {
+      background: var(--card, #141622);
+      border: 1px solid var(--line, #292b3b);
+      border-radius: 18px;
+      padding: 22px 18px;
+      text-align: center;
+    }
+
+    #ministryMemberProfile .member-profile-photo {
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--card2, #1b1d2c);
+      margin-bottom: 12px;
+    }
+
+    #ministryMemberProfile .member-profile-role {
+      display: inline-block;
+      background: #242239;
+      color: #bcb5ee;
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 11px;
+      margin-top: 8px;
+    }
+
+    #ministryMemberProfile .member-profile-details {
+      text-align: left;
+      margin-top: 22px;
+    }
+
+    #ministryMemberProfile .member-profile-details p {
+      border-bottom: 1px solid var(--line, #292b3b);
+      padding: 12px 0;
+      margin: 0;
+      font-size: 13px;
+    }
+
+    #ministryMemberProfile .member-profile-details strong {
+      display: block;
+      color: #999bad;
+      font-size: 11px;
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+  </style>
+
+  <button class="directory-back" onclick="openPage('ministry')">← Back to Ministry Team</button>
+
+  <div class="directory-heading">
+    <div class="eyebrow">LOGIC TEENS COMMUNITY</div>
+    <h1 id="directoryDepartmentName">Department Members</h1>
+    <p class="subtitle">Meet the people serving in this department.</p>
+  </div>
+
+  <div id="departmentMemberList">
+    <div class="directory-empty">
+      <div class="directory-empty-icon">👥</div>
+      <h3>No approved members yet</h3>
+      <p>Approved department members will appear here after an Admin reviews their applications.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="ministryMemberProfile">
+  <button class="directory-back" onclick="openPage('ministryDirectory')">← Back to Members</button>
+
+  <div class="directory-heading">
+    <div class="eyebrow">LOGIC TEENS COMMUNITY</div>
+    <h1>Member Profile</h1>
+  </div>
+
+  <div class="member-profile-card">
+    <img
+      id="directoryMemberPhoto"
+      class="member-profile-photo"
+      src="https://www.gravatar.com/avatar/?d=mp"
+      alt="Member profile photo"
+    >
+    <h2 id="directoryMemberName">Member Name</h2>
+    <div id="directoryMemberRole" class="member-profile-role">Team Member</div>
+
+    <div class="member-profile-details">
+      <p>
+        <strong>Department</strong>
+        <span id="directoryMemberDepartment">—</span>
+      </p>
+      <p>
+        <strong>Responsibility</strong>
+        <span id="directoryMemberResponsibility">Not assigned yet</span>
+      </p>
+      <p>
+        <strong>About Me</strong>
+        <span id="directoryMemberAbout">No introduction added.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  window.openMinistryDirectory = function(department) {
+    document.getElementById("directoryDepartmentName").textContent = department;
+    openPage("ministryDirectory");
+  };
+
+  window.openMinistryMemberProfile = function(member) {
+    document.getElementById("directoryMemberPhoto").src =
+      member.photoURL || "https://www.gravatar.com/avatar/?d=mp";
+
+    document.getElementById("directoryMemberName").textContent =
+      member.fullName || member.username || "LOGIC Teens Member";
+
+    document.getElementById("directoryMemberRole").textContent =
+      member.role || "Team Member";
+
+    document.getElementById("directoryMemberDepartment").textContent =
+      member.department || "—";
+
+    document.getElementById("directoryMemberResponsibility").textContent =
+      member.responsibility || "Not assigned yet";
+
+    document.getElementById("directoryMemberAbout").textContent =
+      member.about || "No introduction added.";
+
+    openPage("ministryMemberProfile");
+  };
+</script>
+  
   
 <section class="page" id="profile">
 
