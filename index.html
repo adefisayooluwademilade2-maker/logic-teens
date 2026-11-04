@@ -2404,19 +2404,29 @@ const db = getFirestore(app);
     snapshot.forEach(memberDoc => {
       const member = memberDoc.data();
 
-      const card = document.createElement("button");
-      card.type = "button";
+            const card = document.createElement("div");
       card.style.cssText = `
         display:flex;
         align-items:center;
-        gap:13px;
+        gap:10px;
         width:100%;
         padding:14px 0;
+        border-bottom:1px solid var(--line);
+      `;
+
+      const profileButton = document.createElement("button");
+      profileButton.type = "button";
+      profileButton.style.cssText = `
+        display:flex;
+        align-items:center;
+        gap:13px;
+        flex:1;
+        min-width:0;
         background:transparent;
         border:0;
-        border-bottom:1px solid var(--line);
         color:white;
         text-align:left;
+        padding:0;
       `;
 
       const photo = document.createElement("img");
@@ -2445,12 +2455,31 @@ const db = getFirestore(app);
         "color:var(--muted);font-size:12px;margin-top:4px";
 
       info.append(name, department, role);
-      card.append(photo, info);
+      profileButton.append(photo, info);
 
-      card.onclick = () => {
+      profileButton.onclick = () => {
         window.openMinistryMemberProfile(member);
       };
 
+      const removeButton = document.createElement("button");
+      removeButton.type = "button";
+      removeButton.textContent = "Remove";
+      removeButton.style.cssText = `
+        background:#7f252d;
+        color:white;
+        border:0;
+        border-radius:9px;
+        padding:9px 11px;
+        font-size:11px;
+        font-weight:600;
+        cursor:pointer;
+      `;
+
+      removeButton.onclick = () => {
+        window.removeAdminMember(memberDoc.id, member.fullName);
+      };
+
+      card.append(profileButton, removeButton);
       list.appendChild(card);
     });
 
