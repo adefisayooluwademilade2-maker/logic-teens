@@ -750,6 +750,14 @@ body.notification-detail-open .bottom-nav {
       padding:11px;
       font-size:13px;
     }
+    /* ADMIN MINISTRY VIEW */
+body.admin-user #ministry button[onclick^="applyTeam("] {
+  display: none !important;
+}
+
+body.admin-user #ministry .ministry-actions {
+  grid-template-columns: 1fr;
+}
   </style>
 
   
@@ -2653,6 +2661,10 @@ onAuthStateChanged(auth, async user => {
       : {};
 
     window.logicIsAdmin = adminSnap.exists();
+    document.body.classList.toggle(
+  "admin-user",
+  window.logicIsAdmin
+);
     window.logicAdminRole = adminData.role || "member";
     window.logicCanManageAdmins =
       adminData.canManageAdmins === true;
