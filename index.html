@@ -1046,16 +1046,20 @@ body.admin-user #ministry .ministry-actions {
     <p>Review, approve and reject ministry team applications.</p>
   </button>
 
-  <div class="panel">
-    <strong>
-      <svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:middle;margin-right:8px" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="9" cy="8" r="3"/>
-        <path d="M3 21v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6"/>
-      </svg>
-      Manage Members
-    </strong>
-    <p>View approved members and manage their membership.</p>
-  </div>
+  <button class="panel" type="button"
+  onclick="openPage('adminManageMembers'); loadAdminManageMembers()">
+  <strong>
+    <svg viewBox="0 0 24 24" width="20" height="20"
+      style="vertical-align:middle;margin-right:8px"
+      fill="none" stroke="currentColor" stroke-width="1.6"
+      stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="9" cy="8" r="3"/>
+      <path d="M3 21v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6"/>
+    </svg>
+    Manage Members
+  </strong>
+  <p>Search and view all registered members.</p>
+  </button>
 
   <div class="panel">
     <strong>
@@ -1144,6 +1148,43 @@ body.admin-user #ministry .ministry-actions {
   </div>
 </section>
 
+  <section class="page" id="adminManageMembers">
+
+  <button class="directory-back"
+    onclick="openPage('adminDashboard')">←</button>
+
+  <div class="eyebrow">LOGIC TEENS MANAGEMENT</div>
+  <h1>Manage Members</h1>
+  <p class="subtitle">
+    Search and view registered LOGIC Teens members.
+  </p>
+
+  <div style="margin:22px 0 16px">
+    <input
+      id="adminMemberSearch"
+      type="search"
+      placeholder="Search members by name..."
+      oninput="renderAdminManageMembers()"
+      style="
+        width:100%;
+        padding:15px;
+        border-radius:12px;
+        border:1px solid var(--line);
+        background:var(--card);
+        color:white;
+        font-size:14px;
+        outline:none;
+      "
+    >
+  </div>
+
+  <div id="adminManageMemberList">
+    <div class="directory-empty">
+      <h3>Loading members...</h3>
+    </div>
+  </div>
+
+  </section>
 
 <section class="page" id="adminApprovedMembers">
 
@@ -1183,9 +1224,9 @@ body.admin-user #ministry .ministry-actions {
     const currentPage = document.querySelector(".page.active")?.id;
 
     window.logicMemberProfileReturnPage =
-      currentPage === "adminApprovedMembers"
-        ? "adminApprovedMembers"
-        : "ministryDirectory";
+  ["adminApprovedMembers", "adminManageMembers"].includes(currentPage)
+    ? currentPage
+    : "ministryDirectory";
 
     let profile = {};
 
@@ -1238,8 +1279,12 @@ body.admin-user #ministry .ministry-actions {
     openPage(returnPage);
 
     if (returnPage === "adminApprovedMembers") {
-      window.loadAdminApprovedMembers();
-    } else if (
+  window.loadAdminApprovedMembers();
+
+} else if (returnPage === "adminManageMembers") {
+  window.loadAdminManageMembers();
+
+} else if (
       returnPage === "ministryDirectory" &&
       window.logicCurrentDepartment
     ) {
@@ -2652,6 +2697,140 @@ const db = getFirestore(app);
   }
 };
 
+window.logicAdminMembersCache = [];
+
+window.loadAdminManageMembers = async function() {
+  if (!window.logicIsAdmin) return;
+
+  const list = document.getElementById("adminManageMemberList");
+
+  list.innerHTML = `
+    <div class="directory-empty">
+      <h3>Loading members...</h3>
+    </div>
+  `;
+
+  try {
+    const [usersSnapshot, adminsSnapshot] = await Promise.all([
+      getDocs(collection(db, "users")),
+      getDocs(collection(db, "admins"))
+    ]);
+
+    const adminIds = new Set(
+      adminsSnapshot.docs.map(item => item.id)
+    );
+
+    window.logicAdminMembersCache = usersSnapshot.docs
+      .filter(userDoc => !adminIds.has(userDoc.id))
+      .map(userDoc => ({
+        ...userDoc.data(),
+        userId: userDoc.id
+      }))
+      .sort((a, b) =>
+        (a.fullName || "").localeCompare(b.fullName || "")
+      );
+
+    window.renderAdminManageMembers();
+
+  } catch (error) {
+    console.error("Manage members error:", error);
+
+    list.innerHTML = `
+      <div class="directory-empty">
+        <h3>Couldn't load members</h3>
+        <p>Please check your connection and try again.</p>
+      </div>
+    `;
+  }
+};
+
+
+window.renderAdminManageMembers = function() {
+  const list = document.getElementById("adminManageMemberList");
+  const search = document.getElementById("adminMemberSearch");
+
+  if (!list) return;
+
+  const searchText = (search?.value || "").trim().toLowerCase();
+
+  const members = (window.logicAdminMembersCache || []).filter(member =>
+    (member.fullName || "").toLowerCase().includes(searchText)
+  );
+
+  list.innerHTML = "";
+
+  if (!members.length) {
+    list.innerHTML = `
+      <div class="directory-empty">
+        <h3>No members found</h3>
+        <p>Try another name.</p>
+      </div>
+    `;
+    return;
+  }
+
+  members.forEach(member => {
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.style.cssText = `
+      display:flex;
+      align-items:center;
+      gap:14px;
+      width:100%;
+      padding:14px 0;
+      background:transparent;
+      border:0;
+      border-bottom:1px solid var(--line);
+      color:white;
+      text-align:left;
+      cursor:pointer;
+    `;
+
+    const photo = document.createElement("img");
+
+    photo.src =
+      member.photoURL ||
+      "https://www.gravatar.com/avatar/?d=mp";
+
+    photo.style.cssText = `
+      width:49px;
+      height:49px;
+      border-radius:50%;
+      object-fit:cover;
+      flex-shrink:0;
+    `;
+
+    photo.onerror = () => {
+      photo.src = "https://www.gravatar.com/avatar/?d=mp";
+    };
+
+    const name = document.createElement("strong");
+
+    name.textContent =
+      member.fullName || "LOGIC Teens Member";
+
+    const arrow = document.createElement("span");
+    arrow.textContent = "›";
+    arrow.style.cssText = `
+      margin-left:auto;
+      color:var(--muted);
+      font-size:24px;
+    `;
+
+    button.append(photo, name, arrow);
+
+    button.onclick = () => {
+      window.openMinistryMemberProfile({
+        ...member,
+        role: "Member"
+      });
+    };
+
+    list.appendChild(button);
+  });
+};
+  
   window.loadAdminApprovedMembers = async function() {
   const list = document.getElementById("adminApprovedMemberList");
 
