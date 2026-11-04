@@ -1883,9 +1883,11 @@ window.startNotificationListener = function(user) {
       const title = document.createElement("strong");
       title.textContent = item.title || "Notification";
 
-      const message = document.createElement("p");
-      message.textContent = item.message || "";
-
+const message = document.createElement("p");
+const fullMessage = item.message || "";
+message.textContent = fullMessage.length > 55
+  ? fullMessage.slice(0, 55).trim() + "..."
+  : fullMessage;
       card.append(title, message);
 
       const button = document.createElement("button");
