@@ -2441,6 +2441,128 @@ list.appendChild(card);
     `;
   }
 };
+
+window.approveTeamApplication = async function(applicationId) {
+  const admin = auth.currentUser;
+
+  if (!admin || !window.logicIsAdmin) {
+    alert("You are not authorised to approve applications.");
+    return;
+  }
+
+  try {
+    const applicationRef = doc(db, "teamApplications", applicationId);
+    const applicationSnap = await getDoc(applicationRef);
+
+    if (!applicationSnap.exists()) {
+      alert("Application not found.");
+      return;
+    }
+
+    const application = applicationSnap.data();
+
+    if (application.status !== "pending") {
+      alert("This application has already been reviewed.");
+      return;
+    }
+
+    const batch = writeBatch(db);
+
+    const memberRef = doc(db, "departmentMembers", applicationId);
+
+    batch.set(memberRef, {
+      userId: application.userId,
+      fullName: application.memberName || "LOGIC Teens Member",
+      email: application.email || "",
+      department: application.team,
+      status: "approved",
+      role: "Team Member",
+      responsibility: "Not assigned yet",
+      approvedAt: serverTimestamp()
+    });
+
+    batch.update(applicationRef, {
+      status: "approved",
+      reviewedAt: serverTimestamp(),
+      reviewedBy: admin.uid
+    });
+
+    const notificationRef = doc(
+      collection(db, "users", application.userId, "notifications")
+    );
+
+    batch.set(notificationRef, {
+      title: "Ministry Team Application Approved",
+      message: `Your application to join the ${application.team} has been approved. Welcome to the team!`,
+      read: false,
+      createdAt: serverTimestamp()
+    });
+
+    await batch.commit();
+
+    alert("Application approved successfully.");
+    window.loadAdminApplications();
+
+  } catch (error) {
+    console.error("Application approval error:", error);
+    alert("Could not approve this application. Please try again.");
+  }
+};
+
+
+window.rejectTeamApplication = async function(applicationId) {
+  const admin = auth.currentUser;
+
+  if (!admin || !window.logicIsAdmin) {
+    alert("You are not authorised to reject applications.");
+    return;
+  }
+
+  try {
+    const applicationRef = doc(db, "teamApplications", applicationId);
+    const applicationSnap = await getDoc(applicationRef);
+
+    if (!applicationSnap.exists()) {
+      alert("Application not found.");
+      return;
+    }
+
+    const application = applicationSnap.data();
+
+    if (application.status !== "pending") {
+      alert("This application has already been reviewed.");
+      return;
+    }
+
+    const batch = writeBatch(db);
+
+    batch.update(applicationRef, {
+      status: "rejected",
+      reviewedAt: serverTimestamp(),
+      reviewedBy: admin.uid
+    });
+
+    const notificationRef = doc(
+      collection(db, "users", application.userId, "notifications")
+    );
+
+    batch.set(notificationRef, {
+      title: "Ministry Team Application Update",
+      message: `Your application to join the ${application.team} was not approved at this time.`,
+      read: false,
+      createdAt: serverTimestamp()
+    });
+
+    await batch.commit();
+
+    alert("Application rejected.");
+    window.loadAdminApplications();
+
+  } catch (error) {
+    console.error("Application rejection error:", error);
+    alert("Could not reject this application. Please try again.");
+  }
+};
   
   window.applyTeam = async function(team, button) {
   const user = auth.currentUser;
