@@ -2495,6 +2495,32 @@ const db = getFirestore(app);
   }
 };
 
+window.removeAdminMember = async function(memberId, memberName) {
+  if (!window.logicIsAdmin) {
+    alert("You are not authorised to remove members.");
+    return;
+  }
+
+  const confirmed = confirm(
+    `Are you sure you want to remove ${memberName || "this member"} from the approved department members?`
+  );
+
+  if (!confirmed) return;
+
+  try {
+    await deleteDoc(doc(db, "departmentMembers", memberId));
+
+    alert("Member removed successfully.");
+
+    await window.loadAdminApprovedMembers();
+    await window.loadAdminHomeCounts();
+
+  } catch (error) {
+    console.error("Remove member error:", error);
+    alert("Could not remove this member. Please try again.");
+  }
+};
+  
   window.loadAdminHomeCounts = async function() {
   try {
     const membersQuery = query(
