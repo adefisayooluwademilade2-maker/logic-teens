@@ -2008,6 +2008,14 @@ loadNotificationSettings();
 
 <script>
 function openPage(page, options = {}) {
+  
+  if (
+    page === "adminDashboard" &&
+    window.logicIsAdmin !== true
+  ) {
+    page = "home";
+  }
+  
   if (document.body.classList.contains("profile-editing")) {
     closeProfileEditor();
   }
