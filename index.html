@@ -487,28 +487,54 @@ body.notification-detail-open .bottom-nav {
     </div>
 
     <h2>Your journey</h2>
-    <div class="grid">
-      <button class="tile" onclick="openPage('bible')">
-        <span class="emoji">📖</span>
-        <strong>Daily Devotionals</strong>
-        <small>Grow in God's word</small>
-      </button>
-      <button class="tile" onclick="openPage('bible')">
-        <span class="emoji">✦</span>
-        <strong>Bible Quiz</strong>
-        <small>Learn and test yourself</small>
-      </button>
-      <button class="tile" onclick="openPage('connect')">
-        <span class="emoji">🤝</span>
-        <strong>Teens Community</strong>
-        <small>Connect with others</small>
-      </button>
-      <button class="tile" onclick="openPage('event')">
-        <span class="emoji">📅</span>
-        <strong>Events</strong>
-        <small>See what's happening</small>
-      </button>
-    </div>
+    
+<!-- NORMAL MEMBER HOMEPAGE -->
+<div class="grid" id="memberHomeTiles">
+  <button class="tile" onclick="openPage('bible')">
+    <span class="emoji">📖</span>
+    <strong>Daily Devotionals</strong>
+    <small>Grow in God's word</small>
+  </button>
+
+  <button class="tile" onclick="openPage('bible')">
+    <span class="emoji">✦</span>
+    <strong>Bible Quiz</strong>
+    <small>Learn and test yourself</small>
+  </button>
+
+  <button class="tile" onclick="openPage('connect')">
+    <span class="emoji">🤝</span>
+    <strong>Teens Community</strong>
+    <small>Connect with others</small>
+  </button>
+
+  <button class="tile" onclick="openPage('event')">
+    <span class="emoji">📅</span>
+    <strong>Events</strong>
+    <small>See what's happening</small>
+  </button>
+</div>
+
+<!-- ADMIN HOMEPAGE -->
+<div class="grid" id="adminHomeTiles" hidden>
+  <button class="tile" onclick="openPage('adminDashboard')">
+    <span class="emoji">👥</span>
+    <strong id="adminMemberCount">0</strong>
+    <small>Approved Members</small>
+  </button>
+
+  <button class="tile" onclick="openPage('adminDashboard')">
+    <span class="emoji">📋</span>
+    <strong id="adminApplicationCount">0</strong>
+    <small>Pending Applications</small>
+  </button>
+
+  <button class="tile" onclick="openPage('adminDashboard')">
+    <span class="emoji">🛡️</span>
+    <strong>Open Admin Dashboard</strong>
+    <small>Manage LOGIC Teens</small>
+  </button>
+</div>
 
     <h2>Upcoming at LOGIC</h2>
     <div class="panel">
