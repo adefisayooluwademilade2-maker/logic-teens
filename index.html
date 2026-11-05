@@ -1086,20 +1086,149 @@ body.admin-user #ministry .ministry-actions {
   color: #999bad;
   font-size: 11px;
   font-weight: 500;
-  margin-bottom: 4px;
+#ministryMemberProfile .member-profile-card {
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  text-align: left;
+}
+
+#ministryMemberProfile .member-profile-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 25px 16px;
+  background: linear-gradient(135deg,#292044,#171526 65%,#302543);
+  border: 1px solid #393047;
+  border-radius: 20px;
+  text-align: center;
+}
+
+#ministryMemberProfile .member-photo-wrap {
+  position: relative;
+  width: 95px;
+  height: 95px;
+  min-width: 95px;
+}
+
+#ministryMemberProfile .member-profile-photo {
+  display: block;
+  width: 95px;
+  height: 95px;
+  border: 3px solid var(--gold,#d6b779);
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--card2,#1b1d2c);
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#ministryMemberProfile .member-online-dot {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  right: 2px;
+  bottom: 5px;
+  border-radius: 50%;
+  border: 2px solid #292044;
+}
+
+#ministryMemberProfile .member-profile-name {
+  color: #f5f3f8;
+  font-size: 22px;
+  line-height: 1.3;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+#ministryMemberProfile .member-profile-role {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+#ministryMemberProfile .member-role-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 30px;
+  background: #302543;
+  color: #d6b779;
+  border: 1px solid #9a783d;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+#ministryMemberProfile .member-profile-details {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  margin-top: 14px;
+  padding: 4px 15px;
+  background: var(--card,#141622);
+  border: 1px solid var(--line,#292b3b);
+  border-radius: 16px;
+}
+
+#ministryMemberProfile .member-profile-details p {
+  border-bottom: 1px solid var(--line,#292b3b);
+  padding: 13px 0;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+#ministryMemberProfile .member-profile-details p:last-child {
+  border-bottom: 0;
+}
+
+#ministryMemberProfile .member-profile-details strong,
+#ministryMemberProfile .member-share-row strong {
+  display: block;
+  color: #999bad;
+  font-size: 11px;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+#ministryMemberProfile .member-share-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 17px 3px;
+  font-size: 12px;
+}
+
+#ministryMemberProfile .member-share-button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #bcb5ee;
 }
 
 #ministryMemberProfile .member-profile-actions {
   display: flex;
-  gap: 9px;
-  margin-top: 14px;
+  gap: 10px;
+  margin-top: 5px;
+  width: 100%;
 }
 
 #ministryMemberProfile .member-profile-action {
   flex: 1;
-  padding: 10px 8px;
+  min-width: 0;
+  padding: 12px 8px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 12px;
   font-weight: 600;
   text-align: center;
@@ -1110,7 +1239,7 @@ body.admin-user #ministry .ministry-actions {
 #ministryMemberProfile .member-profile-action.follow {
   background: var(--gold);
   color: #171321;
-}
+    }
 
 #ministryMemberProfile .member-share-row {
   display: flex;
@@ -1187,14 +1316,12 @@ body.admin-user #ministry .ministry-actions {
           class="member-online-dot"></span>
       </div>
 
-      <div style="min-width:0">
+      <div style="min-width:0;width:100%">
         <h2 id="directoryMemberName" class="member-profile-name">
           Member Name
         </h2>
 
-        <div id="directoryMemberRole" class="member-profile-role">
-          Team Member
-        </div>
+        <div id="directoryMemberRole" class="member-profile-role"></div>
       </div>
     </div>
 
@@ -1235,23 +1362,24 @@ body.admin-user #ministry .ministry-actions {
     </div>
 
     <div class="member-profile-actions">
-  <button type="button" class="member-profile-action">
-    Message
-  </button>
+      <button type="button" class="member-profile-action">
+        Message
+      </button>
 
-  <button type="button" class="member-profile-action follow">
-    <svg width="17" height="17" viewBox="0 0 24 24"
-      fill="none" stroke="currentColor" stroke-width="2"
-      stroke-linecap="round" stroke-linejoin="round">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-      <circle cx="10" cy="7" r="4"/>
-      <path d="M19 8v6M16 11h6"/>
-    </svg>
-    Add Friend
-  </button>
+      <button type="button" class="member-profile-action follow">
+        <svg width="17" height="17" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="10" cy="7" r="4"/>
+          <path d="M19 8v6M16 11h6"/>
+        </svg>
+        Add Friend
+      </button>
+    </div>
+
   </div>
-    
- </section>
+          </section>
   
 
 <section class="page" id="membersDirectory">
@@ -1526,28 +1654,29 @@ body.admin-user #ministry .ministry-actions {
   }
 
   #ministryMemberProfile .directory-heading {
-    display: none;
-  }
+  display: none;
+}
 
-  #ministryMemberProfile .member-profile-card {
-    background: var(--card, #141622) !important;
-    border: 1px solid var(--line, #292b3b) !important;
-    border-radius: 16px !important;
-    box-shadow: none !important;
-    padding: 16px !important;
-    text-align: left !important;
-    }
+#ministryMemberProfile {
+  width: 100%;
+}
 
-  #ministryMemberProfile .member-profile-photo {
-    display: block;
-  }
+#ministryMemberProfile .member-profile-card {
+  width: 100%;
+  max-width: none;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
 
-  #ministryMemberProfile .member-profile-role {
-    background: transparent !important;
-    border: 1px solid var(--gold);
-    color: var(--gold) !important;
-    border-radius: 20px;
-  }
+#ministryMemberProfile .member-profile-role {
+  display: flex !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: inherit !important;
+}
 
 /* TEAM APPLICATIONS AND MANAGE MEMBERS */
 #adminApplications,
@@ -1748,21 +1877,23 @@ body.admin-user #ministry .ministry-actions {
 window.openMinistryMemberProfile = async function(member) {
   const currentPage = document.querySelector(".page.active")?.id;
 
-  window.logicMemberProfileReturnPage =
-    [
-      "adminApprovedMembers",
-      "adminManageMembers",
-      "membersDirectory"
-    ].includes(currentPage)
-      ? currentPage
-      : "ministryDirectory";
+  window.logicMemberProfileReturnPage = [
+    "adminApprovedMembers",
+    "adminManageMembers",
+    "membersDirectory"
+  ].includes(currentPage)
+    ? currentPage
+    : "ministryDirectory";
 
+  const userId = member.userId || "";
   let profile = {};
+  let memberships = [];
+  let isAdmin = member.isAdmin === true;
 
-  if (member.userId) {
+  if (userId) {
     try {
       const profileSnap = await getDoc(
-        doc(db, "publicProfiles", member.userId)
+        doc(db, "publicProfiles", userId)
       );
 
       if (profileSnap.exists()) {
@@ -1771,7 +1902,51 @@ window.openMinistryMemberProfile = async function(member) {
     } catch (error) {
       console.warn("Public member profile unavailable:", error);
     }
+
+    try {
+      const membershipSnapshot = await getDocs(
+        query(
+          collection(db, "departmentMembers"),
+          where("userId", "==", userId)
+        )
+      );
+
+      memberships = membershipSnapshot.docs
+        .map(item => item.data())
+        .filter(item =>
+          String(item.status || "").toLowerCase() === "approved"
+        );
+    } catch (error) {
+      console.warn("Could not load all approved team memberships:", error);
+    }
+
+    try {
+      const adminSnap = await getDoc(doc(db, "admins", userId));
+      isAdmin = isAdmin || adminSnap.exists();
+    } catch (error) {
+      console.warn("Could not verify admin status:", error);
+    }
   }
+
+  isAdmin = isAdmin || profile.isAdmin === true;
+
+  const departments = [...new Set(
+    memberships
+      .map(item => String(item.department || "").trim())
+      .filter(Boolean)
+  )];
+
+  const responsibilities = [...new Set(
+    memberships
+      .map(item => String(item.responsibility || "").trim())
+      .filter(value => value && value !== "—")
+  )];
+
+  const hasTeamMember = memberships.length > 0;
+
+  const hasTeamLeader = memberships.some(item =>
+    String(item.role || "").toLowerCase().includes("leader")
+  );
 
   document.getElementById("directoryMemberPhoto").src =
     profile.photoURL ||
@@ -1785,11 +1960,21 @@ window.openMinistryMemberProfile = async function(member) {
     member.username ||
     "LOGIC Teens Member";
 
-  const isTeamLeader =
-    String(member.role || "").toLowerCase().includes("leader");
+  const roleContainer =
+    document.getElementById("directoryMemberRole");
 
-  document.getElementById("directoryMemberRole").textContent =
-    isTeamLeader ? "Team Leader" : "Team Member";
+  roleContainer.replaceChildren();
+
+  const addRoleBadge = label => {
+    const badge = document.createElement("span");
+    badge.className = "member-role-badge";
+    badge.textContent = label;
+    roleContainer.appendChild(badge);
+  };
+
+  if (isAdmin) addRoleBadge("Admin");
+  if (hasTeamMember) addRoleBadge("Team Member");
+  if (hasTeamLeader) addRoleBadge("Team Leader");
 
   const isOnline =
     profile.isOnline === true || member.isOnline === true;
@@ -1803,12 +1988,16 @@ window.openMinistryMemberProfile = async function(member) {
   onlineDot.title = isOnline ? "Online" : "Offline";
 
   document.getElementById("directoryMemberDepartment").textContent =
-    member.department || "—";
+    departments.length
+      ? departments.join(" / ")
+      : "—";
 
   document.getElementById("directoryMemberResponsibility").textContent =
-    member.responsibility || "Not assigned yet";
+    responsibilities.length
+      ? responsibilities.join(" / ")
+      : "Not assigned yet";
 
-    const savedAbout = Object.prototype.hasOwnProperty.call(
+  const savedAbout = Object.prototype.hasOwnProperty.call(
     profile,
     "about"
   )
@@ -1818,7 +2007,7 @@ window.openMinistryMemberProfile = async function(member) {
   document.getElementById("directoryMemberAbout").textContent =
     savedAbout || "No introduction added.";
 
-    const joinedDate =
+  const joinedDate =
     member.joinedAt ||
     member.approvedAt ||
     member.createdAt ||
