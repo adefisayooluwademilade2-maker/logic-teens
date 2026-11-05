@@ -1339,8 +1339,29 @@ body.admin-user #ministry .ministry-actions {
       member.username ||
       "LOGIC Teens Member";
 
-    document.getElementById("directoryMemberRole").textContent =
-      member.role || "Team Member";
+    let isAdmin = member.isAdmin === true;
+
+if (member.userId) {
+  try {
+    const adminCheck = await getDoc(
+      doc(db, "admins", member.userId)
+    );
+
+    isAdmin = adminCheck.exists() || isAdmin;
+
+  } catch (error) {
+    console.warn("Could not verify account role:", error);
+  }
+}
+
+const departmentRole = member.role || "";
+
+document.getElementById("directoryMemberRole").textContent =
+  departmentRole.toLowerCase().includes("leader")
+    ? "Team Leader"
+    : isAdmin
+      ? "Admin"
+      : "Team Member";
 
     document.getElementById("directoryMemberDepartment").textContent =
       member.department || "—";
@@ -2769,8 +2790,16 @@ const member = {
         member.fullName || member.username || member.memberName || "LOGIC Teens Member";
 
       const role = document.createElement("div");
-      role.textContent = member.role || "Team Member";
-      role.style.cssText = "color:var(--gold);font-size:11px;margin-top:5px";
+
+role.textContent =
+  (member.role || "").toLowerCase().includes("leader")
+    ? "Team Leader"
+    : member.isAdmin
+      ? "Admin"
+      : "Team Member";
+
+role.style.cssText =
+  "color:var(--gold);font-size:11px;margin-top:5px";
 
       const responsibility = document.createElement("div");
       responsibility.textContent =
@@ -2899,8 +2928,8 @@ window.renderAdminManageMembers = function() {
 
   members.forEach(member => {
     const button = document.createElement("button");
-
     button.type = "button";
+
     button.style.cssText = `
       display:flex;
       align-items:center;
@@ -2916,7 +2945,6 @@ window.renderAdminManageMembers = function() {
     `;
 
     const photo = document.createElement("img");
-
     photo.src =
       member.photoURL ||
       "https://www.gravatar.com/avatar/?d=mp";
@@ -2933,10 +2961,21 @@ window.renderAdminManageMembers = function() {
       photo.src = "https://www.gravatar.com/avatar/?d=mp";
     };
 
-    const name = document.createElement("strong");
+    const info = document.createElement("div");
+    info.style.flex = "1";
+    info.style.minWidth = "0";
 
+    const name = document.createElement("strong");
     name.textContent =
       member.fullName || "LOGIC Teens Member";
+
+    const accountRole = document.createElement("div");
+    accountRole.textContent =
+      member.isAdmin ? "Admin" : "Member";
+    accountRole.style.cssText =
+      "color:var(--gold);font-size:12px;margin-top:5px";
+
+    info.append(name, accountRole);
 
     const arrow = document.createElement("span");
     arrow.textContent = "›";
@@ -2946,13 +2985,13 @@ window.renderAdminManageMembers = function() {
       font-size:24px;
     `;
 
-    button.append(photo, name, arrow);
+    button.append(photo, info, arrow);
 
     button.onclick = () => {
       window.openMinistryMemberProfile({
-  ...member,
-  isAdmin: member.isAdmin === true
-});
+        ...member,
+        isAdmin: member.isAdmin === true
+      });
     };
 
     list.appendChild(button);
@@ -2960,6 +2999,8 @@ window.renderAdminManageMembers = function() {
 };
   
   window.loadAdminApprovedMembers = async function() {
+  if (!window.logicIsAdmin) return;
+
   const list = document.getElementById("adminApprovedMemberList");
 
   list.innerHTML = `
@@ -2974,7 +3015,14 @@ window.renderAdminManageMembers = function() {
       where("status", "==", "approved")
     );
 
-    const snapshot = await getDocs(membersQuery);
+    const [snapshot, adminsSnapshot] = await Promise.all([
+      getDocs(membersQuery),
+      getDocs(collection(db, "admins"))
+    ]);
+
+    const adminIds = new Set(
+      adminsSnapshot.docs.map(item => item.id)
+    );
 
     list.innerHTML = "";
 
@@ -2989,9 +3037,15 @@ window.renderAdminManageMembers = function() {
     }
 
     snapshot.forEach(memberDoc => {
-      const member = memberDoc.data();
+      const memberData = memberDoc.data();
 
-            const card = document.createElement("div");
+      const member = {
+        ...memberData,
+        userId: memberData.userId || "",
+        isAdmin: adminIds.has(memberData.userId)
+      };
+
+      const card = document.createElement("div");
       card.style.cssText = `
         display:flex;
         align-items:center;
@@ -3017,34 +3071,49 @@ window.renderAdminManageMembers = function() {
       `;
 
       const photo = document.createElement("img");
-      photo.src = member.photoURL || "https://www.gravatar.com/avatar/?d=mp";
+      photo.src =
+        member.photoURL ||
+        "https://www.gravatar.com/avatar/?d=mp";
+
       photo.style.cssText = `
         width:48px;
         height:48px;
         border-radius:50%;
         object-fit:cover;
+        flex-shrink:0;
       `;
 
       const info = document.createElement("div");
       info.style.flex = "1";
+      info.style.minWidth = "0";
+
+      const name = document.createElement("strong");
+      name.textContent =
+        member.fullName || "LOGIC Teens Member";
 
       const accountRole = document.createElement("div");
-accountRole.textContent = member.isAdmin ? "Admin" : "Member";
-accountRole.style.cssText =
-  "color:var(--gold);font-size:12px;margin-top:5px";
-      name.textContent = member.fullName || "LOGIC Teens Member";
+      accountRole.textContent =
+        member.isAdmin ? "Admin" : "Member";
+      accountRole.style.cssText =
+        "color:var(--gold);font-size:12px;margin-top:5px";
 
       const department = document.createElement("div");
-      department.textContent = member.department || "Department not assigned";
+      department.textContent =
+        member.department || "Department not assigned";
       department.style.cssText =
         "color:var(--gold);font-size:11px;margin-top:5px";
 
       const role = document.createElement("div");
-      role.textContent = member.role || "Team Member";
+      role.textContent =
+        (member.role || "").toLowerCase().includes("leader")
+          ? "Team Leader"
+          : member.isAdmin
+            ? "Admin"
+            : "Team Member";
       role.style.cssText =
         "color:var(--muted);font-size:12px;margin-top:4px";
 
-      info.append(name, department, role);
+      info.append(name, accountRole, department, role);
       profileButton.append(photo, info);
 
       profileButton.onclick = () => {
