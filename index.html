@@ -1108,32 +1108,6 @@ body.admin-user #ministry .ministry-actions {
   
 <section class="page" id="adminApplications">
 
-/* CONSISTENT ADMIN MANAGEMENT PAGE DESIGN */
-
-#adminApplications,
-#adminManageMembers {
-  color:var(--white) !important;
-  text-align:left !important;
-}
-
-#adminApplications h1,
-#adminManageMembers h1,
-#adminApplications #adminApplicationList .panel strong,
-#adminApplications #adminApplicationList .panel p,
-#adminManageMembers #adminManageMemberList strong {
-  color:var(--white) !important;
-  text-align:left !important;
-}
-
-#adminApplications #adminApplicationList,
-#adminManageMembers #adminManageMemberList {
-  text-align:left !important;
-}
-
-#adminManageMembers #adminManageMemberList button {
-  justify-content:flex-start !important;
-  text-align:left !important;
-}
   
   <style>
   body.management-page-open header {
@@ -1244,6 +1218,50 @@ body.admin-user #ministry .ministry-actions {
     color: var(--gold) !important;
     border-radius: 20px;
   }
+
+/* TEAM APPLICATIONS AND MANAGE MEMBERS */
+#adminApplications,
+#adminManageMembers {
+  color: var(--white) !important;
+  text-align: left !important;
+}
+
+#adminApplications h1,
+#adminApplications .subtitle,
+#adminManageMembers h1,
+#adminManageMembers .subtitle,
+#adminApplications #adminApplicationList,
+#adminManageMembers #adminManageMemberList {
+  color: var(--white) !important;
+  text-align: left !important;
+}
+
+#adminApplications #adminApplicationList .panel {
+  color: var(--white) !important;
+  text-align: left !important;
+}
+
+#adminApplications #adminApplicationList .panel strong,
+#adminApplications #adminApplicationList .panel p {
+  color: var(--white) !important;
+  text-align: left !important;
+}
+
+#adminManageMembers #adminManageMemberList button {
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+#adminManageMembers #adminManageMemberList strong {
+  color: var(--white) !important;
+  text-align: left !important;
+}
+
+#adminManageMembers #adminMemberSearch {
+  color: white !important;
+  text-align: left !important;
+    }
+    
   </style>
 
   <button class="directory-back" onclick="openPage('adminDashboard')">←</button>
@@ -2763,14 +2781,7 @@ const db = getFirestore(app);
       where("status", "==", "approved")
     );
 
-    const [snapshot, adminsSnapshot] = await Promise.all([
-  getDocs(membersQuery),
-  getDocs(collection(db, "admins"))
-]);
-
-const adminIds = new Set(
-  adminsSnapshot.docs.map(item => item.id)
-);
+    const snapshot = await getDocs(membersQuery);
 
     list.innerHTML = "";
 
@@ -2790,8 +2801,8 @@ const adminIds = new Set(
 const member = {
   ...memberData,
   userId: memberData.userId || "",
-  isAdmin: adminIds.has(memberData.userId)
-};
+  isAdmin: memberData.isAdmin === true
+  }; 
 
       const card = document.createElement("button");
       card.type = "button";
@@ -3516,7 +3527,16 @@ window.rejectTeamApplication = async function(applicationId) {
     const existing = await getDoc(applicationRef);
 
     if (existing.exists()) {
-  button.textContent = "Request sent";
+  const application = existing.data();
+
+  if (application.status === "approved") {
+    button.textContent = "Approved";
+  } else if (application.status === "rejected") {
+    button.textContent = "Not approved";
+  } else {
+    button.textContent = "Request sent";
+  }
+
   button.disabled = true;
   return;
   }
