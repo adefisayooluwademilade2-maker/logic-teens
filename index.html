@@ -1235,48 +1235,87 @@ body.admin-user #ministry .ministry-actions {
     </div>
 
     <div class="member-profile-actions">
-      <div class="member-profile-action">Message</div>
-      <div class="member-profile-action follow">Follow</div>
-    </div>
+  <button type="button" class="member-profile-action">
+    Message
+  </button>
 
+  <button type="button" class="member-profile-action follow">
+    <svg width="17" height="17" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="10" cy="7" r="4"/>
+      <path d="M19 8v6M16 11h6"/>
+    </svg>
+    Add Friend
+  </button>
   </div>
+    
  </section>
-
-<section class="page" id="ministryMemberProfile">
-  <button class="directory-back" onclick="window.closeMinistryMemberProfile()">←</button>
   
-  <div class="directory-heading">
-    <div class="eyebrow">LOGIC TEENS COMMUNITY</div>
-    <h1>Member Profile</h1>
+
+<section class="page" id="membersDirectory">
+  <button class="directory-back" onclick="openPage('home')">←</button>
+
+  <div class="eyebrow">LOGIC TEENS COMMUNITY</div>
+  <h1>Members</h1>
+  <p class="subtitle">Meet the people in the LOGIC Teens community.</p>
+
+  <div class="members-directory-tools">
+    <input
+      id="membersDirectorySearch"
+      type="search"
+      placeholder="Search members..."
+      oninput="renderMembersDirectory()"
+    >
+
+    <button
+      type="button"
+      class="members-filter-trigger"
+      onclick="toggleMembersFilter()"
+    >
+      <svg viewBox="0 0 24 24">
+        <path d="M4 6h16M7 12h10M10 18h4"/>
+      </svg>
+      Filter
+    </button>
+
+    <div
+      id="membersFilterPopup"
+      class="members-filter-popup"
+      hidden
+    >
+      <div class="members-filter-heading">Show members</div>
+
+      <div class="members-filter-option"
+        onclick="setMembersDirectoryFilter('all')">
+        Everyone <span id="filterCheckAll" class="members-filter-check">✓</span>
+      </div>
+
+      <div class="members-filter-option"
+        onclick="setMembersDirectoryFilter('admin')">
+        Admins <span id="filterCheckAdmin" class="members-filter-check"></span>
+      </div>
+
+      <div class="members-filter-option"
+        onclick="setMembersDirectoryFilter('member')">
+        Members <span id="filterCheckMember" class="members-filter-check"></span>
+      </div>
+    </div>
   </div>
 
-  <div class="member-profile-card">
-    <img
-      id="directoryMemberPhoto"
-      class="member-profile-photo"
-      src="https://www.gravatar.com/avatar/?d=mp"
-      alt="Member profile photo"
-    >
-    <h2 id="directoryMemberName">Member Name</h2>
-    <div id="directoryMemberRole" class="member-profile-role">Team Member</div>
+  <select id="membersDirectoryFilter" hidden>
+    <option value="all">Everyone</option>
+    <option value="admin">Admins</option>
+    <option value="member">Members</option>
+  </select>
 
-    <div class="member-profile-details">
-      <p>
-        <strong>Department</strong>
-        <span id="directoryMemberDepartment">—</span>
-      </p>
-      <p>
-        <strong>Responsibility</strong>
-        <span id="directoryMemberResponsibility">Not assigned yet</span>
-      </p>
-      <p>
-        <strong>About Me</strong>
-        <span id="directoryMemberAbout">No introduction added.</span>
-      </p>
+  <div id="membersDirectoryList">
+    <div class="directory-empty">
+      <h3>Loading members...</h3>
     </div>
   </div>
 </section>
-
   
 <section class="page" id="adminDashboard">
 
@@ -1491,13 +1530,13 @@ body.admin-user #ministry .ministry-actions {
   }
 
   #ministryMemberProfile .member-profile-card {
-    background: transparent !important;
-    border: 0 !important;
-    border-radius: 0 !important;
+    background: var(--card, #141622) !important;
+    border: 1px solid var(--line, #292b3b) !important;
+    border-radius: 16px !important;
     box-shadow: none !important;
-    padding: 8px 0 !important;
+    padding: 16px !important;
     text-align: left !important;
-  }
+    }
 
   #ministryMemberProfile .member-profile-photo {
     display: block;
@@ -1769,13 +1808,19 @@ window.openMinistryMemberProfile = async function(member) {
   document.getElementById("directoryMemberResponsibility").textContent =
     member.responsibility || "Not assigned yet";
 
-  document.getElementById("directoryMemberAbout").textContent =
-    profile.about ||
-    member.about ||
-    "No introduction added.";
+    const savedAbout = Object.prototype.hasOwnProperty.call(
+    profile,
+    "about"
+  )
+    ? profile.about
+    : member.about;
 
-  const joinedDate =
+  document.getElementById("directoryMemberAbout").textContent =
+    savedAbout || "No introduction added.";
+
+    const joinedDate =
     member.joinedAt ||
+    member.approvedAt ||
     member.createdAt ||
     member.reviewedAt ||
     profile.createdAt;
