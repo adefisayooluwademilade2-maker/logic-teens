@@ -1085,23 +1085,55 @@ body.admin-user #ministry .ministry-actions {
     <p class="subtitle">Discover and connect with everyone in LOGIC Teens.</p>
   </div>
 
+  <div class="members-directory-tools">
   <input
     id="membersDirectorySearch"
     type="search"
     placeholder="Search by name or username..."
     oninput="renderMembersDirectory()"
-    style="width:100%;padding:15px;border-radius:12px"
   >
 
-  <select
-    id="membersDirectoryFilter"
-    onchange="renderMembersDirectory()"
-    style="width:100%;padding:14px;border-radius:12px"
+  <div
+    class="members-filter-trigger"
+    role="button"
+    tabindex="0"
+    onclick="toggleMembersFilter()"
+    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleMembersFilter()}"
   >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 7h16M7 12h10M10 17h4"/>
+      <circle cx="8" cy="7" r="2"/>
+      <circle cx="15" cy="12" r="2"/>
+      <circle cx="12" cy="17" r="2"/>
+    </svg>
+    <span>Filter</span>
+  </div>
+
+  <div id="membersFilterPopup" class="members-filter-popup" hidden>
+    <div class="members-filter-heading">Filter members</div>
+
+    <div class="members-filter-option" onclick="setMembersDirectoryFilter('all')">
+      <span>Everyone</span>
+      <span class="members-filter-check" id="filterCheckAll">✓</span>
+    </div>
+
+    <div class="members-filter-option" onclick="setMembersDirectoryFilter('admin')">
+      <span>Admins</span>
+      <span class="members-filter-check" id="filterCheckAdmin"></span>
+    </div>
+
+    <div class="members-filter-option" onclick="setMembersDirectoryFilter('member')">
+      <span>Members</span>
+      <span class="members-filter-check" id="filterCheckMember"></span>
+    </div>
+  </div>
+
+  <select id="membersDirectoryFilter" hidden>
     <option value="all">Everyone</option>
     <option value="member">Members</option>
     <option value="admin">Admins</option>
   </select>
+  </div>
 
   <div id="membersDirectoryList">
     <div class="directory-empty">
