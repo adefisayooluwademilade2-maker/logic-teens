@@ -3089,33 +3089,25 @@ window.renderAdminManageMembers = function() {
       name.textContent =
         member.fullName || "LOGIC Teens Member";
 
-      const accountRole = document.createElement("div");
-      accountRole.textContent =
-        member.isAdmin ? "Admin" : "Member";
-      accountRole.style.cssText =
-        "color:var(--gold);font-size:12px;margin-top:5px";
-
-      const department = document.createElement("div");
-      department.textContent =
-        member.department || "Department not assigned";
-      department.style.cssText =
-        "color:var(--gold);font-size:11px;margin-top:5px";
-
       const isTeamLeader =
   (member.role || "").toLowerCase().includes("leader");
 
-const role = document.createElement("div");
-role.textContent =
-  isTeamLeader ? "Team Leader" : "";
+const accountRole = document.createElement("div");
 
-role.style.cssText =
-  "color:var(--muted);font-size:12px;margin-top:4px";
+accountRole.textContent =
+  (member.isAdmin ? "Admin" : "Member") +
+  (isTeamLeader ? " · Team Leader" : "");
 
-if (!isTeamLeader) {
-  role.style.display = "none";
-  }
+accountRole.style.cssText =
+  "color:var(--gold);font-size:12px;margin-top:5px";
 
-      info.append(name, accountRole, department, role);
+const department = document.createElement("div");
+department.textContent =
+  member.department || "Department not assigned";
+department.style.cssText =
+  "color:var(--gold);font-size:11px;margin-top:5px";
+
+info.append(name, accountRole, department);
       profileButton.append(photo, info);
 
       profileButton.onclick = () => {
