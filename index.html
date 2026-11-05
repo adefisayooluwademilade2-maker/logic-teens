@@ -5040,51 +5040,75 @@ onAuthStateChanged(auth, async user => {
   }
   
     const profileRef = doc(db, "users", user.uid);
-    const profileSnap = await getDoc(profileRef);
+const publicProfileRef = doc(db, "publicProfiles", user.uid);
 
-    const data = profileSnap.exists()
+const [profileSnap, publicProfileSnap] = await Promise.all([
+  getDoc(profileRef),
+  getDoc(publicProfileRef)
+]);
+
+const userData = profileSnap.exists()
   ? profileSnap.data()
   : {};
 
-const joinedAt =
-  data.joinedAt ||
-  user.metadata.creationTime ||
-  data.createdAt ||
-  new Date().toISOString();
+const publicData = publicProfileSnap.exists()
+  ? publicProfileSnap.data()
+  : {};
+
+const data = {
+  ...publicData,
+  ...userData,
+
+  fullName:
+    userData.fullName ||
+    publicData.fullName ||
+    user.displayName ||
+    "",
+
+  photoURL:
+    userData.photoURL ||
+    publicData.photoURL ||
+    user.photoURL ||
+    "",
+
+  username:
+    userData.username ||
+    publicData.username ||
+    "",
+
+  about:
+    userData.about ||
+    publicData.about ||
+    "",
+
+  joinedAt:
+    userData.joinedAt ||
+    publicData.joinedAt ||
+    user.metadata.creationTime ||
+    userData.createdAt ||
+    publicData.createdAt ||
+    new Date().toISOString()
+};
+
+const joinedAt = data.joinedAt;
 
 await setDoc(profileRef, {
-  fullName: data.fullName || user.displayName || "",
+  fullName: data.fullName,
   email: user.email || "",
-  photoURL: data.photoURL || user.photoURL || "",
-  username: data.username || "",
-  about: data.about || "",
+  photoURL: data.photoURL,
+  username: data.username,
+  about: data.about,
   joinedAt: joinedAt
 }, { merge: true });
 
-await setDoc(
-  doc(db, "publicProfiles", user.uid),
-  {
-    fullName: data.fullName || user.displayName || "",
-    photoURL: data.photoURL || user.photoURL || "",
-    username: data.username || "",
-    about: data.about || "",
-    joinedAt: joinedAt,
-    isAdmin: window.logicIsAdmin === true
-  },
-  { merge: true }
-);
-    
-await setDoc(
-  doc(db, "publicProfiles", user.uid),
-  {
-    fullName: data.fullName || user.displayName || "",
-    photoURL: data.photoURL || user.photoURL || "",
-    username: data.username || "",
-    about: data.about || "",
-    isAdmin: window.logicIsAdmin === true
-  },
-  { merge: true }
-);
+await setDoc(publicProfileRef, {
+  fullName: data.fullName,
+  photoURL: data.photoURL,
+  username: data.username,
+  about: data.about,
+  joinedAt: joinedAt,
+  isAdmin: window.logicIsAdmin === true
+}, { merge: true });
 
     const savedNotifications = data.notificationSettings;
 
