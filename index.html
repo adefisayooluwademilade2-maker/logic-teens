@@ -4969,14 +4969,34 @@ onAuthStateChanged(auth, async user => {
   ? profileSnap.data()
   : {};
 
+const joinedAt =
+  data.joinedAt ||
+  user.metadata.creationTime ||
+  data.createdAt ||
+  new Date().toISOString();
+
 await setDoc(profileRef, {
   fullName: data.fullName || user.displayName || "",
   email: user.email || "",
   photoURL: data.photoURL || user.photoURL || "",
   username: data.username || "",
-  about: data.about || ""
+  about: data.about || "",
+  joinedAt: joinedAt
 }, { merge: true });
 
+await setDoc(
+  doc(db, "publicProfiles", user.uid),
+  {
+    fullName: data.fullName || user.displayName || "",
+    photoURL: data.photoURL || user.photoURL || "",
+    username: data.username || "",
+    about: data.about || "",
+    joinedAt: joinedAt,
+    isAdmin: window.logicIsAdmin === true
+  },
+  { merge: true }
+);
+    
 await setDoc(
   doc(db, "publicProfiles", user.uid),
   {
