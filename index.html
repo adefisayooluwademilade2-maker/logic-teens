@@ -1355,13 +1355,12 @@ if (member.userId) {
 }
 
 const departmentRole = member.role || "";
+const isTeamLeader =
+  departmentRole.toLowerCase().includes("leader");
 
 document.getElementById("directoryMemberRole").textContent =
-  departmentRole.toLowerCase().includes("leader")
-    ? "Team Leader"
-    : isAdmin
-      ? "Admin"
-      : "Team Member";
+  (isAdmin ? "Admin" : "Member") +
+  (isTeamLeader ? " · Team Leader" : "");
 
     document.getElementById("directoryMemberDepartment").textContent =
       member.department || "—";
@@ -2789,18 +2788,17 @@ const member = {
       name.textContent =
         member.fullName || member.username || member.memberName || "LOGIC Teens Member";
 
-      const role = document.createElement("div");
+      const accountRole = member.isAdmin ? "Admin" : "Member";
+const isTeamLeader =
+  (member.role || "").toLowerCase().includes("leader");
+
+const role = document.createElement("div");
 
 role.textContent =
-  (member.role || "").toLowerCase().includes("leader")
-    ? "Team Leader"
-    : member.isAdmin
-      ? "Admin"
-      : "Team Member";
+  accountRole + (isTeamLeader ? " · Team Leader" : "");
 
 role.style.cssText =
   "color:var(--gold);font-size:11px;margin-top:5px";
-
       const responsibility = document.createElement("div");
       responsibility.textContent =
         member.responsibility || "Not assigned yet";
@@ -3103,15 +3101,19 @@ window.renderAdminManageMembers = function() {
       department.style.cssText =
         "color:var(--gold);font-size:11px;margin-top:5px";
 
-      const role = document.createElement("div");
-      role.textContent =
-        (member.role || "").toLowerCase().includes("leader")
-          ? "Team Leader"
-          : member.isAdmin
-            ? "Admin"
-            : "Team Member";
-      role.style.cssText =
-        "color:var(--muted);font-size:12px;margin-top:4px";
+      const isTeamLeader =
+  (member.role || "").toLowerCase().includes("leader");
+
+const role = document.createElement("div");
+role.textContent =
+  isTeamLeader ? "Team Leader" : "";
+
+role.style.cssText =
+  "color:var(--muted);font-size:12px;margin-top:4px";
+
+if (!isTeamLeader) {
+  role.style.display = "none";
+  }
 
       info.append(name, accountRole, department, role);
       profileButton.append(photo, info);
