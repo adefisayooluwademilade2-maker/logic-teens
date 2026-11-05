@@ -1107,6 +1107,34 @@ body.admin-user #ministry .ministry-actions {
   
   
 <section class="page" id="adminApplications">
+
+/* CONSISTENT ADMIN MANAGEMENT PAGE DESIGN */
+
+#adminApplications,
+#adminManageMembers {
+  color:var(--white) !important;
+  text-align:left !important;
+}
+
+#adminApplications h1,
+#adminManageMembers h1,
+#adminApplications #adminApplicationList .panel strong,
+#adminApplications #adminApplicationList .panel p,
+#adminManageMembers #adminManageMemberList strong {
+  color:var(--white) !important;
+  text-align:left !important;
+}
+
+#adminApplications #adminApplicationList,
+#adminManageMembers #adminManageMemberList {
+  text-align:left !important;
+}
+
+#adminManageMembers #adminManageMemberList button {
+  justify-content:flex-start !important;
+  text-align:left !important;
+}
+  
   <style>
   body.management-page-open header {
     display: none !important;
@@ -2563,6 +2591,14 @@ document.body.classList.toggle(
     history.pushState({ logicPage: page }, "", "#" + page);
   }
 
+if (
+  page === "ministry" &&
+  window.logicCurrentUser &&
+  window.loadTeamApplicationStatus
+) {
+  window.loadTeamApplicationStatus(window.logicCurrentUser);
+}
+  
   window.scrollTo(0, 0);
 }
 
@@ -3534,17 +3570,36 @@ window.rejectTeamApplication = async function(applicationId) {
     const team = match[1];
     const teamId = team.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
-    const applicationRef = doc(
-      db,
-      "teamApplications",
-      user.uid + "_" + teamId
-    );
+    try {
+      const applicationRef = doc(
+        db,
+        "teamApplications",
+        user.uid + "_" + teamId
+      );
 
-    const applicationSnap = await getDoc(applicationRef);
+      const applicationSnap = await getDoc(applicationRef);
 
-    if (applicationSnap.exists()) {
-      button.textContent = "Request sent";
-      button.disabled = true;
+      if (!applicationSnap.exists()) {
+        button.textContent = "Apply to join";
+        button.disabled = false;
+        continue;
+      }
+
+      const application = applicationSnap.data();
+
+      if (application.status === "approved") {
+        button.textContent = "Approved";
+        button.disabled = true;
+      } else if (application.status === "rejected") {
+        button.textContent = "Not approved";
+        button.disabled = true;
+      } else {
+        button.textContent = "Request sent";
+        button.disabled = true;
+      }
+
+    } catch (error) {
+      console.error("Team application status error:", error);
     }
   }
 };
