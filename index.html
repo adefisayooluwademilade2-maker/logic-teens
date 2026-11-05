@@ -4029,11 +4029,11 @@ window.renderAdminManageMembers = function() {
     list.appendChild(button);
   });
 };
-  
   window.loadAdminApprovedMembers = async function() {
   if (!window.logicIsAdmin) return;
 
   const list = document.getElementById("adminApprovedMemberList");
+  if (!list) return;
 
   list.innerHTML = `
     <div class="directory-empty">
@@ -4056,9 +4056,42 @@ window.renderAdminManageMembers = function() {
       adminsSnapshot.docs.map(item => item.id)
     );
 
+    const groupedMembers = new Map();
+
+    snapshot.forEach(memberDoc => {
+      const data = memberDoc.data();
+      const userId = data.userId || "";
+      const groupKey = userId || `document-${memberDoc.id}`;
+
+      if (!groupedMembers.has(groupKey)) {
+        groupedMembers.set(groupKey, {
+          ...data,
+          userId,
+          isAdmin: userId ? adminIds.has(userId) : false,
+          memberships: [],
+          membershipIds: [],
+          departments: []
+        });
+      }
+
+      const member = groupedMembers.get(groupKey);
+
+      member.memberships.push(data);
+      member.membershipIds.push(memberDoc.id);
+
+      const department = String(data.department || "").trim();
+
+      if (
+        department &&
+        !member.departments.includes(department)
+      ) {
+        member.departments.push(department);
+      }
+    });
+
     list.innerHTML = "";
 
-    if (snapshot.empty) {
+    if (groupedMembers.size === 0) {
       list.innerHTML = `
         <div class="directory-empty">
           <h3>No approved members yet</h3>
@@ -4068,16 +4101,9 @@ window.renderAdminManageMembers = function() {
       return;
     }
 
-    snapshot.forEach(memberDoc => {
-      const memberData = memberDoc.data();
-
-      const member = {
-        ...memberData,
-        userId: memberData.userId || "",
-        isAdmin: adminIds.has(memberData.userId)
-      };
-
+    groupedMembers.forEach(member => {
       const card = document.createElement("div");
+
       card.style.cssText = `
         display:flex;
         align-items:center;
@@ -4088,7 +4114,9 @@ window.renderAdminManageMembers = function() {
       `;
 
       const profileButton = document.createElement("button");
+
       profileButton.type = "button";
+
       profileButton.style.cssText = `
         display:flex;
         align-items:center;
@@ -4103,6 +4131,7 @@ window.renderAdminManageMembers = function() {
       `;
 
       const photo = document.createElement("img");
+
       photo.src =
         member.photoURL ||
         "https://www.gravatar.com/avatar/?d=mp";
@@ -4116,32 +4145,39 @@ window.renderAdminManageMembers = function() {
       `;
 
       const info = document.createElement("div");
+
       info.style.flex = "1";
       info.style.minWidth = "0";
 
       const name = document.createElement("strong");
+
       name.textContent =
         member.fullName || "LOGIC Teens Member";
 
-      const isTeamLeader =
-  (member.role || "").toLowerCase().includes("leader");
+      const isTeamLeader = member.memberships.some(item =>
+        String(item.role || "").toLowerCase().includes("leader")
+      );
 
-const accountRole = document.createElement("div");
+      const accountRole = document.createElement("div");
 
-accountRole.textContent =
-  (member.isAdmin ? "Admin" : "Member") +
-  (isTeamLeader ? " · Team Leader" : "");
+      accountRole.textContent =
+        (member.isAdmin ? "Admin" : "Member") +
+        (isTeamLeader ? " · Team Leader" : "");
 
-accountRole.style.cssText =
-  "color:var(--gold);font-size:12px;margin-top:5px";
+      accountRole.style.cssText =
+        "color:var(--gold);font-size:12px;margin-top:5px";
 
-const department = document.createElement("div");
-department.textContent =
-  member.department || "Department not assigned";
-department.style.cssText =
-  "color:var(--gold);font-size:11px;margin-top:5px";
+      const department = document.createElement("div");
 
-info.append(name, accountRole, department);
+      department.textContent =
+        member.departments.length
+          ? member.departments.join(" / ")
+          : "Department not assigned";
+
+      department.style.cssText =
+        "color:var(--gold);font-size:11px;margin-top:5px";
+
+      info.append(name, accountRole, department);
       profileButton.append(photo, info);
 
       profileButton.onclick = () => {
@@ -4149,8 +4185,10 @@ info.append(name, accountRole, department);
       };
 
       const removeButton = document.createElement("button");
+
       removeButton.type = "button";
       removeButton.textContent = "Remove";
+
       removeButton.style.cssText = `
         background:#7f252d;
         color:white;
@@ -4162,8 +4200,34 @@ info.append(name, accountRole, department);
         cursor:pointer;
       `;
 
-      removeButton.onclick = () => {
-        window.removeAdminMember(memberDoc.id, member.fullName);
+      removeButton.onclick = async () => {
+        const confirmed = await window.logicConfirm(
+          `Are you sure you want to remove ${member.fullName || "this member"} from ALL their approved ministry teams?`,
+          "Remove member?",
+          "Remove"
+        );
+
+        if (!confirmed) return;
+
+        try {
+          await Promise.all(
+            member.membershipIds.map(id =>
+              deleteDoc(doc(db, "departmentMembers", id))
+            )
+          );
+
+          window.logicNotify("Member removed successfully.");
+
+          await window.loadAdminApprovedMembers();
+          await window.loadAdminHomeCounts();
+
+        } catch (error) {
+          console.error("Remove grouped member error:", error);
+
+          window.logicNotify(
+            "Could not remove this member. Please try again."
+          );
+        }
       };
 
       card.append(profileButton, removeButton);
@@ -4181,8 +4245,7 @@ info.append(name, accountRole, department);
     `;
   }
 };
-
-
+  
 window.removeAdminMember = async function(memberId, memberName) {
   if (!window.logicIsAdmin) {
     window.logicNotify("You are not authorised to remove members.");
