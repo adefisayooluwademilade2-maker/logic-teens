@@ -135,24 +135,27 @@ h2 {font-size:19px;margin:27px 0 14px}
 .tile .emoji {font-size:25px;display:block;margin-bottom:13px}
 .tile strong {font-size:14px;display:block}
 .tile small {display:block;color:var(--muted);margin-top:6px;font-size:11px}
-  .admin-home-grid .admin-tile-icon {
-  width: 27px;
-  height: 27px;
+  .admin-home-grid .admin-tile-icon,
+#memberHomeTiles .admin-tile-icon {
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
+  justify-content: center;
   margin-bottom: 13px;
   color: var(--gold);
 }
 
-.admin-home-grid .admin-tile-icon svg {
-  width: 26px;
-  height: 26px;
+.admin-home-grid .admin-tile-icon svg,
+#memberHomeTiles .admin-tile-icon svg {
+  width: 24px;
+  height: 24px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.6;
+  stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
-}
+  }
 .panel {
   background:var(--card);border:1px solid var(--line);
   padding:18px;border-radius:17px;margin-bottom:12px;
@@ -398,6 +401,95 @@ body.notification-detail-open .bottom-nav {
 }
 
 /* Remove the line above bottom navigation */
+.members-directory-tools {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 22px 0 16px;
+  width: 100%;
+}
+
+.members-directory-tools input {
+  flex: 1;
+  min-width: 0;
+  width: 0;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
+
+.members-filter-trigger {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 12px 10px;
+  color: var(--gold);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.members-filter-trigger svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.members-filter-popup {
+  position: absolute;
+  top: calc(100% + 9px);
+  right: 0;
+  z-index: 30;
+  width: min(235px, 75vw);
+  padding: 12px;
+  background: #171827;
+  border: 1px solid #343047;
+  border-radius: 15px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.45);
+}
+
+.members-filter-heading {
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: bold;
+  padding: 5px 7px 10px;
+}
+
+.members-filter-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 10px;
+  margin-top: 5px;
+  border-radius: 10px;
+  background: var(--card2);
+  color: var(--white);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.members-filter-option:active {
+  background: #302b45;
+}
+
+.members-filter-check {
+  color: var(--gold);
+  font-weight: bold;
+  }
+  
 .bottom-nav {
   border-top: none;
 }
@@ -1185,10 +1277,14 @@ body.admin-user #ministry .ministry-actions {
     text-align: left;
   }
 
-  body.management-page-open footer,
+    body.management-page-open footer,
   body.management-page-open .bottom-nav {
     display: none !important;
-    }
+  }
+
+  body.management-page-open.show-bottom-nav .bottom-nav {
+    display: flex !important;
+  }
 
   body.management-page-open .directory-back,
   #ministryMemberProfile .directory-back {
@@ -2654,6 +2750,15 @@ document.body.classList.toggle(
     "ministryMemberProfile"
   ].includes(page)
 );
+
+    document.body.classList.toggle(
+    "show-bottom-nav",
+    page === "ministryDirectory" ||
+    (
+      page === "ministryMemberProfile" &&
+      window.logicMemberProfileReturnPage === "ministryDirectory"
+    )
+  );
   
   document.body.classList.toggle("bible-open", page === "bible");
   document.body.classList.toggle(
@@ -2864,6 +2969,35 @@ window.loadMembersDirectory = async function() {
   }
 };
 
+  window.toggleMembersFilter = function() {
+  const popup = document.getElementById("membersFilterPopup");
+  if (!popup) return;
+
+  popup.hidden = !popup.hidden;
+};
+
+window.setMembersDirectoryFilter = function(value) {
+  const filter = document.getElementById("membersDirectoryFilter");
+  const popup = document.getElementById("membersFilterPopup");
+
+  if (!filter) return;
+
+  filter.value = value;
+
+  document.getElementById("filterCheckAll").textContent =
+    value === "all" ? "✓" : "";
+
+  document.getElementById("filterCheckAdmin").textContent =
+    value === "admin" ? "✓" : "";
+
+  document.getElementById("filterCheckMember").textContent =
+    value === "member" ? "✓" : "";
+
+  if (popup) popup.hidden = true;
+
+  window.renderMembersDirectory();
+};
+
 window.renderMembersDirectory = function() {
   const list = document.getElementById("membersDirectoryList");
   const search = (
@@ -3020,14 +3154,40 @@ window.renderMembersDirectory = function() {
       return;
     }
 
-    snapshot.forEach(memberDoc => {
+        for (const memberDoc of snapshot.docs) {
       const memberData = memberDoc.data();
 
-const member = {
-  ...memberData,
-  userId: memberData.userId || "",
-  isAdmin: memberData.isAdmin === true
-  }; 
+      const member = {
+        ...memberData,
+        userId: memberData.userId || "",
+        isAdmin: memberData.isAdmin === true
+      };
+
+      let publicProfile = {};
+
+      if (member.userId) {
+        try {
+          const profileSnap = await getDoc(
+            doc(db, "publicProfiles", member.userId)
+          );
+
+          if (profileSnap.exists()) {
+            publicProfile = profileSnap.data();
+          }
+        } catch (profileError) {
+          console.warn("Could not load department member photo:", profileError);
+        }
+      }
+
+      member.photoURL =
+        member.photoURL || publicProfile.photoURL || "";
+
+      member.fullName =
+        member.fullName ||
+        publicProfile.fullName ||
+        member.username ||
+        member.memberName ||
+        "LOGIC Teens Member";
 
       const card = document.createElement("button");
       card.type = "button";
@@ -3044,41 +3204,70 @@ const member = {
         text-align:left;
       `;
 
-      const photo = document.createElement("img");
-      photo.src = member.photoURL || "https://www.gravatar.com/avatar/?d=mp";
-      photo.style.cssText = `
+      const avatar = document.createElement("div");
+      avatar.textContent =
+        member.fullName.trim().charAt(0).toUpperCase();
+
+      avatar.style.cssText = `
         width:48px;
         height:48px;
+        min-width:48px;
         border-radius:50%;
-        object-fit:cover;
+        background:var(--card2);
+        color:var(--gold);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:17px;
+        font-weight:bold;
+        overflow:hidden;
       `;
+
+      if (member.photoURL) {
+        const photo = document.createElement("img");
+        photo.src = member.photoURL;
+        photo.alt = "";
+        photo.style.cssText = `
+          width:100%;
+          height:100%;
+          border-radius:50%;
+          object-fit:cover;
+        `;
+
+        photo.onerror = () => {
+          photo.remove();
+        };
+
+        avatar.appendChild(photo);
+      }
 
       const info = document.createElement("div");
       info.style.flex = "1";
+      info.style.minWidth = "0";
 
       const name = document.createElement("strong");
-      name.textContent =
-        member.fullName || member.username || member.memberName || "LOGIC Teens Member";
+      name.textContent = member.fullName;
 
       const accountRole = member.isAdmin ? "Admin" : "Member";
-const isTeamLeader =
-  (member.role || "").toLowerCase().includes("leader");
+      const isTeamLeader =
+        (member.role || "").toLowerCase().includes("leader");
 
-const role = document.createElement("div");
+      const role = document.createElement("div");
+      role.textContent =
+        accountRole + (isTeamLeader ? " · Team Leader" : "");
 
-role.textContent =
-  accountRole + (isTeamLeader ? " · Team Leader" : "");
+      role.style.cssText =
+        "color:var(--gold);font-size:11px;margin-top:5px";
 
-role.style.cssText =
-  "color:var(--gold);font-size:11px;margin-top:5px";
       const responsibility = document.createElement("div");
       responsibility.textContent =
         member.responsibility || "Not assigned yet";
+
       responsibility.style.cssText =
         "color:var(--muted);font-size:12px;margin-top:4px";
 
       info.append(name, role, responsibility);
-      card.append(photo, info);
+      card.append(avatar, info);
 
       card.onclick = () => {
         window.openMinistryMemberProfile({
@@ -3088,7 +3277,7 @@ role.style.cssText =
       };
 
       list.appendChild(card);
-    });
+    }
 
   } catch (error) {
     console.error("Department directory error:", error);
