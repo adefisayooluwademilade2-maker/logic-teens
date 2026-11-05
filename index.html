@@ -1943,9 +1943,9 @@ body.admin-user #ministry .ministry-actions {
     window.loadDepartmentMembers(department);
   }
 };
-
   
-window.openMinistryMemberProfile = async function(member) {
+  
+window.openMinistryMemberProfile = function(member) {
   const currentPage = document.querySelector(".page.active")?.id;
 
   window.logicMemberProfileReturnPage = [
@@ -1956,154 +1956,179 @@ window.openMinistryMemberProfile = async function(member) {
     ? currentPage
     : "ministryDirectory";
 
-  const userId = member.userId || "";
+  // Stop listening to the previously opened profile.
+  window.logicStopMemberProfileListeners?.();
+
   let profile = {};
   let memberships = [];
   let isAdmin = member.isAdmin === true;
 
-  if (userId) {
-    try {
-      const profileSnap = await getDoc(
-        doc(db, "publicProfiles", userId)
-      );
+  const userId = member.userId || "";
 
-      if (profileSnap.exists()) {
-        profile = profileSnap.data();
+  let stopProfile = () => {};
+  let stopMemberships = () => {};
+  let stopAdmin = () => {};
+
+  window.logicStopMemberProfileListeners = () => {
+    stopProfile();
+    stopMemberships();
+    stopAdmin();
+  };
+
+  openPage("ministryMemberProfile");
+
+  function renderProfile() {
+    const departments = [...new Set(
+      memberships
+        .map(item => String(item.department || "").trim())
+        .filter(Boolean)
+    )];
+
+    const responsibilities = [...new Set(
+      memberships
+        .map(item => String(item.responsibility || "").trim())
+        .filter(value => value && value !== "—")
+    )];
+
+    const hasTeamMember = memberships.length > 0;
+
+    const hasTeamLeader = memberships.some(item =>
+      String(item.role || "").toLowerCase().includes("leader")
+    );
+
+    const photo = document.getElementById("directoryMemberPhoto");
+
+    photo.src =
+      profile.photoURL ||
+      member.photoURL ||
+      "https://www.gravatar.com/avatar/?d=mp";
+
+    document.getElementById("directoryMemberName").textContent =
+      profile.fullName ||
+      member.fullName ||
+      profile.username ||
+      member.username ||
+      "LOGIC Teens Member";
+
+    const roleContainer =
+      document.getElementById("directoryMemberRole");
+
+    roleContainer.replaceChildren();
+
+    const addRoleBadge = label => {
+      const badge = document.createElement("span");
+      badge.className = "member-role-badge";
+      badge.textContent = label;
+      roleContainer.appendChild(badge);
+    };
+
+    if (isAdmin) addRoleBadge("Admin");
+    if (hasTeamMember) addRoleBadge("Team Member");
+    if (hasTeamLeader) addRoleBadge("Team Leader");
+
+    const isOnline =
+      Object.prototype.hasOwnProperty.call(profile, "isOnline")
+        ? profile.isOnline === true
+        : member.isOnline === true;
+
+    const onlineDot =
+      document.getElementById("directoryMemberOnlineDot");
+
+    onlineDot.style.background =
+      isOnline ? "#22c55e" : "#ef4444";
+
+    onlineDot.title = isOnline ? "Online" : "Offline";
+
+    document.getElementById("directoryMemberDepartment").textContent =
+      departments.length ? departments.join(" / ") : "—";
+
+    document.getElementById("directoryMemberResponsibility").textContent =
+      responsibilities.length
+        ? responsibilities.join(" / ")
+        : "Not assigned yet";
+
+    const savedAbout =
+      Object.prototype.hasOwnProperty.call(profile, "about")
+        ? profile.about
+        : member.about;
+
+    document.getElementById("directoryMemberAbout").textContent =
+      savedAbout || "No introduction added.";
+
+    const joinedDate =
+      profile.joinedAt || member.joinedAt;
+
+    let joinedText = "Date unavailable";
+
+    if (joinedDate) {
+      const date = joinedDate.toDate
+        ? joinedDate.toDate()
+        : new Date(joinedDate);
+
+      if (!isNaN(date.getTime())) {
+        joinedText = date.toLocaleDateString("en-GB", {
+          month: "long",
+          year: "numeric"
+        });
       }
-    } catch (error) {
-      console.warn("Public member profile unavailable:", error);
     }
 
-                try {
-      const membershipSnapshot = await getDocs(
-        query(
-          collection(db, "departmentMembers"),
-          where("userId", "==", userId)
-        )
-      );
+    document.getElementById("directoryMemberSince").textContent =
+      joinedText;
+  }
 
-      memberships = membershipSnapshot.docs
+  // Show the available information immediately.
+  renderProfile();
+
+  if (!userId) return;
+
+  // Listen for changes to the member's public profile.
+  stopProfile = onSnapshot(
+    doc(db, "publicProfiles", userId),
+    snapshot => {
+      profile = snapshot.exists() ? snapshot.data() : {};
+      renderProfile();
+    },
+    error => {
+      console.warn("Live profile update failed:", error);
+    }
+  );
+
+  // Listen for all of the member's ministry memberships.
+  stopMemberships = onSnapshot(
+    query(
+      collection(db, "departmentMembers"),
+      where("userId", "==", userId)
+    ),
+    snapshot => {
+      memberships = snapshot.docs
         .map(item => item.data())
         .filter(item => item.status === "approved");
 
-    } catch (error) {
-      console.warn("Could not load all approved team memberships:", error);
-                }
-
-    try {
-      const adminSnap = await getDoc(doc(db, "admins", userId));
-      isAdmin = isAdmin || adminSnap.exists();
-    } catch (error) {
-      console.warn("Could not verify admin status:", error);
+      renderProfile();
+    },
+    error => {
+      console.warn("Live membership update failed:", error);
     }
-  }
-
-  isAdmin = isAdmin || profile.isAdmin === true;
-
-  const departments = [...new Set(
-    memberships
-      .map(item => String(item.department || "").trim())
-      .filter(Boolean)
-  )];
-
-  const responsibilities = [...new Set(
-    memberships
-      .map(item => String(item.responsibility || "").trim())
-      .filter(value => value && value !== "—")
-  )];
-
-  const hasTeamMember = memberships.length > 0;
-
-  const hasTeamLeader = memberships.some(item =>
-    String(item.role || "").toLowerCase().includes("leader")
   );
 
-  document.getElementById("directoryMemberPhoto").src =
-    profile.photoURL ||
-    member.photoURL ||
-    "https://www.gravatar.com/avatar/?d=mp";
-
-  document.getElementById("directoryMemberName").textContent =
-    profile.fullName ||
-    member.fullName ||
-    profile.username ||
-    member.username ||
-    "LOGIC Teens Member";
-
-  const roleContainer =
-    document.getElementById("directoryMemberRole");
-
-  roleContainer.replaceChildren();
-
-  const addRoleBadge = label => {
-    const badge = document.createElement("span");
-    badge.className = "member-role-badge";
-    badge.textContent = label;
-    roleContainer.appendChild(badge);
-  };
-
-  if (isAdmin) addRoleBadge("Admin");
-  if (hasTeamMember) addRoleBadge("Team Member");
-  if (hasTeamLeader) addRoleBadge("Team Leader");
-
-  const isOnline =
-    profile.isOnline === true || member.isOnline === true;
-
-  const onlineDot =
-    document.getElementById("directoryMemberOnlineDot");
-
-  onlineDot.style.background =
-    isOnline ? "#22c55e" : "#ef4444";
-
-  onlineDot.title = isOnline ? "Online" : "Offline";
-
-  document.getElementById("directoryMemberDepartment").textContent =
-    departments.length
-      ? departments.join(" / ")
-      : "—";
-
-  document.getElementById("directoryMemberResponsibility").textContent =
-    responsibilities.length
-      ? responsibilities.join(" / ")
-      : "Not assigned yet";
-
-  const savedAbout = Object.prototype.hasOwnProperty.call(
-    profile,
-    "about"
-  )
-    ? profile.about
-    : member.about;
-
-  document.getElementById("directoryMemberAbout").textContent =
-    savedAbout || "No introduction added.";
-
-      const joinedDate =
-    profile.joinedAt ||
-    member.joinedAt;
-  
-  let joinedText = "Date unavailable";
-
-  if (joinedDate) {
-    const date = joinedDate.toDate
-      ? joinedDate.toDate()
-      : new Date(joinedDate);
-
-    if (!isNaN(date.getTime())) {
-      joinedText = date.toLocaleDateString("en-GB", {
-        month: "long",
-        year: "numeric"
-      });
+  // Listen for admin status changes.
+  stopAdmin = onSnapshot(
+    doc(db, "admins", userId),
+    snapshot => {
+      isAdmin = snapshot.exists() || profile.isAdmin === true;
+      renderProfile();
+    },
+    error => {
+      console.warn("Live admin status update failed:", error);
     }
-  }
-
-  document.getElementById("directoryMemberSince").textContent =
-    joinedText;
-
-  openPage("ministryMemberProfile");
+  );
 };
+  
   
 
   window.closeMinistryMemberProfile = function() {
+    window.logicStopMemberProfileListeners?.();
     const returnPage = window.logicMemberProfileReturnPage;
 
     openPage(returnPage);
