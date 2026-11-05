@@ -1314,8 +1314,9 @@ body.admin-user #ministry .ministry-actions {
     display: none !important;
   }
 
-  body.management-page-open.show-bottom-nav .bottom-nav {
-    display: flex !important;
+    body.management-page-open.show-bottom-nav .bottom-nav {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr);
   }
 
   body.management-page-open .directory-back,
@@ -3236,9 +3237,7 @@ window.renderMembersDirectory = function() {
         text-align:left;
       `;
 
-      const avatar = document.createElement("div");
-      avatar.textContent =
-        member.fullName.trim().charAt(0).toUpperCase();
+            const avatar = document.createElement("div");
 
       avatar.style.cssText = `
         width:48px;
@@ -3253,6 +3252,7 @@ window.renderMembersDirectory = function() {
         font-size:17px;
         font-weight:bold;
         overflow:hidden;
+        flex-shrink:0;
       `;
 
       if (member.photoURL) {
@@ -3264,13 +3264,19 @@ window.renderMembersDirectory = function() {
           height:100%;
           border-radius:50%;
           object-fit:cover;
+          display:block;
         `;
 
         photo.onerror = () => {
           photo.remove();
+          avatar.textContent =
+            member.fullName.trim().charAt(0).toUpperCase();
         };
 
         avatar.appendChild(photo);
+      } else {
+        avatar.textContent =
+          member.fullName.trim().charAt(0).toUpperCase();
       }
 
       const info = document.createElement("div");
