@@ -3888,7 +3888,13 @@ window.saveProfilePreview = async function() {
       return;
     }
 
-    await setDoc(doc(db, "users", user.uid), updates, { merge: true });
+        await setDoc(doc(db, "users", user.uid), updates, { merge: true });
+
+    await setDoc(
+      doc(db, "publicProfiles", user.uid),
+      updates,
+      { merge: true }
+    );
 
     window.logicProfileData = {
       ...(window.logicProfileData || {}),
@@ -3997,6 +4003,18 @@ await setDoc(profileRef, {
   username: data.username || "",
   about: data.about || ""
 }, { merge: true });
+
+await setDoc(
+  doc(db, "publicProfiles", user.uid),
+  {
+    fullName: data.fullName || user.displayName || "",
+    photoURL: data.photoURL || user.photoURL || "",
+    username: data.username || "",
+    about: data.about || "",
+    isAdmin: window.logicIsAdmin === true
+  },
+  { merge: true }
+);
 
     const savedNotifications = data.notificationSettings;
 
