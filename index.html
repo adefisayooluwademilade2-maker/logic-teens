@@ -1108,31 +1108,114 @@ body.admin-user #ministry .ministry-actions {
   
 <section class="page" id="adminApplications">
   <style>
-    #adminApplications {
-      text-align: left;
-    }
+  body.management-page-open header {
+    display: none !important;
+  }
 
-    #adminApplications #adminApplicationList {
-      width: 100%;
-      text-align: left;
-      margin-top: 20px;
-    }
+  body.management-page-open main {
+    padding-top: 7px !important;
+  }
 
-    #adminApplications #adminApplicationList .panel {
-      background: #141622;
-      border: 1px solid #292b3b;
-      text-align: left;
-      margin-left: 0;
-      margin-right: 0;
-    }
+  body.management-page-open #adminApplications,
+  body.management-page-open #adminManageMembers,
+  body.management-page-open #adminApprovedMembers,
+  body.management-page-open #ministryMemberProfile {
+    width: 100%;
+    max-width: none;
+    text-align: left;
+  }
 
-    #adminApplications .directory-empty {
-      background: transparent;
-      border: 0;
-      border-radius: 0;
-      padding: 18px 0;
-      text-align: left;
-    }
+  body.management-page-open .directory-back,
+  #ministryMemberProfile .directory-back {
+    display: inline-block;
+    background: transparent !important;
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    color: #fff !important;
+    font-size: 25px;
+    padding: 0 !important;
+    margin: 0 0 12px !important;
+    appearance: none;
+  }
+
+  #adminApplications #adminApplicationList,
+  #adminManageMembers #adminManageMemberList {
+    display: block;
+    width: 100%;
+    max-width: none;
+    text-align: left;
+    margin-top: 16px;
+  }
+
+  #adminApplications #adminApplicationList .panel {
+    width: 100%;
+    background: transparent !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--line) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    color: var(--white) !important;
+    text-align: left !important;
+    padding: 16px 0 !important;
+    margin: 0 !important;
+  }
+
+  #adminApplications #adminApplicationList .panel p {
+    color: var(--white) !important;
+    text-align: left;
+  }
+
+  #adminApplications .directory-empty,
+  #adminManageMembers .directory-empty {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    padding: 18px 0;
+    text-align: left;
+  }
+
+  #adminManageMembers #adminMemberSearch {
+    background: transparent !important;
+    border: 1px solid var(--line) !important;
+    color: white !important;
+    text-align: left;
+  }
+
+  #adminManageMembers #adminManageMemberList button {
+    display: flex !important;
+    width: 100% !important;
+    max-width: none !important;
+    justify-content: flex-start;
+    text-align: left !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  #ministryMemberProfile .directory-heading {
+    display: none;
+  }
+
+  #ministryMemberProfile .member-profile-card {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 8px 0 !important;
+    text-align: left !important;
+  }
+
+  #ministryMemberProfile .member-profile-photo {
+    display: block;
+  }
+
+  #ministryMemberProfile .member-profile-role {
+    background: transparent !important;
+    border: 1px solid var(--gold);
+    color: var(--gold) !important;
+    border-radius: 20px;
+  }
   </style>
 
   <button class="directory-back" onclick="openPage('adminDashboard')">←</button>
@@ -2433,7 +2516,17 @@ function openPage(page, options = {}) {
   );
 
   target.classList.add("active");
-
+document.body.classList.toggle(
+  "management-page-open",
+  [
+    "adminDashboard",
+    "adminApplications",
+    "adminManageMembers",
+    "adminApprovedMembers",
+    "ministryMemberProfile"
+  ].includes(page)
+);
+  
   document.body.classList.toggle("bible-open", page === "bible");
   document.body.classList.toggle(
   "notification-detail-open",
@@ -2614,7 +2707,14 @@ const db = getFirestore(app);
       where("status", "==", "approved")
     );
 
-    const snapshot = await getDocs(membersQuery);
+    const [snapshot, adminsSnapshot] = await Promise.all([
+  getDocs(membersQuery),
+  getDocs(collection(db, "admins"))
+]);
+
+const adminIds = new Set(
+  adminsSnapshot.docs.map(item => item.id)
+);
 
     list.innerHTML = "";
 
@@ -2629,7 +2729,13 @@ const db = getFirestore(app);
     }
 
     snapshot.forEach(memberDoc => {
-      const member = memberDoc.data();
+      const memberData = memberDoc.data();
+
+const member = {
+  ...memberData,
+  userId: memberData.userId || "",
+  isAdmin: adminIds.has(memberData.userId)
+};
 
       const card = document.createElement("button");
       card.type = "button";
@@ -2716,16 +2822,38 @@ window.loadAdminManageMembers = async function() {
       getDocs(collection(db, "admins"))
     ]);
 
+    const usersById = new Map(
+      usersSnapshot.docs.map(item => [
+        item.id,
+        { ...item.data(), userId: item.id }
+      ])
+    );
+
     const adminIds = new Set(
       adminsSnapshot.docs.map(item => item.id)
     );
 
-    window.logicAdminMembersCache = usersSnapshot.docs
-      .filter(userDoc => !adminIds.has(userDoc.id))
-      .map(userDoc => ({
-        ...userDoc.data(),
-        userId: userDoc.id
-      }))
+    const allAccounts = new Map();
+
+    usersById.forEach((account, uid) => {
+      allAccounts.set(uid, {
+        ...account,
+        isAdmin: adminIds.has(uid)
+      });
+    });
+
+    adminsSnapshot.docs.forEach(adminDoc => {
+      const existing = allAccounts.get(adminDoc.id) || {};
+
+      allAccounts.set(adminDoc.id, {
+        ...adminDoc.data(),
+        ...existing,
+        userId: adminDoc.id,
+        isAdmin: true
+      });
+    });
+
+    window.logicAdminMembersCache = Array.from(allAccounts.values())
       .sort((a, b) =>
         (a.fullName || "").localeCompare(b.fullName || "")
       );
@@ -2738,7 +2866,7 @@ window.loadAdminManageMembers = async function() {
     list.innerHTML = `
       <div class="directory-empty">
         <h3>Couldn't load members</h3>
-        <p>Please check your connection and try again.</p>
+        <p>Please try again later.</p>
       </div>
     `;
   }
@@ -2822,9 +2950,9 @@ window.renderAdminManageMembers = function() {
 
     button.onclick = () => {
       window.openMinistryMemberProfile({
-        ...member,
-        role: "Member"
-      });
+  ...member,
+  isAdmin: member.isAdmin === true
+});
     };
 
     list.appendChild(button);
@@ -2900,7 +3028,10 @@ window.renderAdminManageMembers = function() {
       const info = document.createElement("div");
       info.style.flex = "1";
 
-      const name = document.createElement("strong");
+      const accountRole = document.createElement("div");
+accountRole.textContent = member.isAdmin ? "Admin" : "Member";
+accountRole.style.cssText =
+  "color:var(--gold);font-size:12px;margin-top:5px";
       name.textContent = member.fullName || "LOGIC Teens Member";
 
       const department = document.createElement("div");
