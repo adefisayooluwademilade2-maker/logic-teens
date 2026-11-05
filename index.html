@@ -1412,72 +1412,72 @@ body.admin-user #ministry .ministry-actions {
     }
   };
 
-  window.openMinistryMemberProfile = async function(member) {
-            const currentPage = document.querySelector(".page.active")?.id;
+  
+window.openMinistryMemberProfile = async function(member) {
+  const currentPage = document.querySelector(".page.active")?.id;
 
-    window.logicMemberProfileReturnPage =
-      [
-        "adminApprovedMembers",
-        "adminManageMembers",
-        "membersDirectory"
-      ].includes(currentPage)
-        ? currentPage
-        : "ministryDirectory";
+  window.logicMemberProfileReturnPage =
+    [
+      "adminApprovedMembers",
+      "adminManageMembers",
+      "membersDirectory"
+    ].includes(currentPage)
+      ? currentPage
+      : "ministryDirectory";
 
-    let profile = {};
+  let profile = {};
 
-    if (member.userId) {
-      try {
-        const profileSnap = await getDoc(
-          doc(db, "publicProfiles", member.userId)
-        );
+  if (member.userId) {
+    try {
+      const profileSnap = await getDoc(
+        doc(db, "publicProfiles", member.userId)
+      );
 
-        if (profileSnap.exists()) {
-          profile = profileSnap.data();
-        }
-      } catch (error) {
-        console.warn("Public member profile unavailable:", error);
+      if (profileSnap.exists()) {
+        profile = profileSnap.data();
       }
+    } catch (error) {
+      console.warn("Public member profile unavailable:", error);
     }
-
-    document.getElementById("directoryMemberPhoto").src =
-      profile.photoURL ||
-      member.photoURL ||
-      "https://www.gravatar.com/avatar/?d=mp";
-
-    document.getElementById("directoryMemberName").textContent =
-      profile.fullName ||
-      member.fullName ||
-      profile.username ||
-      member.username ||
-      "LOGIC Teens Member";
-
-    const isAdmin =
-      profile.isAdmin === true || member.isAdmin === true;
   }
-}
 
-const departmentRole = member.role || "";
-const isTeamLeader =
-  departmentRole.toLowerCase().includes("leader");
+  document.getElementById("directoryMemberPhoto").src =
+    profile.photoURL ||
+    member.photoURL ||
+    "https://www.gravatar.com/avatar/?d=mp";
 
-document.getElementById("directoryMemberRole").textContent =
-  (isAdmin ? "Admin" : "Member") +
-  (isTeamLeader ? " · Team Leader" : "");
+  document.getElementById("directoryMemberName").textContent =
+    profile.fullName ||
+    member.fullName ||
+    profile.username ||
+    member.username ||
+    "LOGIC Teens Member";
 
-    document.getElementById("directoryMemberDepartment").textContent =
-      member.department || "—";
+  const isAdmin =
+    profile.isAdmin === true || member.isAdmin === true;
 
-    document.getElementById("directoryMemberResponsibility").textContent =
-      member.responsibility || "Not assigned yet";
+  const departmentRole = member.role || "";
+  const isTeamLeader =
+    departmentRole.toLowerCase().includes("leader");
 
-    document.getElementById("directoryMemberAbout").textContent =
-      profile.about ||
-      member.about ||
-      "No introduction added.";
+  document.getElementById("directoryMemberRole").textContent =
+    (isAdmin ? "Admin" : "Member") +
+    (isTeamLeader ? " · Team Leader" : "");
 
-    openPage("ministryMemberProfile");
-  };
+  document.getElementById("directoryMemberDepartment").textContent =
+    member.department || "—";
+
+  document.getElementById("directoryMemberResponsibility").textContent =
+    member.responsibility || "Not assigned yet";
+
+  document.getElementById("directoryMemberAbout").textContent =
+    profile.about ||
+    member.about ||
+    "No introduction added.";
+
+  openPage("ministryMemberProfile");
+};
+  
 
   window.closeMinistryMemberProfile = function() {
     const returnPage = window.logicMemberProfileReturnPage;
