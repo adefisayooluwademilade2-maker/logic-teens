@@ -509,29 +509,49 @@ body.notification-detail-open .bottom-nav {
     
 <!-- NORMAL MEMBER HOMEPAGE -->
 <div class="grid" id="memberHomeTiles">
-  <button class="tile" onclick="openPage('bible')">
-    <span class="emoji">📖</span>
-    <strong>Daily Devotionals</strong>
-    <small>Grow in God's word</small>
+
+  <button class="tile" onclick="openPage('membersDirectory'); loadMembersDirectory()">
+    <span class="admin-tile-icon">
+      <svg viewBox="0 0 24 24">
+        <circle cx="9" cy="8" r="3"/>
+        <path d="M3 21v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6M18 15a5 5 0 0 1 3 4v2"/>
+      </svg>
+    </span>
+    <strong>Members</strong>
+    <small>Meet the LOGIC Teens community</small>
   </button>
 
   <button class="tile" onclick="openPage('bible')">
-    <span class="emoji">✦</span>
+    <span class="admin-tile-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 7v14M12 7C9 4 5 4 3 5v14c3-1 6-1 9 2M12 7c3-3 7-3 9-2v14c-3-1-6-1-9 2"/>
+      </svg>
+    </span>
     <strong>Bible Quiz</strong>
     <small>Learn and test yourself</small>
   </button>
 
   <button class="tile" onclick="openPage('connect')">
-    <span class="emoji">🤝</span>
+    <span class="admin-tile-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/>
+      </svg>
+    </span>
     <strong>Teens Community</strong>
     <small>Connect with others</small>
   </button>
 
   <button class="tile" onclick="openPage('event')">
-    <span class="emoji">📅</span>
+    <span class="admin-tile-icon">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="16" rx="2"/>
+        <path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h7"/>
+      </svg>
+    </span>
     <strong>Events</strong>
     <small>See what's happening</small>
   </button>
+
 </div>
 
 <!-- ADMIN HOMEPAGE -->
@@ -946,7 +966,7 @@ body.admin-user #ministry .ministry-actions {
     }
   </style>
 
-<button class="directory-back" onclick="openPage('home')">←</button>
+<button class="directory-back" onclick="openPage('ministry')">←</button>
 
   <div class="directory-heading">
     <div class="eyebrow">LOGIC TEENS COMMUNITY</div>
@@ -962,6 +982,42 @@ body.admin-user #ministry .ministry-actions {
     </div>
   </div>
 </section>
+
+  <section class="page" id="membersDirectory">
+
+  <button class="directory-back" onclick="openPage('home')">←</button>
+
+  <div class="directory-heading">
+    <div class="eyebrow">LOGIC TEENS COMMUNITY</div>
+    <h1>Members</h1>
+    <p class="subtitle">Discover and connect with everyone in LOGIC Teens.</p>
+  </div>
+
+  <input
+    id="membersDirectorySearch"
+    type="search"
+    placeholder="Search by name or username..."
+    oninput="renderMembersDirectory()"
+    style="width:100%;padding:15px;border-radius:12px"
+  >
+
+  <select
+    id="membersDirectoryFilter"
+    onchange="renderMembersDirectory()"
+    style="width:100%;padding:14px;border-radius:12px"
+  >
+    <option value="all">Everyone</option>
+    <option value="member">Members</option>
+    <option value="admin">Admins</option>
+  </select>
+
+  <div id="membersDirectoryList">
+    <div class="directory-empty">
+      <h3>Loading members...</h3>
+    </div>
+  </div>
+
+  </section>
 
 <section class="page" id="ministryMemberProfile">
   <button class="directory-back" onclick="window.closeMinistryMemberProfile()">←</button>
@@ -1118,14 +1174,21 @@ body.admin-user #ministry .ministry-actions {
     padding-top: 7px !important;
   }
 
-  body.management-page-open #adminApplications,
+    body.management-page-open #adminApplications,
   body.management-page-open #adminManageMembers,
   body.management-page-open #adminApprovedMembers,
+  body.management-page-open #ministryDirectory,
+  body.management-page-open #membersDirectory,
   body.management-page-open #ministryMemberProfile {
     width: 100%;
     max-width: none;
     text-align: left;
   }
+
+  body.management-page-open footer,
+  body.management-page-open .bottom-nav {
+    display: none !important;
+    }
 
   body.management-page-open .directory-back,
   #ministryMemberProfile .directory-back {
@@ -1350,26 +1413,30 @@ body.admin-user #ministry .ministry-actions {
   };
 
   window.openMinistryMemberProfile = async function(member) {
-    const currentPage = document.querySelector(".page.active")?.id;
+            const currentPage = document.querySelector(".page.active")?.id;
 
     window.logicMemberProfileReturnPage =
-  ["adminApprovedMembers", "adminManageMembers"].includes(currentPage)
-    ? currentPage
-    : "ministryDirectory";
+      [
+        "adminApprovedMembers",
+        "adminManageMembers",
+        "membersDirectory"
+      ].includes(currentPage)
+        ? currentPage
+        : "ministryDirectory";
 
     let profile = {};
 
     if (member.userId) {
       try {
         const profileSnap = await getDoc(
-          doc(db, "users", member.userId)
+          doc(db, "publicProfiles", member.userId)
         );
 
         if (profileSnap.exists()) {
           profile = profileSnap.data();
         }
       } catch (error) {
-        console.warn("Member profile details unavailable:", error);
+        console.warn("Public member profile unavailable:", error);
       }
     }
 
@@ -1385,18 +1452,8 @@ body.admin-user #ministry .ministry-actions {
       member.username ||
       "LOGIC Teens Member";
 
-    let isAdmin = member.isAdmin === true;
-
-if (member.userId) {
-  try {
-    const adminCheck = await getDoc(
-      doc(db, "admins", member.userId)
-    );
-
-    isAdmin = adminCheck.exists() || isAdmin;
-
-  } catch (error) {
-    console.warn("Could not verify account role:", error);
+    const isAdmin =
+      profile.isAdmin === true || member.isAdmin === true;
   }
 }
 
@@ -1432,6 +1489,9 @@ document.getElementById("directoryMemberRole").textContent =
 
 } else if (returnPage === "adminManageMembers") {
   window.loadAdminManageMembers();
+
+      } else if (returnPage === "membersDirectory") {
+      window.loadMembersDirectory();
 
 } else if (
       returnPage === "ministryDirectory" &&
@@ -2589,6 +2649,8 @@ document.body.classList.toggle(
     "adminApplications",
     "adminManageMembers",
     "adminApprovedMembers",
+    "ministryDirectory",
+    "membersDirectory",
     "ministryMemberProfile"
   ].includes(page)
 );
@@ -2765,6 +2827,169 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+window.logicMembersDirectoryCache = [];
+
+window.loadMembersDirectory = async function() {
+  const list = document.getElementById("membersDirectoryList");
+
+  list.innerHTML = `
+    <div class="directory-empty">
+      <h3>Loading members...</h3>
+    </div>
+  `;
+
+  try {
+    const snapshot = await getDocs(
+      collection(db, "publicProfiles")
+    );
+
+    window.logicMembersDirectoryCache = snapshot.docs.map(item => ({
+      ...item.data(),
+      userId: item.id
+    })).sort((a, b) =>
+      (a.fullName || "").localeCompare(b.fullName || "")
+    );
+
+    window.renderMembersDirectory();
+
+  } catch (error) {
+    console.error("Members directory error:", error);
+
+    list.innerHTML = `
+      <div class="directory-empty">
+        <h3>Couldn't load members</h3>
+        <p>Please try again later.</p>
+      </div>
+    `;
+  }
+};
+
+window.renderMembersDirectory = function() {
+  const list = document.getElementById("membersDirectoryList");
+  const search = (
+    document.getElementById("membersDirectorySearch")?.value || ""
+  ).trim().toLowerCase();
+
+  const filter =
+    document.getElementById("membersDirectoryFilter")?.value || "all";
+
+  const members = (window.logicMembersDirectoryCache || []).filter(member => {
+    const name = (member.fullName || "").toLowerCase();
+    const username = (member.username || "").toLowerCase();
+
+    const matchesSearch =
+      name.includes(search) || username.includes(search);
+
+    const matchesRole =
+      filter === "all" ||
+      (filter === "admin" && member.isAdmin === true) ||
+      (filter === "member" && member.isAdmin !== true);
+
+    return matchesSearch && matchesRole;
+  });
+
+  list.innerHTML = "";
+
+  if (!members.length) {
+    list.innerHTML = `
+      <div class="directory-empty">
+        <h3>No members found</h3>
+        <p>Try another search or filter.</p>
+      </div>
+    `;
+    return;
+  }
+
+  members.forEach(member => {
+    const card = document.createElement("button");
+    card.type = "button";
+
+    card.style.cssText = `
+      display:flex;
+      align-items:center;
+      gap:13px;
+      width:100%;
+      padding:14px 0;
+      background:transparent;
+      border:0;
+      border-bottom:1px solid var(--line);
+      color:white;
+      text-align:left;
+    `;
+
+    const photo = document.createElement("img");
+    photo.alt = "";
+    photo.style.cssText = `
+      width:49px;
+      height:49px;
+      border-radius:50%;
+      object-fit:cover;
+      flex-shrink:0;
+      background:var(--card2);
+    `;
+
+    const fallback = document.createElement("div");
+    fallback.textContent =
+      (member.fullName || "M").trim().charAt(0).toUpperCase();
+
+    fallback.style.cssText = `
+      width:49px;
+      height:49px;
+      border-radius:50%;
+      background:var(--card2);
+      color:var(--gold);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:bold;
+      flex-shrink:0;
+    `;
+
+    if (member.photoURL) {
+      photo.src = member.photoURL;
+      photo.onerror = () => {
+        photo.style.display = "none";
+        fallback.style.display = "flex";
+      };
+      fallback.style.display = "none";
+    } else {
+      photo.style.display = "none";
+    }
+
+    const info = document.createElement("div");
+    info.style.flex = "1";
+
+    const name = document.createElement("strong");
+    name.textContent = member.fullName || "LOGIC Teens Member";
+
+    const role = document.createElement("div");
+    role.textContent = member.isAdmin === true ? "Admin" : "Member";
+    role.style.cssText =
+      "color:var(--gold);font-size:11px;margin-top:5px";
+
+    const username = document.createElement("div");
+    username.textContent = member.username
+      ? "@" + member.username
+      : "LOGIC Teens community";
+
+    username.style.cssText =
+      "color:var(--muted);font-size:12px;margin-top:4px";
+
+    info.append(name, role, username);
+    card.append(photo, fallback, info);
+
+    card.onclick = () => {
+      window.openMinistryMemberProfile({
+        ...member,
+        department: "Community Member",
+        responsibility: "—"
+      });
+    };
+
+    list.appendChild(card);
+  });
+};
+  
   window.loadDepartmentMembers = async function(department) {
   const list = document.getElementById("departmentMemberList");
 
