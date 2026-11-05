@@ -1115,18 +1115,53 @@ body.admin-user #ministry .ministry-actions {
   width: 95px;
   height: 95px;
   min-width: 95px;
+#ministryMemberProfile .member-profile-card {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: var(--card,#141622) !important;
+  border: 1px solid var(--line,#292b3b) !important;
+  border-radius: 20px !important;
+  padding: 16px !important;
+  margin: 12px 0 20px;
+  text-align: left;
+  overflow: hidden;
+}
+
+#ministryMemberProfile .member-profile-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 16px;
+  padding: 24px 14px;
+  background: linear-gradient(135deg,#292044,#171526 65%,#302543);
+  border: 1px solid #393047;
+  border-radius: 16px;
+  text-align: center;
+}
+
+#ministryMemberProfile .member-photo-wrap {
+  position: relative;
+  width: 92px;
+  height: 92px;
+  min-width: 92px;
 }
 
 #ministryMemberProfile .member-profile-photo {
   display: block;
-  width: 95px;
-  height: 95px;
+  width: 92px;
+  height: 92px;
+  box-sizing: border-box;
   border: 3px solid var(--gold,#d6b779);
   border-radius: 50%;
   object-fit: cover;
   background: var(--card2,#1b1d2c);
   margin: 0;
-  box-sizing: border-box;
 }
 
 #ministryMemberProfile .member-online-dot {
@@ -1140,48 +1175,59 @@ body.admin-user #ministry .ministry-actions {
 }
 
 #ministryMemberProfile .member-profile-name {
-  color: #f5f3f8;
-  font-size: 22px;
-  line-height: 1.3;
+  color: #f5f3f8 !important;
+  font-size: 21px;
+  line-height: 1.35;
   margin: 0;
   overflow-wrap: anywhere;
 }
 
 #ministryMemberProfile .member-profile-role {
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   gap: 7px;
+  width: 100%;
   margin-top: 10px;
+  background: transparent !important;
+  border: 0 !important;
 }
 
 #ministryMemberProfile .member-role-badge {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 30px;
-  background: #302543;
-  color: #d6b779;
-  border: 1px solid #9a783d;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 13px;
+  min-height: 27px;
+  box-sizing: border-box;
+  border-radius: 30px !important;
+  background: #302543 !important;
+  color: #d6b779 !important;
+  border: 1px solid #9a783d !important;
   font-size: 11px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 #ministryMemberProfile .member-profile-details {
+  display: block;
   width: 100%;
   box-sizing: border-box;
-  text-align: left;
-  margin-top: 14px;
-  padding: 4px 15px;
-  background: var(--card,#141622);
+  margin: 0;
+  padding: 4px 14px;
+  background: #10121d;
   border: 1px solid var(--line,#292b3b);
-  border-radius: 16px;
+  border-radius: 14px;
+  text-align: left;
 }
 
 #ministryMemberProfile .member-profile-details p {
-  border-bottom: 1px solid var(--line,#292b3b);
-  padding: 13px 0;
+  display: block;
+  padding: 12px 0;
   margin: 0;
+  border-bottom: 1px solid var(--line,#292b3b);
+  color: #f1eff7;
   font-size: 13px;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -1194,67 +1240,88 @@ body.admin-user #ministry .ministry-actions {
 #ministryMemberProfile .member-profile-details strong,
 #ministryMemberProfile .member-share-row strong {
   display: block;
+  margin-bottom: 5px;
   color: #999bad;
   font-size: 11px;
   font-weight: 500;
-  margin-bottom: 5px;
 }
 
 #ministryMemberProfile .member-share-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding: 17px 3px;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px 2px;
+  color: #f1eff7;
   font-size: 12px;
 }
 
 #ministryMemberProfile .member-share-button {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 7px;
-  color: #bcb5ee;
+  padding: 9px 12px;
+  border: 1px solid #51466f;
+  border-radius: 30px;
+  background: #242239;
+  color: #d6b779 !important;
+  white-space: nowrap;
+}
+
+#ministryMemberProfile .member-share-button strong {
+  color: #d6b779 !important;
+  margin: 0;
 }
 
 #ministryMemberProfile .member-profile-actions {
   display: flex;
+  align-items: center;
   gap: 10px;
-  margin-top: 5px;
   width: 100%;
+  box-sizing: border-box;
+  margin-top: 5px;
 }
 
-#ministryMemberProfile .member-profile-action {
-  flex: 1;
+#ministryMemberProfile .member-profile-action,
+#ministryMemberProfile .member-profile-action.follow {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex: 1 1 0;
   min-width: 0;
-  padding: 12px 8px;
-  border: 0;
-  border-radius: 12px;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 11px 8px !important;
+  border: 1px solid #6749C9 !important;
+  border-radius: 30px !important;
+  background: #6749C9 !important;
+  color: #ffffff !important;
   font-size: 12px;
   font-weight: 600;
   text-align: center;
-  background: #6749C9;
-  color: white;
+  white-space: nowrap;
+  box-shadow: none !important;
 }
 
 #ministryMemberProfile .member-profile-action.follow {
-  background: var(--gold);
-  color: #171321;
-    }
-
-#ministryMemberProfile .member-share-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 12px 0;
-  font-size: 12px;
+  border-color: #9a783d !important;
+  background: #302543 !important;
+  color: #ffffff !important;
 }
 
-#ministryMemberProfile .member-share-button {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: #bcb5ee;
+#ministryMemberProfile .member-profile-action svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  stroke: currentColor;
+}
+
+#ministryMemberProfile .directory-heading {
+  display: none;
 }
   </style>
 
