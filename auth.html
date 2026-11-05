@@ -235,6 +235,7 @@ await setDoc(doc(db, "publicProfiles", result.user.uid), {
   username: "",
   photoURL: "",
   about: "",
+  joinedAt: result.user.metadata.creationTime || new Date().toISOString(),
   isAdmin: false
 });
 
