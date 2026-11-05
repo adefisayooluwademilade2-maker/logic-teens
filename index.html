@@ -1131,21 +1131,35 @@ body.admin-user #ministry .ministry-actions {
 
 <button class="directory-back" onclick="openPage('ministry')">←</button>
 
-<div class="directory-heading">
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-    <h1 id="directoryDepartmentName">Department Members</h1>
-    <span id="directoryDepartmentCount"
-      style="background:#302543;color:#c9b8ff;padding:5px 10px;border-radius:20px;font-size:12px;white-space:nowrap">
-      0 members
+<div id="directoryDepartmentSummary"
+  style="display:flex;align-items:center;gap:11px;background:linear-gradient(135deg,#191b2b,#141622);border:1px solid #292b3b;border-radius:14px;padding:12px;margin:0 0 16px">
+
+  <div id="directoryDepartmentIcon"
+    style="width:43px;height:43px;min-width:43px;border-radius:12px;background:#292541;display:flex;align-items:center;justify-content:center;color:#c5bff0">
+  </div>
+
+  <div style="flex:1;min-width:0">
+    <strong id="directoryDepartmentName"
+      style="display:block;font-size:14px;color:white">
+      Department Members
+    </strong>
+    <span id="directoryDepartmentDescription"
+      style="display:block;font-size:11px;color:#9999aa;margin-top:4px">
+      Meet the people serving in this department.
     </span>
   </div>
+
+  <span id="directoryDepartmentCount"
+    style="background:#302543;color:#c9b8ff;padding:5px 8px;border-radius:20px;font-size:11px;white-space:nowrap">
+    0 members
+  </span>
 </div>
 
 <div id="departmentMemberList">
   <div class="directory-empty">
     <div class="directory-empty-icon">👥</div>
     <h3>No approved members yet</h3>
-    <p>Approved department members will appear here after an Admin reviews their applications.</p>
+    <p>Approved members of this department will appear here.</p>
   </div>
 </div>
 </section>
@@ -1614,17 +1628,82 @@ body.admin-user #ministry .ministry-actions {
   window.logicMemberProfileReturnPage = "ministryDirectory";
 
   window.openMinistryDirectory = function(department) {
-    window.logicCurrentDepartment = department;
+  window.logicCurrentDepartment = department;
 
-    document.getElementById("directoryDepartmentName").textContent =
-      department;
-
-    openPage("ministryDirectory");
-
-    if (window.loadDepartmentMembers) {
-      window.loadDepartmentMembers(department);
-    }
+  const icons = {
+    "Logic Teens Sound (LTS)": `
+      <svg width="25" height="25" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="1.7"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 14v-3a9 9 0 0 1 18 0v3"/>
+        <rect x="2" y="13" width="4" height="7" rx="2"/>
+        <rect x="18" y="13" width="4" height="7" rx="2"/>
+      </svg>`,
+    "Ushering Department": `
+      <svg width="25" height="25" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="1.7"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 12 5 9a2 2 0 0 0-3 3l6 7a3 3 0 0 0 2 1h5a3 3 0 0 0 2-1l5-6a2 2 0 0 0-3-3l-3 3"/>
+        <path d="m8 12 3-3a2 2 0 0 1 3 0l2 2-4 4"/>
+        <path d="M8 12l4 4"/>
+      </svg>`,
+    "Social Media Department": `
+      <svg width="25" height="25" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="1.7"
+        stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="3"/>
+        <path d="M9 6h6M11 18h2"/>
+      </svg>`,
+    "Technical Department": `
+      <svg width="25" height="25" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="1.7"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-2 .9l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-2-.9l-1.7.7-1.4-2.4 1.4-1.1a8 8 0 0 1 0-2.2l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 2-.9l.3-1.8h2.8l.3 1.8a8 8 0 0 1 2 .9l1.7-.7 1.4 2.4-1.4 1.1a8 8 0 0 1 0 2.2z"/>
+      </svg>`,
+    "Logic Teens SWAT Department": `
+      <svg width="25" height="25" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="1.7"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"/>
+        <path d="m9 12 2 2 4-4"/>
+      </svg>`,
+    "Planning Committee": `
+      <svg width="25" height="25" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="1.7"
+        stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="3" width="14" height="18" rx="2"/>
+        <path d="M9 3V2h6v1M9 9h6M9 13h6M9 17h4"/>
+      </svg>`
   };
+
+  const descriptions = {
+    "Logic Teens Sound (LTS)": "Serve through sound and audio support.",
+    "Ushering Department": "Welcome and assist people during gatherings.",
+    "Social Media Department": "Help share and communicate the LOGIC Teens message.",
+    "Technical Department": "Support the technical needs of church activities.",
+    "Logic Teens SWAT Department": "Serve and support the work of LOGIC Teens.",
+    "Planning Committee": "Help plan and coordinate LOGIC Teens activities."
+  };
+
+  document.getElementById("directoryDepartmentName").textContent =
+    department;
+
+  document.getElementById("directoryDepartmentDescription").textContent =
+    descriptions[department] || "Meet the people serving in this department.";
+
+  document.getElementById("directoryDepartmentIcon").innerHTML =
+    icons[department] || icons["Planning Committee"];
+
+  document.getElementById("directoryDepartmentCount").textContent =
+    "Loading...";
+
+  openPage("ministryDirectory");
+
+  if (window.loadDepartmentMembers) {
+    window.loadDepartmentMembers(department);
+  }
+};
 
   
 window.openMinistryMemberProfile = async function(member) {
@@ -3281,16 +3360,18 @@ window.renderMembersDirectory = function() {
     </div>
   `;
 
-  try {
+    try {
     const membersQuery = query(
       collection(db, "departmentMembers"),
       where("department", "==", department),
       where("status", "==", "approved")
     );
 
+    const snapshot = await getDocs(membersQuery);
+
     document.getElementById("directoryDepartmentCount").textContent =
-  snapshot.size + (snapshot.size === 1 ? " member" : " members");
-    
+      snapshot.size + (snapshot.size === 1 ? " member" : " members");
+
     list.innerHTML = "";
 
     if (snapshot.empty) {
@@ -3445,6 +3526,9 @@ role.style.cssText =
   } catch (error) {
     console.error("Department directory error:", error);
 
+    document.getElementById("directoryDepartmentCount").textContent =
+      "Unavailable";
+      
     list.innerHTML = `
       <div class="directory-empty">
         <h3>Couldn't load members</h3>
