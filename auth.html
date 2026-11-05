@@ -124,6 +124,12 @@ import {
   reload
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
+  import {
+  getFirestore,
+  doc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyA3rI1PVBHOGN24VLqgAKBiI50BkYlXW_o",
   authDomain: "logic-teens.firebaseapp.com",
@@ -135,6 +141,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 await setPersistence(auth, browserLocalPersistence);
 
@@ -220,7 +227,16 @@ $("authForm").addEventListener("submit", async e => {
 
       const result = await createUserWithEmailAndPassword(auth, email, password);
 
-      await updateProfile(result.user, { displayName: fullName });
+await updateProfile(result.user, { displayName: fullName });
+
+// Create the safe public directory profile.
+await setDoc(doc(db, "publicProfiles", result.user.uid), {
+  fullName: fullName,
+  username: "",
+  photoURL: "",
+  about: "",
+  isAdmin: false
+});
 
       try {
         await sendEmailVerification(result.user);
