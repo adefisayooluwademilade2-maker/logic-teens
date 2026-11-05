@@ -1974,13 +1974,19 @@ window.openMinistryMemberProfile = async function(member) {
       console.warn("Public member profile unavailable:", error);
     }
 
-    try {
+        try {
       const membershipSnapshot = await getDocs(
         query(
           collection(db, "departmentMembers"),
-          where("userId", "==", userId)
+          where("userId", "==", userId),
+          where("status", "==", "approved")
         )
       );
+
+      memberships = membershipSnapshot.docs.map(item => item.data());
+    } catch (error) {
+      console.warn("Could not load all approved team memberships:", error);
+  }
 
       memberships = membershipSnapshot.docs
         .map(item => item.data())
@@ -2078,13 +2084,14 @@ window.openMinistryMemberProfile = async function(member) {
   document.getElementById("directoryMemberAbout").textContent =
     savedAbout || "No introduction added.";
 
-  const joinedDate =
+    const joinedDate =
+    profile.joinedAt ||
     member.joinedAt ||
     member.approvedAt ||
     member.createdAt ||
     member.reviewedAt ||
     profile.createdAt;
-
+  
   let joinedText = "Date unavailable";
 
   if (joinedDate) {
