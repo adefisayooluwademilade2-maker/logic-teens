@@ -1974,7 +1974,7 @@ window.openMinistryMemberProfile = async function(member) {
       console.warn("Public member profile unavailable:", error);
     }
 
-        try {
+            try {
       const membershipSnapshot = await getDocs(
         query(
           collection(db, "departmentMembers"),
@@ -1987,15 +1987,6 @@ window.openMinistryMemberProfile = async function(member) {
     } catch (error) {
       console.warn("Could not load all approved team memberships:", error);
   }
-
-      memberships = membershipSnapshot.docs
-        .map(item => item.data())
-        .filter(item =>
-          String(item.status || "").toLowerCase() === "approved"
-        );
-    } catch (error) {
-      console.warn("Could not load all approved team memberships:", error);
-    }
 
     try {
       const adminSnap = await getDoc(doc(db, "admins", userId));
