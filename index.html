@@ -5107,6 +5107,32 @@ if (savedNotifications) {
     const username = data.username || "";
     const about = data.about || "";
 
+// Load this account's actual role and approved ministry teams.
+const myMembershipsSnapshot = await getDocs(
+  query(
+    collection(db, "departmentMembers"),
+    where("userId", "==", user.uid)
+  )
+);
+
+const myApprovedMemberships = myMembershipsSnapshot.docs
+  .map(item => item.data())
+  .filter(item => item.status === "approved");
+
+const myDepartments = [...new Set(
+  myApprovedMemberships
+    .map(item => String(item.department || "").trim())
+    .filter(Boolean)
+)];
+
+document.getElementById("profileRole").textContent =
+  window.logicIsAdmin ? "Admin" : "Member";
+
+document.getElementById("profileDepartment").textContent =
+  myDepartments.length
+    ? myDepartments.join(" / ")
+    : "No ministry team assigned";
+    
     window.logicProfileData = {
       fullName,
       username,
