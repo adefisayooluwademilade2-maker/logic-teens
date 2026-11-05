@@ -1010,138 +1010,223 @@ body.admin-user #ministry .ministry-actions {
       margin-bottom: 0;
     }
 
-    #ministryMemberProfile .member-profile-card {
-      background: var(--card, #141622);
-      border: 1px solid var(--line, #292b3b);
-      border-radius: 18px;
-      padding: 22px 18px;
-      text-align: center;
-    }
+#ministryMemberProfile .member-profile-card {
+  background: var(--card, #141622);
+  border: 1px solid var(--line, #292b3b);
+  border-radius: 16px;
+  padding: 15px;
+  text-align: left;
+}
 
-    #ministryMemberProfile .member-profile-photo {
-      width: 86px;
-      height: 86px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: var(--card2, #1b1d2c);
-      margin-bottom: 12px;
-    }
+#ministryMemberProfile .member-profile-top {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 16px;
+}
 
-    #ministryMemberProfile .member-profile-role {
-      display: inline-block;
-      background: #242239;
-      color: #bcb5ee;
-      border-radius: 20px;
-      padding: 6px 12px;
-      font-size: 11px;
-      margin-top: 8px;
-    }
+#ministryMemberProfile .member-photo-wrap {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  min-width: 76px;
+}
 
-    #ministryMemberProfile .member-profile-details {
-      text-align: left;
-      margin-top: 22px;
-    }
+#ministryMemberProfile .member-profile-photo {
+  display: block;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--card2, #1b1d2c);
+  margin: 0;
+}
 
-    #ministryMemberProfile .member-profile-details p {
-      border-bottom: 1px solid var(--line, #292b3b);
-      padding: 12px 0;
-      margin: 0;
-      font-size: 13px;
-    }
+#ministryMemberProfile .member-online-dot {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  right: -1px;
+  bottom: 7px;
+  border-radius: 50%;
+  border: 2px solid var(--card, #141622);
+}
 
-    #ministryMemberProfile .member-profile-details strong {
-      display: block;
-      color: #999bad;
-      font-size: 11px;
-      font-weight: 500;
-      margin-bottom: 5px;
-    }
+#ministryMemberProfile .member-profile-name {
+  font-size: 18px;
+  line-height: 1.3;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+#ministryMemberProfile .member-profile-role {
+  display: inline-block;
+  background: #242239;
+  color: #bcb5ee;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 11px;
+  margin-top: 7px;
+}
+
+#ministryMemberProfile .member-profile-details {
+  text-align: left;
+  margin-top: 12px;
+}
+
+#ministryMemberProfile .member-profile-details p {
+  border-bottom: 1px solid var(--line, #292b3b);
+  padding: 10px 0;
+  margin: 0;
+  font-size: 13px;
+}
+
+#ministryMemberProfile .member-profile-details strong {
+  display: block;
+  color: #999bad;
+  font-size: 11px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+#ministryMemberProfile .member-profile-actions {
+  display: flex;
+  gap: 9px;
+  margin-top: 14px;
+}
+
+#ministryMemberProfile .member-profile-action {
+  flex: 1;
+  padding: 10px 8px;
+  border: 0;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  background: #6749C9;
+  color: white;
+}
+
+#ministryMemberProfile .member-profile-action.follow {
+  background: var(--gold);
+  color: #171321;
+}
+
+#ministryMemberProfile .member-share-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 0;
+  font-size: 12px;
+}
+
+#ministryMemberProfile .member-share-button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #bcb5ee;
+}
   </style>
 
 <button class="directory-back" onclick="openPage('ministry')">←</button>
 
-  <div class="directory-heading">
-    <div class="eyebrow">LOGIC TEENS COMMUNITY</div>
+<div class="directory-heading">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
     <h1 id="directoryDepartmentName">Department Members</h1>
-    <p class="subtitle">Meet the people serving in this department.</p>
+    <span id="directoryDepartmentCount"
+      style="background:#302543;color:#c9b8ff;padding:5px 10px;border-radius:20px;font-size:12px;white-space:nowrap">
+      0 members
+    </span>
   </div>
+</div>
 
-  <div id="departmentMemberList">
-    <div class="directory-empty">
-      <div class="directory-empty-icon">👥</div>
-      <h3>No approved members yet</h3>
-      <p>Approved department members will appear here after an Admin reviews their applications.</p>
-    </div>
+<div id="departmentMemberList">
+  <div class="directory-empty">
+    <div class="directory-empty-icon">👥</div>
+    <h3>No approved members yet</h3>
+    <p>Approved department members will appear here after an Admin reviews their applications.</p>
   </div>
+</div>
 </section>
 
-  <section class="page" id="membersDirectory">
+ <section class="page" id="ministryMemberProfile">
 
-  <button class="directory-back" onclick="openPage('home')">←</button>
+  <button class="directory-back"
+    onclick="window.closeMinistryMemberProfile()">←</button>
 
   <div class="directory-heading">
-    <div class="eyebrow">LOGIC TEENS COMMUNITY</div>
-    <h1>Members</h1>
-    <p class="subtitle">Discover and connect with everyone in LOGIC Teens.</p>
+    <h1>Member Profile</h1>
   </div>
 
-  <div class="members-directory-tools">
-  <input
-    id="membersDirectorySearch"
-    type="search"
-    placeholder="Search by name or username..."
-    oninput="renderMembersDirectory()"
-  >
+  <div class="member-profile-card">
 
-  <div
-    class="members-filter-trigger"
-    role="button"
-    tabindex="0"
-    onclick="toggleMembersFilter()"
-    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleMembersFilter()}"
-  >
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 7h16M7 12h10M10 17h4"/>
-      <circle cx="8" cy="7" r="2"/>
-      <circle cx="15" cy="12" r="2"/>
-      <circle cx="12" cy="17" r="2"/>
-    </svg>
-    <span>Filter</span>
-  </div>
+    <div class="member-profile-top">
+      <div class="member-photo-wrap">
+        <img
+          id="directoryMemberPhoto"
+          class="member-profile-photo"
+          src="https://www.gravatar.com/avatar/?d=mp"
+          alt="Member profile photo"
+        >
+        <span id="directoryMemberOnlineDot"
+          class="member-online-dot"></span>
+      </div>
 
-  <div id="membersFilterPopup" class="members-filter-popup" hidden>
-    <div class="members-filter-heading">Filter members</div>
+      <div style="min-width:0">
+        <h2 id="directoryMemberName" class="member-profile-name">
+          Member Name
+        </h2>
 
-    <div class="members-filter-option" onclick="setMembersDirectoryFilter('all')">
-      <span>Everyone</span>
-      <span class="members-filter-check" id="filterCheckAll">✓</span>
+        <div id="directoryMemberRole" class="member-profile-role">
+          Team Member
+        </div>
+      </div>
     </div>
 
-    <div class="members-filter-option" onclick="setMembersDirectoryFilter('admin')">
-      <span>Admins</span>
-      <span class="members-filter-check" id="filterCheckAdmin"></span>
+    <div class="member-profile-details">
+      <p>
+        <strong>Ministry Team</strong>
+        <span id="directoryMemberDepartment">—</span>
+      </p>
+
+      <p>
+        <strong>Responsibility</strong>
+        <span id="directoryMemberResponsibility">Not assigned yet</span>
+      </p>
+
+      <p>
+        <strong>About Me</strong>
+        <span id="directoryMemberAbout">No introduction added.</span>
+      </p>
     </div>
 
-    <div class="members-filter-option" onclick="setMembersDirectoryFilter('member')">
-      <span>Members</span>
-      <span class="members-filter-check" id="filterCheckMember"></span>
+    <div class="member-share-row">
+      <div>
+        <strong>Member Since</strong>
+        <div id="directoryMemberSince">Date unavailable</div>
+      </div>
+
+      <div class="member-share-button">
+        <svg width="19" height="19" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/>
+          <circle cx="6" cy="12" r="3"/>
+          <circle cx="18" cy="19" r="3"/>
+          <path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4"/>
+        </svg>
+        <strong>Share Profile</strong>
+      </div>
     </div>
-  </div>
 
-  <select id="membersDirectoryFilter" hidden>
-    <option value="all">Everyone</option>
-    <option value="member">Members</option>
-    <option value="admin">Admins</option>
-  </select>
-  </div>
-
-  <div id="membersDirectoryList">
-    <div class="directory-empty">
-      <h3>Loading members...</h3>
+    <div class="member-profile-actions">
+      <div class="member-profile-action">Message</div>
+      <div class="member-profile-action follow">Follow</div>
     </div>
-  </div>
 
-  </section>
+  </div>
+ </section>
 
 <section class="page" id="ministryMemberProfile">
   <button class="directory-back" onclick="window.closeMinistryMemberProfile()">←</button>
@@ -1582,16 +1667,22 @@ window.openMinistryMemberProfile = async function(member) {
     member.username ||
     "LOGIC Teens Member";
 
-  const isAdmin =
-    profile.isAdmin === true || member.isAdmin === true;
-
-  const departmentRole = member.role || "";
   const isTeamLeader =
-    departmentRole.toLowerCase().includes("leader");
+    String(member.role || "").toLowerCase().includes("leader");
 
   document.getElementById("directoryMemberRole").textContent =
-    (isAdmin ? "Admin" : "Member") +
-    (isTeamLeader ? " · Team Leader" : "");
+    isTeamLeader ? "Team Leader" : "Team Member";
+
+  const isOnline =
+    profile.isOnline === true || member.isOnline === true;
+
+  const onlineDot =
+    document.getElementById("directoryMemberOnlineDot");
+
+  onlineDot.style.background =
+    isOnline ? "#22c55e" : "#ef4444";
+
+  onlineDot.title = isOnline ? "Online" : "Offline";
 
   document.getElementById("directoryMemberDepartment").textContent =
     member.department || "—";
@@ -1603,6 +1694,30 @@ window.openMinistryMemberProfile = async function(member) {
     profile.about ||
     member.about ||
     "No introduction added.";
+
+  const joinedDate =
+    member.joinedAt ||
+    member.createdAt ||
+    member.reviewedAt ||
+    profile.createdAt;
+
+  let joinedText = "Date unavailable";
+
+  if (joinedDate) {
+    const date = joinedDate.toDate
+      ? joinedDate.toDate()
+      : new Date(joinedDate);
+
+    if (!isNaN(date.getTime())) {
+      joinedText = date.toLocaleDateString("en-GB", {
+        month: "long",
+        year: "numeric"
+      });
+    }
+  }
+
+  document.getElementById("directoryMemberSince").textContent =
+    joinedText;
 
   openPage("ministryMemberProfile");
 };
@@ -3173,8 +3288,9 @@ window.renderMembersDirectory = function() {
       where("status", "==", "approved")
     );
 
-    const snapshot = await getDocs(membersQuery);
-
+    document.getElementById("directoryDepartmentCount").textContent =
+  snapshot.size + (snapshot.size === 1 ? " member" : " members");
+    
     list.innerHTML = "";
 
     if (snapshot.empty) {
@@ -3187,7 +3303,15 @@ window.renderMembersDirectory = function() {
       return;
     }
 
-        for (const memberDoc of snapshot.docs) {
+        for (const memberDoc of [...snapshot.docs].sort((a, b) => {
+  const aLeader =
+    String(a.data().role || "").toLowerCase().includes("leader");
+
+  const bLeader =
+    String(b.data().role || "").toLowerCase().includes("leader");
+
+  return Number(bLeader) - Number(aLeader);
+})) {
       const memberData = memberDoc.data();
 
       const member = {
@@ -3288,14 +3412,15 @@ window.renderMembersDirectory = function() {
 
       const accountRole = member.isAdmin ? "Admin" : "Member";
       const isTeamLeader =
-        (member.role || "").toLowerCase().includes("leader");
+  String(member.role || "").toLowerCase().includes("leader");
 
-      const role = document.createElement("div");
-      role.textContent =
-        accountRole + (isTeamLeader ? " · Team Leader" : "");
+const role = document.createElement("div");
 
-      role.style.cssText =
-        "color:var(--gold);font-size:11px;margin-top:5px";
+role.textContent =
+  isTeamLeader ? "Team Leader" : "Team Member";
+
+role.style.cssText =
+  "color:var(--gold);font-size:11px;margin-top:5px";
 
       const responsibility = document.createElement("div");
       responsibility.textContent =
