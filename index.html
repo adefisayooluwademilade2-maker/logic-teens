@@ -1578,16 +1578,20 @@ body.admin-user #ministry .ministry-actions {
   <p>Search and view all registered members.</p>
   </button>
 
-  <div class="panel">
-    <strong>
-      <svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:middle;margin-right:8px" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 21h18M5 21V7l7-4 7 4v14M9 10h1M14 10h1M9 14h1M14 14h1"/>
-      </svg>
-      Departments
-    </strong>
-    <p>Manage department members, Team Leaders and responsibilities.</p>
-  </div>
-
+<button class="panel" type="button"
+  onclick="openPage('adminApprovedMembers'); loadAdminApprovedMembers()">
+  <strong>
+    <svg viewBox="0 0 24 24" width="20" height="20"
+      style="vertical-align:middle;margin-right:8px"
+      fill="none" stroke="currentColor" stroke-width="1.6"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 21h18M5 21V7l7-4 7 4v14M9 10h1M14 10h1M9 14h1M14 14h1"/>
+    </svg>
+    Departments
+  </strong>
+  <p>Manage department members, Team Leaders and responsibilities.</p>
+</button>
+  
   <div class="panel">
     <strong>
       <svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:middle;margin-right:8px" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
