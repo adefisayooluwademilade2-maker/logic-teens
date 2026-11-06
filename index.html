@@ -5492,29 +5492,29 @@ if (savedNotifications) {
         );
       }
 
-      const roleSummary =
-        document.getElementById("editProfileRoleSummary");
+            const profileRoleSummary =
+        document.getElementById("profileAccountRoleSummary");
 
-      if (roleSummary) {
-        roleSummary.textContent =
+      if (profileRoleSummary) {
+        profileRoleSummary.textContent =
           [accountRole, ...teamLabels].join(" · ");
       }
 
-      const teamsSummary =
-        document.getElementById("editProfileTeamsSummary");
+      const profileTeamsSummary =
+        document.getElementById("profileTeamsSummary");
 
-      if (teamsSummary) {
-        teamsSummary.textContent =
+      if (profileTeamsSummary) {
+        profileTeamsSummary.textContent =
           departments.length
             ? departments.join(" / ")
             : "No ministry team assigned";
       }
 
-      const responsibilitySummary =
-        document.getElementById("editProfileResponsibilitySummary");
+      const profileResponsibilitySummary =
+        document.getElementById("profileResponsibilitySummary");
 
-      if (responsibilitySummary) {
-        responsibilitySummary.textContent =
+      if (profileResponsibilitySummary) {
+        profileResponsibilitySummary.textContent =
           responsibilities.length
             ? responsibilities.join(" / ")
             : "Not assigned yet";
