@@ -5637,6 +5637,24 @@ window.rejectTeamApplication = async function(applicationId) {
   }
 };
 
+  window.logicSendMemberNotification = async function(userId, title, message) {
+  if (!userId) {
+    console.warn("Notification not sent: member user ID is missing.");
+    return;
+  }
+
+  const notificationRef = doc(
+    collection(db, "users", userId, "notifications")
+  );
+
+  await setDoc(notificationRef, {
+    title: title,
+    message: message,
+    read: false,
+    createdAt: serverTimestamp()
+  });
+};
+
   window.saveNotificationSettingsToFirebase = async function() {
   const user = auth.currentUser;
   if (!user) return;
