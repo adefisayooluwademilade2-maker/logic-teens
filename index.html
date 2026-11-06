@@ -3772,12 +3772,15 @@ window.loadMembersDirectory = async function() {
     list.innerHTML = `
       <div class="directory-empty">
         <h3>Couldn't load members</h3>
-        <p>Please try again later.</p>
+        <p id="membersDirectoryError"></p>
       </div>
     `;
+
+    document.getElementById("membersDirectoryError").textContent =
+      (error.code || "Error") + ": " +
+      (error.message || "Unknown error");
   }
 };
-
   window.toggleMembersFilter = function() {
   const popup = document.getElementById("membersFilterPopup");
   if (!popup) return;
