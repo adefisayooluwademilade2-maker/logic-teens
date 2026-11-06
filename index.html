@@ -5075,7 +5075,7 @@ window.renderAdminApprovedPeople = function() {
       "color:var(--muted);font-size:11px;margin-top:5px";
 
     info.append(name, roleText, departmentText, responsibilityText);
-    row.append(photo, info, arrow);
+row.append(photo, info);
 
     row.onclick = () => {
       window.openMinistryMemberProfile(member);
