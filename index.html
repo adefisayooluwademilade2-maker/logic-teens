@@ -3651,6 +3651,39 @@ loadNotificationSettings();
   </div>
 </div>
 
+  <div id="logicDepartmentEditorOverlay">
+  <div class="logic-department-editor">
+    <h3>Edit Department Details</h3>
+    <p>Update this member's responsibility and team role.</p>
+
+    <label for="logicDepartmentResponsibility">Responsibility</label>
+    <textarea id="logicDepartmentResponsibility" placeholder="Not assigned yet"></textarea>
+
+    <div id="logicDepartmentRoleField">
+      <label>Team Role</label>
+      <div class="logic-role-select">
+        <button type="button" id="logicDepartmentRoleTrigger">
+          <span id="logicDepartmentRoleValue">Team Member</span>
+          <span>⌄</span>
+        </button>
+        <div id="logicDepartmentRoleOptions">
+          <button type="button" class="logic-role-option" data-role="Team Member">
+            Team Member <span class="logic-role-check">✓</span>
+          </button>
+          <button type="button" class="logic-role-option" data-role="Team Leader">
+            Team Leader <span class="logic-role-check">✓</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="logic-department-editor-actions">
+      <button type="button" id="logicDepartmentEditorCancel">Cancel</button>
+      <button type="button" id="logicDepartmentEditorSave">Save Changes</button>
+    </div>
+  </div>
+  </div>
+
 <div id="logicToast"></div>
 
 <script>
