@@ -5540,12 +5540,12 @@ if (savedNotifications) {
       const profileTeamsSummary =
         document.getElementById("profileTeamsSummary");
 
-      if (profileTeamsSummary) {
-                profileResponsibilitySummary.textContent =
-          teamResponsibilities.length
-            ? teamResponsibilities.join("\n")
-            : "Not assigned yet";
-      }
+            if (profileTeamsSummary) {
+        profileTeamsSummary.textContent =
+          departments.length
+            ? departments.join(" / ")
+            : "No ministry team assigned";
+            }
 
       const profileResponsibilitySummary =
         document.getElementById("profileResponsibilitySummary");
