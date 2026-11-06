@@ -2208,47 +2208,10 @@ body.admin-user #ministry .ministry-actions {
     document.getElementById("directoryMemberAbout").textContent =
       profile.about || member.about || "No introduction added.";
 
-    const joinedDate =
-            profile.joinedAt || member.joinedAt || accountJoinedAt;
-
-    let joinedText = "Date unavailable";
-
-        if (joinedDate) {
-      const date = joinedDate.toDate
-        ? joinedDate.toDate()
-        : new Date(joinedDate);
-
-      if (!isNaN(date.getTime())) {
-        joinedText = date.toLocaleDateString("en-GB", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-  timeZone: "Africa/Lagos"
-});
-      }
-      }
-
-    document.getElementById("directoryMemberSince").textContent =
-      joinedText;
   }
 
   renderProfile();
-
-      // Listen for the member's original account creation date.
-  if (userId) {
-    stopUserProfile = onSnapshot(
-      doc(db, "users", userId),
-      snapshot => {
-        if (snapshot.exists()) {
-          accountJoinedAt = snapshot.data().joinedAt || "";
-          renderProfile();
-        }
-      },
-      error => {
-        console.warn("Account date update failed:", error);
-      }
-    );
-  }
+ 
 
   // Listen for the latest saved profile information.
   if (userId) {
