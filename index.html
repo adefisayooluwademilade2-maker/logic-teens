@@ -5507,6 +5507,8 @@ onAuthStateChanged(auth, async user => {
     return;
   }
 
+    document.body.style.visibility = "visible";
+
   window.logicCurrentUser = user;
   window.loadTeamApplicationStatus(user);
 
