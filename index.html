@@ -1988,10 +1988,17 @@ body.admin-user #ministry .ministry-actions {
         .filter(Boolean)
     )];
 
-    const responsibilities = [...new Set(
-      memberships
-        .map(item => String(item.responsibility || "").trim())
-        .filter(value => value && value !== "—")
+        const teamResponsibilities = [...new Set(
+      memberships.map(item => {
+        const team = String(item.department || "").trim();
+        const responsibility = String(item.responsibility || "").trim();
+        if (!team) return "";
+        return `${team} — ${
+          responsibility && responsibility !== "—"
+            ? responsibility
+            : "Not assigned yet"
+        }`;
+      }).filter(Boolean)
     )];
 
     const hasTeamMember = memberships.length > 0;
@@ -2051,10 +2058,10 @@ body.admin-user #ministry .ministry-actions {
     document.getElementById("directoryMemberDepartment").textContent =
       departments.length ? departments.join(" / ") : "No ministry team assigned";
 
-    document.getElementById("directoryMemberResponsibility").textContent =
-      responsibilities.length
-        ? responsibilities.join(" / ")
-        : "Not assigned yet";
+        document.getElementById("directoryMemberResponsibility").textContent =
+      teamResponsibilities.length
+        ? teamResponsibilities.join("\n")
+        : "Not assigned yet"; 
 
     document.getElementById("directoryMemberAbout").textContent =
       profile.about || member.about || "No introduction added.";
@@ -5424,10 +5431,17 @@ if (savedNotifications) {
           .filter(Boolean)
       )];
 
-      const responsibilities = [...new Set(
-        accountMemberships
-          .map(item => String(item.responsibility || "").trim())
-          .filter(value => value && value !== "—")
+            const teamResponsibilities = [...new Set(
+        accountMemberships.map(item => {
+          const team = String(item.department || "").trim();
+          const responsibility = String(item.responsibility || "").trim();
+          if (!team) return "";
+          return `${team} — ${
+            responsibility && responsibility !== "—"
+              ? responsibility
+              : "Not assigned yet"
+          }`;
+        }).filter(Boolean)
       )];
 
       const isTeamMember = accountMemberships.length > 0;
@@ -5527,10 +5541,10 @@ if (savedNotifications) {
         document.getElementById("profileTeamsSummary");
 
       if (profileTeamsSummary) {
-        profileTeamsSummary.textContent =
-          departments.length
-            ? departments.join(" / ")
-            : "No ministry team assigned";
+                profileResponsibilitySummary.textContent =
+          teamResponsibilities.length
+            ? teamResponsibilities.join("\n")
+            : "Not assigned yet";
       }
 
       const profileResponsibilitySummary =
