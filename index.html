@@ -1958,6 +1958,7 @@ body.admin-user #ministry .ministry-actions {
   window.logicStopMemberProfileListeners?.();
 
   let profile = { ...member };
+      let accountJoinedAt = "";
     let memberships = Array.isArray(member.memberships)
     ? [...member.memberships]
     : [];
@@ -2069,7 +2070,7 @@ body.admin-user #ministry .ministry-actions {
       profile.about || member.about || "No introduction added.";
 
     const joinedDate =
-      profile.joinedAt || member.joinedAt;
+            profile.joinedAt || member.joinedAt || accountJoinedAt;
 
     let joinedText = "Date unavailable";
 
