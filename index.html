@@ -3720,6 +3720,121 @@ loadNotificationSettings();
     });
   };
 
+  window.logicEditDepartmentDetails = function(
+    responsibility,
+    role = "Team Member",
+    showRole = true
+  ) {
+    return new Promise(resolve => {
+      const overlay =
+        document.getElementById("logicDepartmentEditorOverlay");
+
+      const responsibilityInput =
+        document.getElementById("logicDepartmentResponsibility");
+
+      const roleField =
+        document.getElementById("logicDepartmentRoleField");
+
+      const roleTrigger =
+        document.getElementById("logicDepartmentRoleTrigger");
+
+      const roleValue =
+        document.getElementById("logicDepartmentRoleValue");
+
+      const roleOptions =
+        document.getElementById("logicDepartmentRoleOptions");
+
+      const roleButtons =
+        roleOptions.querySelectorAll(".logic-role-option");
+
+      const saveButton =
+        document.getElementById("logicDepartmentEditorSave");
+
+      const cancelButton =
+        document.getElementById("logicDepartmentEditorCancel");
+
+      let selectedRole =
+        role === "Team Leader" ? "Team Leader" : "Team Member";
+
+      responsibilityInput.value =
+        responsibility &&
+        responsibility !== "Not assigned yet"
+          ? responsibility
+          : "";
+
+      responsibilityInput.placeholder = "Not assigned yet";
+
+      roleField.style.display = showRole ? "block" : "none";
+
+      function updateRoleDisplay() {
+        roleValue.textContent = selectedRole;
+
+        roleButtons.forEach(button => {
+          button.classList.toggle(
+            "selected",
+            button.dataset.role === selectedRole
+          );
+        });
+      }
+
+      updateRoleDisplay();
+
+      roleOptions.classList.remove("show");
+      overlay.classList.add("show");
+
+      function finish(result) {
+        overlay.classList.remove("show");
+        roleOptions.classList.remove("show");
+
+        saveButton.removeEventListener("click", save);
+        cancelButton.removeEventListener("click", cancel);
+        roleTrigger.removeEventListener("click", toggleRoles);
+        overlay.removeEventListener("click", outside);
+
+        roleButtons.forEach(button => {
+          button.removeEventListener("click", chooseRole);
+        });
+
+        resolve(result);
+      }
+
+      function toggleRoles() {
+        roleOptions.classList.toggle("show");
+      }
+
+      function chooseRole(event) {
+        selectedRole = event.currentTarget.dataset.role;
+        updateRoleDisplay();
+        roleOptions.classList.remove("show");
+      }
+
+      function save() {
+        finish({
+          responsibility:
+            responsibilityInput.value.trim() || "Not assigned yet",
+          role: selectedRole
+        });
+      }
+
+      function cancel() {
+        finish(null);
+      }
+
+      function outside(event) {
+        if (event.target === overlay) cancel();
+      }
+
+      saveButton.addEventListener("click", save);
+      cancelButton.addEventListener("click", cancel);
+      roleTrigger.addEventListener("click", toggleRoles);
+      overlay.addEventListener("click", outside);
+
+      roleButtons.forEach(button => {
+        button.addEventListener("click", chooseRole);
+      });
+    });
+  };
+  
   window.logicNotify = function(message) {
     const toast = document.getElementById("logicToast");
     toast.textContent = message;
