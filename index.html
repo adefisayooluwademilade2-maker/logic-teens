@@ -2128,27 +2128,34 @@ window.openMinistryMemberProfile = function(member) {
   
 
   window.closeMinistryMemberProfile = function() {
-    window.logicStopMemberProfileListeners?.();
-    const returnPage = window.logicMemberProfileReturnPage;
+  window.logicStopMemberProfileListeners?.();
 
-    openPage(returnPage);
+  const returnPage = window.logicMemberProfileReturnPage;
 
-    if (returnPage === "adminApprovedMembers") {
-  window.loadAdminApprovedMembers();
+  // Return to the actual page that opened this profile.
+  if (history.state?.logicPage === "ministryMemberProfile") {
+    history.back();
+    return;
+  }
 
-} else if (returnPage === "adminManageMembers") {
-  window.loadAdminManageMembers();
+  // Fallback if the profile was opened without a previous page.
+  openPage(returnPage || "home");
 
-      } else if (returnPage === "membersDirectory") {
-      window.loadMembersDirectory();
-
-} else if (
-      returnPage === "ministryDirectory" &&
+  if (returnPage === "adminApprovedMembers") {
+    window.loadAdminApprovedMembers?.();
+  } else if (returnPage === "adminManageMembers") {
+    window.loadAdminManageMembers?.();
+  } else if (returnPage === "membersDirectory") {
+    window.loadMembersDirectory?.();
+  } else if (
+    returnPage === "ministryDirectory" &&
+    window.logicCurrentDepartment
+  ) {
+    window.loadDepartmentMembers?.(
       window.logicCurrentDepartment
-    ) {
-      window.loadDepartmentMembers(window.logicCurrentDepartment);
-    }
-  };
+    );
+  }
+};
 </script>
 
   
@@ -3325,8 +3332,15 @@ document.body.classList.toggle(
 
   document.getElementById("menu").classList.remove("open");
 
-  if (!options.skipHistory) {
-    history.pushState({ logicPage: page }, "", "#" + page);
+if (!options.skipHistory) {
+  history.pushState(
+    {
+      logicPage: page,
+      logicDepartment: window.logicCurrentDepartment || ""
+    },
+    "",
+    "#" + page
+  );
   }
 
 if (
@@ -3340,6 +3354,7 @@ if (
   window.scrollTo(0, 0);
 }
 
+
 // Restore the last section after refreshing
 const savedPage = location.hash.replace("#", "");
 const validPages = [...document.querySelectorAll(".page")]
@@ -3349,21 +3364,58 @@ const startingPage = validPages.includes(savedPage)
   ? savedPage
   : "home";
 
+window.logicCurrentDepartment =
+  history.state?.logicDepartment || "";
+
 openPage(startingPage, { skipHistory: true });
 
 history.replaceState(
-  { logicPage: startingPage },
+  {
+    logicPage: startingPage,
+    logicDepartment: window.logicCurrentDepartment
+  },
   "",
   "#" + startingPage
 );
 
 // Keep the user inside the lounge when using phone Back
-history.pushState({ logicPage: startingPage }, "", "#" + startingPage);
+history.pushState(
+  {
+    logicPage: startingPage,
+    logicDepartment: window.logicCurrentDepartment
+  },
+  "",
+  "#" + startingPage
+);
 
-window.addEventListener("popstate", () => {
-  openPage("home", { skipHistory: true });
+window.addEventListener("popstate", (event) => {
+  const pageFromHistory =
+    event.state?.logicPage ||
+    location.hash.replace("#", "");
 
-  history.pushState({ logicPage: "home" }, "", "#home");
+  const pageToRestore = validPages.includes(pageFromHistory)
+    ? pageFromHistory
+    : "home";
+
+  window.logicCurrentDepartment =
+    event.state?.logicDepartment || "";
+
+  openPage(pageToRestore, { skipHistory: true });
+
+  if (pageToRestore === "membersDirectory") {
+    window.loadMembersDirectory?.();
+  } else if (
+    pageToRestore === "ministryDirectory" &&
+    window.logicCurrentDepartment
+  ) {
+    window.loadDepartmentMembers?.(
+      window.logicCurrentDepartment
+    );
+  } else if (pageToRestore === "adminApprovedMembers") {
+    window.loadAdminApprovedMembers?.();
+  } else if (pageToRestore === "adminManageMembers") {
+    window.loadAdminManageMembers?.();
+  }
 });
 
 // DAILY KJV WORD
