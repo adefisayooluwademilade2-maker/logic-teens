@@ -4154,11 +4154,12 @@ window.loadDepartmentMembers = async function(department) {
       info.append(name, role, responsibility);
       profileButton.append(avatar, info);
 
-      profileButton.onclick = () => {
+            profileButton.onclick = () => {
         window.openMinistryMemberProfile({
           ...member,
           ...memberData,
-          department
+          department,
+          departmentMembershipId: memberDoc.id
         });
       };
 
