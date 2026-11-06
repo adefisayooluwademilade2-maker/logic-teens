@@ -4621,62 +4621,7 @@ window.loadDepartmentMembers = async function(department) {
           button.onclick = handler;
           actions.appendChild(button);
         };
-
-                makeAction("Edit responsibility", async () => {
-          const details = await window.logicEditDepartmentDetails(
-            String(memberData.responsibility || ""),
-            String(memberData.role || "Team Member"),
-            false
-          );
-
-          if (!details) return;
-
-          try {
-            await updateDoc(
-              doc(db, "departmentMembers", memberDoc.id),
-              {
-                responsibility: details.responsibility
-              }
-            );
-
-            window.logicNotify("Responsibility updated.");
-            await window.loadDepartmentMembers(department);
-
-          } catch (error) {
-            console.error("Responsibility update error:", error);
-            window.logicNotify("Could not update responsibility.");
-          }
-        });
-
-        makeAction(
-          isTeamLeader ? "Make Team Member" : "Make Team Leader",
-          async () => {
-            const newRole =
-              isTeamLeader ? "Team Member" : "Team Leader";
-
-            const confirmed = await window.logicConfirm(
-              `Change ${member.fullName}'s role to ${newRole}?`,
-              "Change team role?",
-              "Continue"
-            );
-
-            if (!confirmed) return;
-
-            try {
-              await updateDoc(
-                doc(db, "departmentMembers", memberDoc.id),
-                { role: newRole }
-              );
-
-              window.logicNotify("Team role updated.");
-              await window.loadDepartmentMembers(department);
-
-            } catch (error) {
-              console.error("Team role update error:", error);
-              window.logicNotify("Could not change team role.");
-            }
-          }
-        );
+                
 
         makeAction("Remove from department", async () => {
           const confirmed = await window.logicConfirm(
