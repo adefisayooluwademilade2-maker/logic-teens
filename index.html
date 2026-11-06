@@ -2025,6 +2025,115 @@ body.admin-user #ministry .ministry-actions {
 
   openPage("ministryMemberProfile");
 
+      // Department profile controls: admins only.
+  const departmentActions =
+    document.getElementById("adminDepartmentProfileActions");
+
+  const editDepartmentButton =
+    document.getElementById("adminEditDepartmentMember");
+
+  const removeDepartmentButton =
+    document.getElementById("adminRemoveDepartmentMember");
+
+  const departmentMembershipId =
+    member.departmentMembershipId || "";
+
+  const departmentName =
+    String(member.department || "").trim();
+
+  const canManageThisDepartment =
+    window.logicIsAdmin === true &&
+    Boolean(departmentMembershipId && departmentName);
+
+  if (departmentActions) {
+    departmentActions.style.display =
+      canManageThisDepartment ? "flex" : "none";
+  }
+
+  if (canManageThisDepartment) {
+
+    editDepartmentButton.onclick = async () => {
+      const currentResponsibility =
+        String(member.responsibility || "");
+
+      const newResponsibility = window.prompt(
+        "Enter this member's responsibility:",
+        currentResponsibility
+      );
+
+      if (newResponsibility === null) return;
+
+      const currentRole =
+        String(member.role || "Team Member");
+
+      const newRole = window.prompt(
+        "Enter the new team role: Team Leader or Team Member",
+        currentRole
+      );
+
+      if (newRole === null) return;
+
+      const cleanRole = newRole.trim().toLowerCase();
+
+      if (
+        cleanRole !== "team leader" &&
+        cleanRole !== "team member"
+      ) {
+        window.logicNotify(
+          "Please enter Team Leader or Team Member."
+        );
+        return;
+      }
+
+      try {
+        await updateDoc(
+          doc(db, "departmentMembers", departmentMembershipId),
+          {
+            responsibility:
+              newResponsibility.trim() || "Not assigned yet",
+            role:
+              cleanRole === "team leader"
+                ? "Team Leader"
+                : "Team Member"
+          }
+        );
+
+        window.logicNotify("Department details updated.");
+
+      } catch (error) {
+        console.error("Department profile edit error:", error);
+        window.logicNotify("Could not update department details.");
+      }
+    };
+
+    removeDepartmentButton.onclick = async () => {
+      const confirmed = await window.logicConfirm(
+        `Remove ${member.fullName || "this member"} from ${departmentName}? Their other department memberships will remain.`,
+        "Remove from this department?",
+        "Remove"
+      );
+
+      if (!confirmed) return;
+
+      try {
+        await deleteDoc(
+          doc(db, "departmentMembers", departmentMembershipId)
+        );
+
+        window.logicNotify("Member removed from this department.");
+
+        window.closeMinistryMemberProfile();
+
+        await window.loadDepartmentMembers(departmentName);
+        await window.loadAdminHomeCounts?.();
+
+      } catch (error) {
+        console.error("Department profile removal error:", error);
+        window.logicNotify("Could not remove this member.");
+      }
+    };
+  }
+
   function renderProfile() {
     const departments = [...new Set(
       memberships
