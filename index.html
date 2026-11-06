@@ -5549,11 +5549,10 @@ if (savedNotifications) {
 
       const profileResponsibilitySummary =
         document.getElementById("profileResponsibilitySummary");
-
       if (profileResponsibilitySummary) {
         profileResponsibilitySummary.textContent =
-          responsibilities.length
-            ? responsibilities.join(" / ")
+          teamResponsibilities.length
+            ? teamResponsibilities.join("\n")
             : "Not assigned yet";
       }
     }
