@@ -1791,6 +1791,26 @@ body.admin-user #ministry .ministry-actions {
   color: white !important;
   text-align: left !important;
     }
+
+#adminDashboard button.panel {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  color: var(--white) !important;
+  text-align: left !important;
+  background: var(--card) !important;
+}
+
+#adminDashboard button.panel strong {
+  display: block;
+  color: var(--white) !important;
+  text-align: left !important;
+}
+
+#adminDashboard button.panel p {
+  color: var(--muted) !important;
+  text-align: left !important;
+    }
     
   </style>
 
@@ -1991,17 +2011,16 @@ body.admin-user #ministry .ministry-actions {
         .filter(Boolean)
     )];
 
-        const teamResponsibilities = [...new Set(
+            const teamResponsibilities = [...new Set(
       memberships.map(item => {
-        const team = String(item.department || "").trim();
         const responsibility = String(item.responsibility || "").trim();
-        if (!team) return "";
-        return `${team} — ${
-          responsibility && responsibility !== "—"
+
+        return responsibility &&
+          responsibility !== "—" &&
+          responsibility !== "Not assigned yet"
             ? responsibility
-            : "Not assigned yet"
-        }`;
-      }).filter(Boolean)
+            : "Not assigned";
+      })
     )];
 
     const hasTeamMember = memberships.length > 0;
@@ -2064,7 +2083,7 @@ body.admin-user #ministry .ministry-actions {
         document.getElementById("directoryMemberResponsibility").textContent =
       teamResponsibilities.length
         ? teamResponsibilities.join("\n")
-        : "Not assigned yet"; 
+                : "Not assigned";
 
     document.getElementById("directoryMemberAbout").textContent =
       profile.about || member.about || "No introduction added.";
