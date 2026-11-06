@@ -5352,23 +5352,31 @@ const data = {
 
 const joinedAt = data.joinedAt;
 
-await setDoc(profileRef, {
-  fullName: data.fullName,
-  email: user.email || "",
-  photoURL: data.photoURL,
-  username: data.username,
-  about: data.about,
-  joinedAt: joinedAt
-}, { merge: true });
+try {
+  await setDoc(profileRef, {
+    fullName: data.fullName,
+    email: user.email || "",
+    photoURL: data.photoURL,
+    username: data.username,
+    about: data.about,
+    joinedAt: joinedAt
+  }, { merge: true });
 
-await setDoc(publicProfileRef, {
-  fullName: data.fullName,
-  photoURL: data.photoURL,
-  username: data.username,
-  about: data.about,
-  joinedAt: joinedAt,
-  isAdmin: window.logicIsAdmin === true
-}, { merge: true });
+  await setDoc(publicProfileRef, {
+    fullName: data.fullName,
+    photoURL: data.photoURL,
+    username: data.username,
+    about: data.about,
+    joinedAt: joinedAt,
+    isAdmin: window.logicIsAdmin === true
+  }, { merge: true });
+
+} catch (profileSaveError) {
+  console.warn(
+    "Profile sync failed, continuing profile loading:",
+    profileSaveError
+  );
+  }
 
     const savedNotifications = data.notificationSettings;
 
