@@ -3423,6 +3423,9 @@ window.addEventListener("popstate", (event) => {
     window.loadDepartmentMembers?.(
       window.logicCurrentDepartment
     );
+
+      } else if (pageToRestore === "adminApplications") {
+    window.loadAdminApplications?.();
   } else if (pageToRestore === "adminApprovedMembers") {
     window.loadAdminApprovedMembers?.();
   } else if (pageToRestore === "adminManageMembers") {
