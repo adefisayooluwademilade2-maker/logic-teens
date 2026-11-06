@@ -3398,7 +3398,11 @@ history.pushState(
   "#" + startingPage
 );
 
+
 window.addEventListener("popstate", (event) => {
+  const pageBeforeBack =
+    document.querySelector(".page.active")?.id;
+
   const pageFromHistory =
     event.state?.logicPage ||
     location.hash.replace("#", "");
@@ -3409,6 +3413,14 @@ window.addEventListener("popstate", (event) => {
 
   window.logicCurrentDepartment =
     event.state?.logicDepartment || "";
+
+  // Stop live profile listeners when leaving a member profile.
+  if (
+    pageBeforeBack === "ministryMemberProfile" &&
+    pageToRestore !== "ministryMemberProfile"
+  ) {
+    window.logicStopMemberProfileListeners?.();
+  }
 
   openPage(pageToRestore, { skipHistory: true });
 
@@ -3421,15 +3433,27 @@ window.addEventListener("popstate", (event) => {
     window.loadDepartmentMembers?.(
       window.logicCurrentDepartment
     );
-
-      } else if (pageToRestore === "adminApplications") {
+  } else if (pageToRestore === "adminApplications") {
     window.loadAdminApplications?.();
   } else if (pageToRestore === "adminApprovedMembers") {
     window.loadAdminApprovedMembers?.();
   } else if (pageToRestore === "adminManageMembers") {
     window.loadAdminManageMembers?.();
   }
+
+  // Keep the app at Home instead of leaving it unexpectedly.
+  if (pageToRestore === "home") {
+    history.pushState(
+      {
+        logicPage: "home",
+        logicDepartment: ""
+      },
+      "",
+      "#home"
+    );
+  }
 });
+
 
 // DAILY KJV WORD
 const dailyVerses = [
