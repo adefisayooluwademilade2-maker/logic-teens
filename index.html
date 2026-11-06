@@ -2110,7 +2110,9 @@ body.admin-user #ministry .ministry-actions {
 
       } catch (error) {
         console.error("Department profile edit error:", error);
-        window.logicNotify("Could not update department details.");
+        window.logicNotify(
+  "Save error: " + (error.code || error.message || "Unknown error")
+);
       }
     };
 
