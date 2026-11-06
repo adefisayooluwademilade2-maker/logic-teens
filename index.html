@@ -4407,9 +4407,22 @@ groupedMembers.forEach(member => {
 
       const accountRole = document.createElement("div");
 
-      accountRole.textContent =
-        (member.isAdmin ? "Admin" : "Member") +
-        (isTeamLeader ? " · Team Leader" : "");
+            const roleLabels = [];
+
+      if (member.isAdmin) {
+        roleLabels.push("Admin");
+      }
+
+      if (member.memberships.length > 0) {
+        roleLabels.push("Team Member");
+      }
+
+      if (isTeamLeader) {
+        roleLabels.push("Team Leader");
+      }
+
+      accountRole.textContent = roleLabels.join(" · ");
+      accountRole.hidden = roleLabels.length === 0;
 
       accountRole.style.cssText =
         "color:var(--gold);font-size:12px;margin-top:5px";
@@ -4702,7 +4715,7 @@ window.approveTeamApplication = async function(applicationId) {
         application.memberName ||
         "LOGIC Teens Member",
       username: memberProfile.username || "",
-      email: application.email || "",
+      email: String(application.email || "").trim().toLowerCase(),
       photoURL: memberProfile.photoURL || "",
       about: memberProfile.about || "",
       department: application.team,
@@ -4846,7 +4859,7 @@ window.rejectTeamApplication = async function(applicationId) {
     batch.set(applicationRef, {
       userId: user.uid,
       memberName: window.logicProfileData?.fullName || user.displayName || "Member",
-      email: user.email || "",
+      email: String(user.email || "").trim().toLowerCase(),
       team: team,
       status: "pending",
       createdAt: serverTimestamp()
