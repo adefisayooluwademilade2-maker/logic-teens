@@ -4430,320 +4430,161 @@ window.renderAdminManageMembers = function() {
     list.appendChild(button);
   });
 };
-  window.loadAdminApprovedMembers = async function() {
+
+
+window.loadAdminApprovedMembers = async function() {
   if (!window.logicIsAdmin) return;
 
   const list = document.getElementById("adminApprovedMemberList");
   if (!list) return;
 
+  const departments = [
+    {
+      name: "Logic Teens Sound (LTS)",
+      icon: "🎧",
+      description: "Sound and audio support."
+    },
+    {
+      name: "Ushering Department",
+      icon: "🤝",
+      description: "Welcome and assist people during gatherings."
+    },
+    {
+      name: "Social Media Department",
+      icon: "📱",
+      description: "Share and communicate the LOGIC Teens message."
+    },
+    {
+      name: "Technical Department",
+      icon: "⚙️",
+      description: "Support the technical needs of church activities."
+    },
+    {
+      name: "Logic Teens SWAT Department",
+      icon: "🛡️",
+      description: "Serve and support the work of LOGIC Teens."
+    },
+    {
+      name: "Planning Committee",
+      icon: "📋",
+      description: "Plan and coordinate LOGIC Teens activities."
+    }
+  ];
+
   list.innerHTML = `
     <div class="directory-empty">
-      <h3>Loading approved members...</h3>
+      <h3>Loading departments...</h3>
     </div>
   `;
 
   try {
-    const membersQuery = query(
-      collection(db, "departmentMembers"),
-      where("status", "==", "approved")
+    const snapshot = await getDocs(
+      query(
+        collection(db, "departmentMembers"),
+        where("status", "==", "approved")
+      )
     );
 
-        const [snapshot, profilesSnapshot] = await Promise.all([
-      getDocs(membersQuery),
-      getDocs(collection(db, "publicProfiles"))
-    ]);
+    const counts = {};
 
-    let adminsById = new Map();
-
-    try {
-      const adminsSnapshot = await getDocs(collection(db, "admins"));
-
-      adminsById = new Map(
-        adminsSnapshot.docs.map(item => [item.id, item.data()])
-      );
-    } catch (adminError) {
-      console.warn(
-        "Admin details unavailable; using public profile roles:",
-        adminError
-      );
-    }
-
-    const adminIds = new Set(adminsById.keys());
-
-const profilesById = new Map();
-const profilesByEmail = new Map();
-
-profilesSnapshot.forEach(profileDoc => {
-  const profile = profileDoc.data();
-
-  profilesById.set(profileDoc.id, profile);
-
-  const email = String(profile.email || "")
-    .trim()
-    .toLowerCase();
-
-  if (email) {
-    profilesByEmail.set(email, {
-      ...profile,
-      userId: profileDoc.id
+    departments.forEach(department => {
+      counts[department.name] = 0;
     });
-  }
-});
 
-const groupedMembers = new Map();
+    snapshot.forEach(memberDoc => {
+      const department = String(
+        memberDoc.data().department || ""
+      ).trim();
 
-snapshot.forEach(memberDoc => {
-  const data = memberDoc.data();
-
-  const userId = String(data.userId || "").trim();
-  const email = String(data.email || "")
-    .trim()
-    .toLowerCase();
-
-  const groupKey = email
-    ? `email:${email}`
-    : userId
-      ? `uid:${userId}`
-      : `document:${memberDoc.id}`;
-
-  if (!groupedMembers.has(groupKey)) {
-    const savedProfile =
-      (userId && profilesById.get(userId)) ||
-      (email && profilesByEmail.get(email)) ||
-      {};
-
-    groupedMembers.set(groupKey, {
-      ...data,
-      ...savedProfile,
-      userId: userId || savedProfile.userId || "",
-      email: email || savedProfile.email || "",
-      isAdmin: false,
-      memberships: [],
-      membershipIds: [],
-      departments: []
+      if (department === "Media") {
+        counts["Social Media Department"]++;
+      } else if (counts[department] !== undefined) {
+        counts[department]++;
+      }
     });
-  }
-
-  const member = groupedMembers.get(groupKey);
-
-  member.userId =
-    member.userId || userId;
-
-  member.memberships.push(data);
-  member.membershipIds.push(memberDoc.id);
-
-  const department = String(data.department || "").trim();
-
-  if (
-    department &&
-    !member.departments.includes(department)
-  ) {
-    member.departments.push(department);
-  }
-
-  // Use the saved profile when membership data is incomplete.
-  if (!member.photoURL && data.photoURL) {
-    member.photoURL = data.photoURL;
-  }
-
-  if (!member.fullName && data.fullName) {
-    member.fullName = data.fullName;
-  }
-
-  if (!member.about && data.about) {
-    member.about = data.about;
-  }
-});
-
-groupedMembers.forEach(member => {
-  const adminData = member.userId
-    ? adminsById.get(member.userId) || {}
-    : {};
-
-  member.isAdmin = Boolean(
-    (member.userId && adminsById.has(member.userId)) ||
-    member.isAdmin === true
-  );
-
-  member.isAdminManager =
-    member.isAdmin && (
-      adminData.canManageAdmins === true ||
-      String(adminData.role || "")
-        .toLowerCase()
-        .includes("manager")
-    );
-});
 
     list.innerHTML = "";
 
-    if (groupedMembers.size === 0) {
-      list.innerHTML = `
-        <div class="directory-empty">
-          <h3>No approved members yet</h3>
-          <p>Approved department members will appear here.</p>
-        </div>
-      `;
-      return;
-    }
-
-    groupedMembers.forEach(member => {
-      const card = document.createElement("div");
+    departments.forEach(department => {
+      const card = document.createElement("button");
+      card.type = "button";
 
       card.style.cssText = `
         display:flex;
         align-items:center;
-        gap:10px;
+        gap:14px;
         width:100%;
-        padding:14px 0;
-        border-bottom:1px solid var(--line);
-      `;
-
-      const profileButton = document.createElement("button");
-
-      profileButton.type = "button";
-
-      profileButton.style.cssText = `
-        display:flex;
-        align-items:center;
-        gap:13px;
-        flex:1;
-        min-width:0;
-        background:transparent;
-        border:0;
+        padding:16px 13px;
+        margin-bottom:10px;
+        background:var(--card);
+        border:1px solid var(--line);
+        border-radius:14px;
         color:white;
         text-align:left;
-        padding:0;
-      `;
-
-      const photo = document.createElement("img");
-
-      photo.src =
-        member.photoURL ||
-        "https://www.gravatar.com/avatar/?d=mp";
-
-      photo.style.cssText = `
-        width:48px;
-        height:48px;
-        border-radius:50%;
-        object-fit:cover;
-        flex-shrink:0;
-      `;
-
-      const info = document.createElement("div");
-
-      info.style.flex = "1";
-      info.style.minWidth = "0";
-
-      const name = document.createElement("strong");
-
-      name.textContent =
-        member.fullName || "LOGIC Teens Member";
-
-      const isTeamLeader = member.memberships.some(item =>
-        String(item.role || "").toLowerCase().includes("leader")
-      );
-
-      const accountRole = document.createElement("div");
-
-            const roleLabels = [];
-
-            if (member.isAdminManager) {
-        roleLabels.push("Admin Manager");
-      } else if (member.isAdmin) {
-        roleLabels.push("Admin");
-            }
-      if (member.memberships.length > 0) {
-        roleLabels.push("Team Member");
-      }
-
-      if (isTeamLeader) {
-        roleLabels.push("Team Leader");
-      }
-
-      accountRole.textContent = roleLabels.join(" · ");
-      accountRole.hidden = roleLabels.length === 0;
-
-      accountRole.style.cssText =
-        "color:var(--gold);font-size:12px;margin-top:5px";
-
-      const department = document.createElement("div");
-
-      department.textContent =
-        member.departments.length
-          ? member.departments.join(" / ")
-          : "Department not assigned";
-
-      department.style.cssText =
-        "color:var(--gold);font-size:11px;margin-top:5px";
-
-      info.append(name, accountRole, department);
-      profileButton.append(photo, info);
-
-      profileButton.onclick = () => {
-        window.openMinistryMemberProfile(member);
-      };
-
-      const removeButton = document.createElement("button");
-
-      removeButton.type = "button";
-      removeButton.textContent = "Remove";
-
-      removeButton.style.cssText = `
-        background:#7f252d;
-        color:white;
-        border:0;
-        border-radius:9px;
-        padding:9px 11px;
-        font-size:11px;
-        font-weight:600;
         cursor:pointer;
       `;
 
-      removeButton.onclick = async () => {
-        const confirmed = await window.logicConfirm(
-          `Are you sure you want to remove ${member.fullName || "this member"} from ALL their approved ministry teams?`,
-          "Remove member?",
-          "Remove"
-        );
+      const icon = document.createElement("div");
+      icon.textContent = department.icon;
+      icon.style.cssText = `
+        width:45px;
+        height:45px;
+        min-width:45px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:var(--card2);
+        border-radius:12px;
+        font-size:22px;
+      `;
 
-        if (!confirmed) return;
+      const info = document.createElement("div");
+      info.style.cssText = "flex:1;min-width:0";
 
-        try {
-          await Promise.all(
-            member.membershipIds.map(id =>
-              deleteDoc(doc(db, "departmentMembers", id))
-            )
-          );
+      const name = document.createElement("strong");
+      name.textContent = department.name;
+      name.style.cssText = "display:block;font-size:14px";
 
-          window.logicNotify("Member removed successfully.");
+      const description = document.createElement("div");
+      description.textContent = department.description;
+      description.style.cssText =
+        "color:var(--muted);font-size:11px;margin-top:5px";
 
-          await window.loadAdminApprovedMembers();
-          await window.loadAdminHomeCounts();
+      const count = document.createElement("div");
+      count.textContent =
+        counts[department.name] +
+        (counts[department.name] === 1 ? " member" : " members");
+      count.style.cssText =
+        "color:var(--gold);font-size:11px;margin-top:7px";
 
-        } catch (error) {
-          console.error("Remove grouped member error:", error);
+      info.append(name, description, count);
 
-          window.logicNotify(
-            "Could not remove this member. Please try again."
-          );
-        }
+      const arrow = document.createElement("span");
+      arrow.textContent = "›";
+      arrow.style.cssText =
+        "font-size:25px;color:var(--muted)";
+
+      card.append(icon, info, arrow);
+
+      card.onclick = () => {
+        window.openMinistryDirectory(department.name);
       };
 
-      card.append(profileButton, removeButton);
       list.appendChild(card);
     });
 
   } catch (error) {
-    console.error("Approved members error:", error);
+    console.error("Departments loading error:", error);
 
     list.innerHTML = `
       <div class="directory-empty">
-        <h3>Couldn't load approved members</h3>
-        <p>Please try again later.</p>
+        <h3>Couldn't load departments</h3>
+        <p>Please try again.</p>
       </div>
     `;
   }
 };
+  
   
 window.removeAdminMember = async function(memberId, memberName) {
   if (!window.logicIsAdmin) {
