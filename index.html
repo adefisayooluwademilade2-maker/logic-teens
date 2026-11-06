@@ -2026,12 +2026,10 @@ body.admin-user #ministry .ministry-actions {
       roleContainer.appendChild(badge);
     };
 
-    if (isAdminManager) {
+        if (isAdminManager) {
       addRoleBadge("Admin Manager");
     } else if (isAdmin) {
       addRoleBadge("Admin");
-    } else {
-      addRoleBadge("Member");
     }
 
     if (hasTeamMember) addRoleBadge("Team Member");
