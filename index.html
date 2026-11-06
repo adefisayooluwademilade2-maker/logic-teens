@@ -4987,6 +4987,137 @@ window.renderAdminManageMembers = function() {
   });
 };
 
+  window.loadAdminApprovedPeople = async function() {
+  if (!window.logicIsAdmin) return;
+
+  const list = document.getElementById("adminApprovedPeopleList");
+  if (!list) return;
+
+  list.innerHTML = `
+    <div class="directory-empty">
+      <h3>Loading approved members...</h3>
+    </div>
+  `;
+
+  try {
+    // Reuse the existing loader for accounts and approved memberships.
+    await window.loadAdminManageMembers();
+
+    window.renderAdminApprovedPeople();
+
+  } catch (error) {
+    console.error("Approved people loading error:", error);
+
+    list.innerHTML = `
+      <div class="directory-empty">
+        <h3>Couldn't load approved members</h3>
+        <p>Please try again.</p>
+      </div>
+    `;
+  }
+};
+
+
+window.renderAdminApprovedPeople = function() {
+  const list = document.getElementById("adminApprovedPeopleList");
+  const search = document.getElementById("adminApprovedPeopleSearch");
+
+  if (!list) return;
+
+  const searchText = (search?.value || "").trim().toLowerCase();
+
+  // One account per userId, even when the person serves in multiple departments.
+  const approvedPeople = (window.logicAdminMembersCache || [])
+    .filter(member =>
+      Array.isArray(member.memberships) &&
+      member.memberships.length > 0 &&
+      (member.fullName || "").toLowerCase().includes(searchText)
+    );
+
+  list.innerHTML = "";
+
+  if (!approvedPeople.length) {
+    list.innerHTML = `
+      <div class="directory-empty">
+        <h3>No approved members found</h3>
+        <p>Approved Ministry Team members will appear here.</p>
+      </div>
+    `;
+    return;
+  }
+
+  approvedPeople.forEach(member => {
+    const row = document.createElement("button");
+    row.type = "button";
+
+    row.style.cssText = `
+      display:flex;
+      align-items:center;
+      gap:13px;
+      width:100%;
+      padding:14px 0;
+      background:transparent;
+      border:0;
+      border-bottom:1px solid var(--line);
+      color:white;
+      text-align:left;
+      cursor:pointer;
+    `;
+
+    const photo = document.createElement("img");
+    photo.src = member.photoURL ||
+      "https://www.gravatar.com/avatar/?d=mp";
+    photo.onerror = () => {
+      photo.src = "https://www.gravatar.com/avatar/?d=mp";
+    };
+    photo.style.cssText = `
+      width:50px;
+      height:50px;
+      border-radius:50%;
+      object-fit:cover;
+      flex-shrink:0;
+    `;
+
+    const info = document.createElement("div");
+    info.style.cssText = "flex:1;min-width:0";
+
+    const name = document.createElement("strong");
+    name.textContent = member.fullName || "LOGIC Teens Member";
+    name.style.cssText = "display:block;font-size:14px";
+
+    const departments = [...new Set(
+      member.memberships.map(item => item.department).filter(Boolean)
+    )];
+
+    const departmentText = document.createElement("div");
+    departmentText.textContent = departments.join(" • ");
+    departmentText.style.cssText =
+      "color:var(--muted);font-size:11px;margin-top:5px";
+
+    const roles = [...new Set(
+      member.memberships.map(item => item.role).filter(Boolean)
+    )];
+
+    const roleText = document.createElement("div");
+    roleText.textContent = roles.join(" • ") || "Team Member";
+    roleText.style.cssText =
+      "color:var(--gold);font-size:11px;margin-top:5px";
+
+    const arrow = document.createElement("span");
+    arrow.textContent = "›";
+    arrow.style.cssText =
+      "font-size:25px;color:var(--muted)";
+
+    info.append(name, roleText, departmentText);
+    row.append(photo, info, arrow);
+
+    row.onclick = () => {
+      window.openMinistryMemberProfile(member);
+    };
+
+    list.appendChild(row);
+  });
+};
 
 window.loadAdminApprovedMembers = async function() {
   if (!window.logicIsAdmin) return;
