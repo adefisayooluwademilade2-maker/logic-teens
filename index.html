@@ -1649,9 +1649,10 @@ body.admin-user #ministry .ministry-actions {
     padding-top: 7px !important;
   }
 
-    body.management-page-open #adminApplications,
+      body.management-page-open #adminApplications,
   body.management-page-open #adminManageMembers,
   body.management-page-open #adminApprovedMembers,
+  body.management-page-open #adminApprovedPeople,
   body.management-page-open #ministryDirectory,
   body.management-page-open #membersDirectory,
   body.management-page-open #ministryMemberProfile {
@@ -2018,7 +2019,8 @@ body.admin-user #ministry .ministry-actions {
   window.openMinistryMemberProfile = function(member) {
   const currentPage = document.querySelector(".page.active")?.id;
 
-  window.logicMemberProfileReturnPage = [
+    window.logicMemberProfileReturnPage = [
+    "adminApprovedPeople",
     "adminApprovedMembers",
     "adminManageMembers",
     "membersDirectory"
@@ -2385,7 +2387,9 @@ body.admin-user #ministry .ministry-actions {
   // Fallback if the profile was opened without a previous page.
   openPage(returnPage || "home");
 
-  if (returnPage === "adminApprovedMembers") {
+  if (returnPage === "adminApprovedPeople") {
+    window.loadAdminApprovedPeople?.();
+  } else if (returnPage === "adminApprovedMembers") {
     window.loadAdminApprovedMembers?.();
   } else if (returnPage === "adminManageMembers") {
     window.loadAdminManageMembers?.();
@@ -4032,6 +4036,8 @@ window.addEventListener("popstate", (event) => {
     );
   } else if (pageToRestore === "adminApplications") {
     window.loadAdminApplications?.();
+    } else if (pageToRestore === "adminApprovedPeople") {
+    window.loadAdminApprovedPeople?.();
   } else if (pageToRestore === "adminApprovedMembers") {
     window.loadAdminApprovedMembers?.();
   } else if (pageToRestore === "adminManageMembers") {
