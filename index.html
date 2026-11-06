@@ -3696,15 +3696,31 @@ window.loadMembersDirectory = async function() {
     </div>
   `;
 
-  try {
-    const snapshot = await getDocs(
-      collection(db, "publicProfiles")
+      const [snapshot, adminsSnapshot] = await Promise.all([
+      getDocs(collection(db, "publicProfiles")),
+      getDocs(collection(db, "admins"))
+    ]);
+
+    const adminsById = new Map(
+      adminsSnapshot.docs.map(item => [item.id, item.data()])
     );
 
-    window.logicMembersDirectoryCache = snapshot.docs.map(item => ({
-      ...item.data(),
-      userId: item.id
-    })).sort((a, b) =>
+        window.logicMembersDirectoryCache = snapshot.docs.map(item => {
+      const adminData = adminsById.get(item.id) || {};
+      const isAdmin = adminsById.has(item.id);
+
+      return {
+        ...item.data(),
+        userId: item.id,
+        isAdmin,
+        isAdminManager: isAdmin && (
+          adminData.canManageAdmins === true ||
+          String(adminData.role || "")
+            .toLowerCase()
+            .includes("manager")
+        )
+      };
+    }).sort((a, b) =>
       (a.fullName || "").localeCompare(b.fullName || "")
     );
 
