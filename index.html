@@ -2078,13 +2078,29 @@ body.admin-user #ministry .ministry-actions {
       if (!details) return;
 
       try {
-        await updateDoc(
-          doc(db, "departmentMembers", departmentMembershipId),
-          {
-            responsibility: details.responsibility,
-            role: details.role
+                const oldRole = String(member.role || "Team Member");
+        const newRole = String(details.role || "Team Member");
+
+        if (oldRole !== newRole) {
+          let roleMessage = "";
+
+          if (newRole.toLowerCase().includes("leader")) {
+            roleMessage =
+              `Congratulations! You have been appointed Team Leader of the ${departmentName}.`;
+          } else if (oldRole.toLowerCase().includes("leader")) {
+            roleMessage =
+              `Your Team Leader appointment in the ${departmentName} has been removed. You are now a Team Member.`;
+          } else {
+            roleMessage =
+              `Your role in the ${departmentName} has been updated to ${newRole}.`;
           }
-        );
+
+          await window.logicSendMemberNotification(
+            userId,
+            "Team Role Updated",
+            roleMessage
+          );
+  }
 
         window.logicNotify("Department details updated.");
 
