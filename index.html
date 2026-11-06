@@ -4565,25 +4565,20 @@ window.loadDepartmentMembers = async function(department) {
           actions.appendChild(button);
         };
 
-        makeAction("Edit responsibility", async () => {
-          const current =
-            String(memberData.responsibility || "");
-
-          const answer = window.prompt(
-            "Enter this member's responsibility:",
-            current
+                makeAction("Edit responsibility", async () => {
+          const details = await window.logicEditDepartmentDetails(
+            String(memberData.responsibility || ""),
+            String(memberData.role || "Team Member"),
+            false
           );
 
-          if (answer === null) return;
-
-          const newResponsibility = answer.trim();
+          if (!details) return;
 
           try {
             await updateDoc(
               doc(db, "departmentMembers", memberDoc.id),
               {
-                responsibility:
-                  newResponsibility || "Not assigned yet"
+                responsibility: details.responsibility
               }
             );
 
