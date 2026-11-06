@@ -5678,10 +5678,11 @@ if (savedNotifications) {
       renderAccountProfile();
     }
 
-    stopAccountMemberships = onSnapshot(
+        stopAccountMemberships = onSnapshot(
       query(
         collection(db, "departmentMembers"),
-        where("userId", "==", user.uid)
+        where("userId", "==", user.uid),
+        where("status", "==", "approved")
       ),
       snapshot => {
         accountMembershipSources.byUser.clear();
@@ -5700,7 +5701,8 @@ if (savedNotifications) {
     stopAccountEmailMemberships = onSnapshot(
       query(
         collection(db, "departmentMembers"),
-        where("email", "==", String(user.email || "").trim().toLowerCase())
+        where("email", "==", String(user.email || "").trim().toLowerCase()),
+        where("status", "==", "approved")
       ),
       snapshot => {
         accountMembershipSources.byEmail.clear();
