@@ -2094,6 +2094,22 @@ body.admin-user #ministry .ministry-actions {
 
   renderProfile();
 
+      // Listen for the member's original account creation date.
+  if (userId) {
+    stopUserProfile = onSnapshot(
+      doc(db, "users", userId),
+      snapshot => {
+        if (snapshot.exists()) {
+          accountJoinedAt = snapshot.data().joinedAt || "";
+          renderProfile();
+        }
+      },
+      error => {
+        console.warn("Account date update failed:", error);
+      }
+    );
+  }
+
   // Listen for the latest saved profile information.
   if (userId) {
     stopProfile = onSnapshot(
