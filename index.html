@@ -2076,10 +2076,10 @@ body.admin-user #ministry .ministry-actions {
         ? joinedDate.toDate()
         : new Date(joinedDate);
 
-      if (!isNaN(date.getTime())) {
-        joinedText = date.toLocaleDateString("en-GB", {
+              joinedText = date.toLocaleDateString("en-GB", {
           month: "long",
-          year: "numeric"
+          year: "numeric",
+          timeZone: "Africa/Lagos"
         });
       }
     }
