@@ -2077,8 +2077,16 @@ body.admin-user #ministry .ministry-actions {
 
       if (!details) return;
 
-      try {
-                const oldRole = String(member.role || "Team Member");
+            try {
+        await updateDoc(
+          doc(db, "departmentMembers", departmentMembershipId),
+          {
+            responsibility: details.responsibility,
+            role: details.role
+          }
+        );
+
+        const oldRole = String(member.role || "Team Member");
         const newRole = String(details.role || "Team Member");
 
         if (oldRole !== newRole) {
@@ -2100,15 +2108,15 @@ body.admin-user #ministry .ministry-actions {
             "Team Role Updated",
             roleMessage
           );
-  }
+        }
 
         window.logicNotify("Department details updated.");
 
       } catch (error) {
         console.error("Department profile edit error:", error);
         window.logicNotify(
-  "Save error: " + (error.code || error.message || "Unknown error")
-);
+          "Save error: " + (error.code || error.message || "Unknown error")
+        );
       }
     };
 
