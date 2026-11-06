@@ -3775,10 +3775,6 @@ window.loadMembersDirectory = async function() {
       (a.fullName || "").localeCompare(b.fullName || "")
     );
   
-    }).sort((a, b) =>
-      (a.fullName || "").localeCompare(b.fullName || "")
-    );
-
     window.renderMembersDirectory();
 
   } catch (error) {
