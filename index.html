@@ -4249,9 +4249,11 @@ window.renderAdminManageMembers = function() {
     getDocs(collection(db, "publicProfiles"))
   ]);
 
-const adminIds = new Set(
-  adminsSnapshot.docs.map(item => item.id)
+const adminsById = new Map(
+  adminsSnapshot.docs.map(item => [item.id, item.data()])
 );
+
+const adminIds = new Set(adminsById.keys());
 
 const profilesById = new Map();
 const profilesByEmail = new Map();
