@@ -3981,39 +3981,65 @@ const membersQuery = query(
 
   return Number(bLeader) - Number(aLeader);
 })) {
-      const memberData = memberDoc.data();
-
-      const member = {
-        ...memberData,
-        userId: memberData.userId || "",
-        isAdmin: memberData.isAdmin === true
-      };
+            const memberData = memberDoc.data();
+      const userId = String(memberData.userId || "").trim();
 
       let publicProfile = {};
 
-      if (member.userId) {
+      if (userId) {
         try {
           const profileSnap = await getDoc(
-            doc(db, "publicProfiles", member.userId)
+            doc(db, "publicProfiles", userId)
           );
 
           if (profileSnap.exists()) {
             publicProfile = profileSnap.data();
           }
         } catch (profileError) {
-          console.warn("Could not load department member photo:", profileError);
+          console.warn(
+            "Could not load department member profile:",
+            profileError
+          );
         }
       }
 
-                  member.photoURL =
-        publicProfile.photoURL || member.photoURL || "";
+      const member = {
+        ...memberData,
+        ...publicProfile,
 
-      member.fullName =
-        publicProfile.fullName ||
-        member.fullName ||
-        member.username ||
-        member.memberName ||
-        "LOGIC Teens Member";
+        userId,
+
+        isAdmin:
+          memberData.isAdmin === true ||
+          publicProfile.isAdmin === true,
+
+        fullName:
+          publicProfile.fullName ||
+          memberData.fullName ||
+          memberData.username ||
+          memberData.memberName ||
+          "LOGIC Teens Member",
+
+        username:
+          publicProfile.username ||
+          memberData.username ||
+          "",
+
+        photoURL:
+          publicProfile.photoURL ||
+          memberData.photoURL ||
+          "",
+
+        about:
+          publicProfile.about ||
+          memberData.about ||
+          "",
+
+        joinedAt:
+          publicProfile.joinedAt ||
+          memberData.joinedAt ||
+          ""
+      };
           
       const card = document.createElement("button");
       card.type = "button";
