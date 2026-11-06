@@ -4451,18 +4451,27 @@ window.renderAdminManageMembers = function() {
       where("status", "==", "approved")
     );
 
-    const [snapshot, adminsSnapshot, profilesSnapshot] =
-  await Promise.all([
-    getDocs(membersQuery),
-    getDocs(collection(db, "admins")),
-    getDocs(collection(db, "publicProfiles"))
-  ]);
+        const [snapshot, profilesSnapshot] = await Promise.all([
+      getDocs(membersQuery),
+      getDocs(collection(db, "publicProfiles"))
+    ]);
 
-const adminsById = new Map(
-  adminsSnapshot.docs.map(item => [item.id, item.data()])
-);
+    let adminsById = new Map();
 
-const adminIds = new Set(adminsById.keys());
+    try {
+      const adminsSnapshot = await getDocs(collection(db, "admins"));
+
+      adminsById = new Map(
+        adminsSnapshot.docs.map(item => [item.id, item.data()])
+      );
+    } catch (adminError) {
+      console.warn(
+        "Admin details unavailable; using public profile roles:",
+        adminError
+      );
+    }
+
+    const adminIds = new Set(adminsById.keys());
 
 const profilesById = new Map();
 const profilesByEmail = new Map();
@@ -4555,7 +4564,8 @@ groupedMembers.forEach(member => {
     : {};
 
   member.isAdmin = Boolean(
-    member.userId && adminsById.has(member.userId)
+    (member.userId && adminsById.has(member.userId)) ||
+    member.isAdmin === true
   );
 
   member.isAdminManager =
