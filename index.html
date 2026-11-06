@@ -649,7 +649,7 @@ body.notification-detail-open .bottom-nav {
 <!-- ADMIN HOMEPAGE -->
 <div class="grid admin-home-grid" id="adminHomeTiles" hidden>
 
-  <button class="tile" onclick="openPage('adminApprovedMembers'); loadAdminApprovedMembers()">
+  <button class="tile" onclick="openPage('adminDashboard'); loadAdminHomeCounts()">
     <span class="admin-tile-icon">
       <svg viewBox="0 0 24 24">
         <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -5140,14 +5140,24 @@ window.removeAdminMember = async function(memberId, memberName) {
         getDocs(applicationsQuery)
       ]);
 
+        const approvedMemberIds = new Set();
+
+    membersSnapshot.forEach(memberDoc => {
+      const userId = String(
+        memberDoc.data().userId || ""
+      ).trim();
+
+      if (userId) approvedMemberIds.add(userId);
+    });
+
     document.getElementById("adminMemberCount").textContent =
-      membersSnapshot.size;
+      approvedMemberIds.size;
 
     document.getElementById("adminApplicationCount").textContent =
       applicationsSnapshot.size;
 
-    document.getElementById("dashboardMemberCount").textContent =
-      membersSnapshot.size;
+        document.getElementById("dashboardMemberCount").textContent =
+      approvedMemberIds.size;
 
     document.getElementById("dashboardApplicationCount").textContent =
       applicationsSnapshot.size;
