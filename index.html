@@ -1355,13 +1355,7 @@ body.admin-user #ministry .ministry-actions {
   </span>
 </div>
 
-<div id="departmentMemberList">
-  <div class="directory-empty">
-    <div class="directory-empty-icon">👥</div>
-    <h3>No approved members yet</h3>
-    <p>Approved members of this department will appear here.</p>
-  </div>
-</div>
+<div id="departmentMemberList"></div>
 </section>
 
  <section class="page" id="ministryMemberProfile">
@@ -4098,15 +4092,10 @@ window.loadDepartmentMembers = async function(department) {
 
     list.innerHTML = "";
 
-    if (snapshot.empty) {
-      list.innerHTML = `
-        <div class="directory-empty">
-          <h3>No team members yet</h3>
-          <p>Approved members of this department will appear here.</p>
-        </div>
-      `;
+        if (snapshot.empty) {
+      list.innerHTML = "";
       return;
-    }
+        }
 
     const members = [...snapshot.docs].sort((a, b) => {
       const aLeader =
