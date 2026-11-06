@@ -3462,6 +3462,158 @@ loadNotificationSettings();
     border: 0;
   }
 
+  /* DEPARTMENT DETAILS EDITOR */
+
+  #logicDepartmentEditorOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100001;
+    background: rgba(0,0,0,.76);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  #logicDepartmentEditorOverlay.show {
+    display: flex;
+  }
+
+  .logic-department-editor {
+    width: 100%;
+    max-width: 380px;
+    background: #141622;
+    border: 1px solid #36384a;
+    border-radius: 20px;
+    padding: 22px;
+    box-shadow: 0 18px 55px rgba(0,0,0,.45);
+  }
+
+  .logic-department-editor h3 {
+    color: white;
+    font-size: 18px;
+    margin: 0 0 7px;
+  }
+
+  .logic-department-editor p {
+    color: #a4a5b5;
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0 0 17px;
+  }
+
+  .logic-department-editor label {
+    display: block;
+    color: #d6b779;
+    font-size: 12px;
+    margin: 14px 0 7px;
+  }
+
+  .logic-department-editor textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background: #090a12;
+    color: white;
+    border: 1px solid #36384a;
+    border-radius: 11px;
+    padding: 13px;
+    font: 14px Arial;
+    min-height: 105px;
+    resize: vertical;
+    outline: none;
+  }
+
+  .logic-role-select {
+    position: relative;
+  }
+
+  #logicDepartmentRoleTrigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #090a12;
+    color: white;
+    border: 1px solid #36384a;
+    border-radius: 11px;
+    padding: 13px;
+    font: 14px Arial;
+    cursor: pointer;
+  }
+
+  #logicDepartmentRoleOptions {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 5;
+    background: #1b1d2c;
+    border: 1px solid #36384a;
+    border-radius: 11px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0,0,0,.35);
+  }
+
+  #logicDepartmentRoleOptions.show {
+    display: block;
+  }
+
+  .logic-role-option {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px;
+    background: transparent;
+    color: white;
+    border: 0;
+    text-align: left;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .logic-role-option.selected {
+    color: #d6b779;
+    background: #292541;
+  }
+
+  .logic-role-check {
+    visibility: hidden;
+    font-weight: bold;
+  }
+
+  .logic-role-option.selected .logic-role-check {
+    visibility: visible;
+  }
+
+  .logic-department-editor-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .logic-department-editor-actions button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  #logicDepartmentEditorCancel {
+    background: #1b1d2c;
+    color: white;
+    border: 1px solid #36384a;
+  }
+
+  #logicDepartmentEditorSave {
+    background: #d6b779;
+    color: #090a12;
+    border: 0;
+      }
+  
   #logicToast {
     position: fixed;
     z-index: 100000;
