@@ -229,13 +229,27 @@ $("authForm").addEventListener("submit", async e => {
 
 await updateProfile(result.user, { displayName: fullName });
 
-// Create the safe public directory profile.
-await setDoc(doc(db, "publicProfiles", result.user.uid), {
+// Save the original account creation date for every new member.
+const joinedAt =
+  result.user.metadata.creationTime || new Date().toISOString();
+
+const newMemberProfile = {
   fullName: fullName,
+  email: result.user.email || email,
   username: "",
   photoURL: "",
   about: "",
-  joinedAt: result.user.metadata.creationTime || new Date().toISOString(),
+  joinedAt: joinedAt
+};
+
+// Save the account profile.
+await setDoc(doc(db, "users", result.user.uid), {
+  ...newMemberProfile
+});
+
+// Save the public directory profile.
+await setDoc(doc(db, "publicProfiles", result.user.uid), {
+  ...newMemberProfile,
   isAdmin: false
 });
 
