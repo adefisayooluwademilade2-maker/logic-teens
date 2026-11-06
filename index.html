@@ -5429,13 +5429,13 @@ const data = {
     publicData.about ||
     "",
 
-  joinedAt:
-    userData.joinedAt ||
-    publicData.joinedAt ||
-    user.metadata.creationTime ||
-    userData.createdAt ||
-    publicData.createdAt ||
-    ""
+joinedAt:
+  userData.joinedAt ||
+  publicData.joinedAt ||
+  user.metadata.creationTime ||
+  userData.createdAt ||
+  publicData.createdAt ||
+  new Date().toISOString()
 };
 
 const joinedAt = data.joinedAt;
