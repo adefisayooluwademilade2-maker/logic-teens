@@ -275,6 +275,21 @@ await setDoc(doc(db, "publicProfiles", result.user.uid), {
         return;
       }
 
+      // Restore the original joining date for existing accounts.
+const originalJoinedAt =
+  result.user.metadata.creationTime;
+
+if (originalJoinedAt) {
+  await setDoc(doc(db, "users", result.user.uid), {
+    email: result.user.email || email,
+    joinedAt: originalJoinedAt
+  }, { merge: true });
+
+  await setDoc(doc(db, "publicProfiles", result.user.uid), {
+    joinedAt: originalJoinedAt
+  }, { merge: true });
+}
+
       window.location.href = "index.html";
     }
 
