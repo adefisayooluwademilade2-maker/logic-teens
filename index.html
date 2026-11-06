@@ -2046,49 +2046,21 @@ body.admin-user #ministry .ministry-actions {
 
   if (canManageThisDepartment) {
 
-    editDepartmentButton.onclick = async () => {
-      const currentResponsibility =
-        String(member.responsibility || "");
-
-      const newResponsibility = window.prompt(
-        "Enter this member's responsibility:",
-        currentResponsibility
+        editDepartmentButton.onclick = async () => {
+      const details = await window.logicEditDepartmentDetails(
+        String(member.responsibility || ""),
+        String(member.role || "Team Member"),
+        true
       );
 
-      if (newResponsibility === null) return;
-
-      const currentRole =
-        String(member.role || "Team Member");
-
-      const newRole = window.prompt(
-        "Enter the new team role: Team Leader or Team Member",
-        currentRole
-      );
-
-      if (newRole === null) return;
-
-      const cleanRole = newRole.trim().toLowerCase();
-
-      if (
-        cleanRole !== "team leader" &&
-        cleanRole !== "team member"
-      ) {
-        window.logicNotify(
-          "Please enter Team Leader or Team Member."
-        );
-        return;
-      }
+      if (!details) return;
 
       try {
         await updateDoc(
           doc(db, "departmentMembers", departmentMembershipId),
           {
-            responsibility:
-              newResponsibility.trim() || "Not assigned yet",
-            role:
-              cleanRole === "team leader"
-                ? "Team Leader"
-                : "Team Member"
+            responsibility: details.responsibility,
+            role: details.role
           }
         );
 
