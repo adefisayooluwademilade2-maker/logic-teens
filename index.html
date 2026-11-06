@@ -5335,66 +5335,214 @@ if (savedNotifications) {
   window.updateNotificationControls?.();
     }
 
-    const photoURL = data.photoURL || user.photoURL || "";
-    const fullName = data.fullName || user.displayName || "";
-    const username = data.username || "";
-    const about = data.about || "";
-
-// Load this account's actual role and approved ministry teams.
-const myMembershipsSnapshot = await getDocs(
-  query(
-    collection(db, "departmentMembers"),
-    where("userId", "==", user.uid)
-  )
-);
-
-const myApprovedMemberships = myMembershipsSnapshot.docs
-  .map(item => item.data())
-  .filter(item => item.status === "approved");
-
-const myDepartments = [...new Set(
-  myApprovedMemberships
-    .map(item => String(item.department || "").trim())
-    .filter(Boolean)
-)];
-
-document.getElementById("profileRole").textContent =
-  window.logicIsAdmin ? "Admin" : "Member";
-
-document.getElementById("profileDepartment").textContent =
-  myDepartments.length
-    ? myDepartments.join(" / ")
-    : "No ministry team assigned";
-    
-    window.logicProfileData = {
-      fullName,
-      username,
-      about,
-      photoURL
+       let accountProfile = {
+      ...data,
+      photoURL: data.photoURL || user.photoURL || ""
     };
 
-    document.getElementById("profileDisplayName").textContent =
-      fullName || "Member";
+    let accountMemberships = [];
+    let accountAdminData = adminData;
+    let accountIsAdmin = window.logicIsAdmin === true;
 
-    document.getElementById("profileDisplayUsername").textContent =
-      username ? "@" + username : "";
+    window.logicStopAccountProfileListeners?.();
 
-    document.getElementById("profileDisplayAbout").textContent =
-      about || "Tell us something about yourself.";
+    let stopAccountProfile = () => {};
+    let stopAccountMemberships = () => {};
+    let stopAccountAdmin = () => {};
 
-    document.getElementById("editFullName").value = fullName;
-    document.getElementById("editUsername").value = username;
-    document.getElementById("editAbout").value = about;
-    document.getElementById("editEmail").value = user.email || "";
+    window.logicStopAccountProfileListeners = () => {
+      stopAccountProfile();
+      stopAccountMemberships();
+      stopAccountAdmin();
+    };
 
-    setProfileAvatar(
-      document.getElementById("profileAvatar"),
-      photoURL
+    function renderAccountProfile() {
+      const departments = [...new Set(
+        accountMemberships
+          .map(item => String(item.department || "").trim())
+          .filter(Boolean)
+      )];
+
+      const responsibilities = [...new Set(
+        accountMemberships
+          .map(item => String(item.responsibility || "").trim())
+          .filter(value => value && value !== "—")
+      )];
+
+      const isTeamMember = accountMemberships.length > 0;
+
+      const isTeamLeader = accountMemberships.some(item =>
+        String(item.role || "").toLowerCase().includes("leader")
+      );
+
+      const isAdminManager =
+        accountIsAdmin && (
+          accountAdminData.canManageAdmins === true ||
+          String(accountAdminData.role || "")
+            .toLowerCase()
+            .includes("manager")
+        );
+
+      const accountRole = isAdminManager
+        ? "Admin Manager"
+        : accountIsAdmin
+          ? "Admin"
+          : "Member";
+
+      const teamLabels = [];
+
+      if (isTeamMember) teamLabels.push("Team Member");
+      if (isTeamLeader) teamLabels.push("Team Leader");
+
+      window.logicProfileData = {
+        ...accountProfile
+      };
+
+      document.getElementById("profileRole").textContent =
+        accountRole;
+
+      document.getElementById("profileDepartment").textContent =
+        departments.length
+          ? departments.join(" / ")
+          : "No ministry team assigned";
+
+      document.getElementById("profilePresence").textContent =
+        accountProfile.isOnline === true
+          ? "● Online"
+          : "● Offline";
+
+      document.getElementById("profileDisplayName").textContent =
+        accountProfile.fullName ||
+        user.displayName ||
+        "Member";
+
+      document.getElementById("profileDisplayUsername").textContent =
+        accountProfile.username
+          ? "@" + accountProfile.username
+          : "";
+
+      document.getElementById("profileDisplayAbout").textContent =
+        accountProfile.about ||
+        "Tell us something about yourself.";
+
+      if (!document.body.classList.contains("profile-editing")) {
+        document.getElementById("editFullName").value =
+          accountProfile.fullName || user.displayName || "";
+
+        document.getElementById("editUsername").value =
+          accountProfile.username || "";
+
+        document.getElementById("editAbout").value =
+          accountProfile.about || "";
+
+        document.getElementById("editEmail").value =
+          user.email || "";
+      }
+
+      setProfileAvatar(
+        document.getElementById("profileAvatar"),
+        accountProfile.photoURL || ""
+      );
+
+      if (
+        !document.body.classList.contains("profile-editing") ||
+        !window.profilePhotoFile
+      ) {
+        setProfileAvatar(
+          document.getElementById("editAvatarPreview"),
+          accountProfile.photoURL || ""
+        );
+      }
+
+      const roleSummary =
+        document.getElementById("editProfileRoleSummary");
+
+      if (roleSummary) {
+        roleSummary.textContent =
+          [accountRole, ...teamLabels].join(" · ");
+      }
+
+      const teamsSummary =
+        document.getElementById("editProfileTeamsSummary");
+
+      if (teamsSummary) {
+        teamsSummary.textContent =
+          departments.length
+            ? departments.join(" / ")
+            : "No ministry team assigned";
+      }
+
+      const responsibilitySummary =
+        document.getElementById("editProfileResponsibilitySummary");
+
+      if (responsibilitySummary) {
+        responsibilitySummary.textContent =
+          responsibilities.length
+            ? responsibilities.join(" / ")
+            : "Not assigned yet";
+      }
+    }
+
+    renderAccountProfile();
+
+    // Keep profile details updated for every signed-in account.
+    stopAccountProfile = onSnapshot(
+      doc(db, "publicProfiles", user.uid),
+      snapshot => {
+        if (snapshot.exists()) {
+          accountProfile = {
+            ...accountProfile,
+            ...snapshot.data()
+          };
+
+          renderAccountProfile();
+        }
+      },
+      error => {
+        console.warn("Account profile listener failed:", error);
+      }
     );
 
-    setProfileAvatar(
-      document.getElementById("editAvatarPreview"),
-      photoURL
+    // Keep approved ministry memberships updated.
+    stopAccountMemberships = onSnapshot(
+      query(
+        collection(db, "departmentMembers"),
+        where("userId", "==", user.uid)
+      ),
+      snapshot => {
+        accountMemberships = snapshot.docs
+          .map(item => item.data())
+          .filter(item => item.status === "approved");
+
+        renderAccountProfile();
+      },
+      error => {
+        console.warn("Account membership listener failed:", error);
+      }
+    );
+
+    // Keep the account's actual admin role updated.
+    stopAccountAdmin = onSnapshot(
+      doc(db, "admins", user.uid),
+      snapshot => {
+        accountIsAdmin = snapshot.exists();
+
+        accountAdminData = snapshot.exists()
+          ? snapshot.data()
+          : {};
+
+        window.logicIsAdmin = accountIsAdmin;
+        window.logicAdminRole =
+          accountAdminData.role || "member";
+
+        window.logicCanManageAdmins =
+          accountAdminData.canManageAdmins === true;
+
+        renderAccountProfile();
+      },
+      error => {
+        console.warn("Account role listener failed:", error);
+      }
     );
 
   } catch (error) {
