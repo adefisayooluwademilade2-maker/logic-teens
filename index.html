@@ -5093,17 +5093,18 @@ window.renderAdminApprovedPeople = function() {
     name.textContent = member.fullName || "LOGIC Teens Member";
     name.style.cssText = "display:block;font-size:14px";
 
-    const departments = [...new Set(
+        const departments = [...new Set(
       member.memberships.map(item => item.department).filter(Boolean)
     )];
 
-    const departmentText = document.createElement("div");
-    departmentText.textContent = departments.join(" • ");
-    departmentText.style.cssText =
-      "color:var(--muted);font-size:11px;margin-top:5px";
-
     const roles = [...new Set(
       member.memberships.map(item => item.role).filter(Boolean)
+    )];
+
+    const responsibilities = [...new Set(
+      member.memberships
+        .map(item => String(item.responsibility || "").trim())
+        .filter(value => value && value !== "—" && value !== "Not assigned yet")
     )];
 
     const roleText = document.createElement("div");
@@ -5111,12 +5112,18 @@ window.renderAdminApprovedPeople = function() {
     roleText.style.cssText =
       "color:var(--gold);font-size:11px;margin-top:5px";
 
-    const arrow = document.createElement("span");
-    arrow.textContent = "›";
-    arrow.style.cssText =
-      "font-size:25px;color:var(--muted)";
+    const departmentText = document.createElement("div");
+    departmentText.textContent = departments.join(" • ");
+    departmentText.style.cssText =
+      "color:var(--muted);font-size:11px;margin-top:5px";
 
-    info.append(name, roleText, departmentText);
+    const responsibilityText = document.createElement("div");
+    responsibilityText.textContent =
+      responsibilities.join(" • ") || "Responsibility not assigned";
+    responsibilityText.style.cssText =
+      "color:var(--muted);font-size:11px;margin-top:5px";
+
+    info.append(name, roleText, departmentText, responsibilityText);
     row.append(photo, info, arrow);
 
     row.onclick = () => {
