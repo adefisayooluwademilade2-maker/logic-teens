@@ -4185,6 +4185,23 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// Make Firebase available to the other page scripts.
+window.db = db;
+window.doc = doc;
+window.getDoc = getDoc;
+window.getDocs = getDocs;
+window.updateDoc = updateDoc;
+window.deleteDoc = deleteDoc;
+window.setDoc = setDoc;
+window.collection = collection;
+window.query = query;
+window.where = where;
+window.onSnapshot = onSnapshot;
+window.orderBy = orderBy;
+window.serverTimestamp = serverTimestamp;
+window.writeBatch = writeBatch;
+
 window.logicMembersDirectoryCache = [];
 
 window.loadMembersDirectory = async function() {
