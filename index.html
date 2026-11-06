@@ -2048,9 +2048,7 @@ window.openMinistryMemberProfile = function(member) {
         : "Not assigned yet";
 
     const savedAbout =
-      Object.prototype.hasOwnProperty.call(profile, "about")
-        ? profile.about
-        : member.about;
+  profile.about || member.about || "";
 
     document.getElementById("directoryMemberAbout").textContent =
       savedAbout || "No introduction added.";
@@ -3733,13 +3731,8 @@ window.renderMembersDirectory = function() {
     card.append(photo, fallback, info);
 
     card.onclick = () => {
-      window.openMinistryMemberProfile({
-        ...member,
-        department: "Community Member",
-        responsibility: "—"
-      });
-    };
-
+  window.openMinistryMemberProfile(member);
+};
     list.appendChild(card);
   });
 };
