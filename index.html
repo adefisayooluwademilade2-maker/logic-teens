@@ -1960,7 +1960,9 @@ window.openMinistryMemberProfile = function(member) {
   window.logicStopMemberProfileListeners?.();
 
   let profile = {};
-  let memberships = [];
+  let memberships = Array.isArray(member.memberships)
+  ? member.memberships.filter(item => item.status === "approved")
+  : [];
   let isAdmin = member.isAdmin === true;
 
   const userId = member.userId || "";
