@@ -1943,9 +1943,8 @@ body.admin-user #ministry .ministry-actions {
     window.loadDepartmentMembers(department);
   }
 };
-  
-  
-window.openMinistryMemberProfile = function(member) {
+
+  window.openMinistryMemberProfile = function(member) {
   const currentPage = document.querySelector(".page.active")?.id;
 
   window.logicMemberProfileReturnPage = [
@@ -1956,24 +1955,25 @@ window.openMinistryMemberProfile = function(member) {
     ? currentPage
     : "ministryDirectory";
 
-  // Stop listening to the previously opened profile.
   window.logicStopMemberProfileListeners?.();
 
-  let profile = {};
-  let memberships = Array.isArray(member.memberships)
-  ? member.memberships.filter(item => item.status === "approved")
-  : [];
+  let profile = { ...member };
+  let memberships = [];
   let isAdmin = member.isAdmin === true;
+  let isAdminManager = false;
 
   const userId = member.userId || "";
+  const email = String(member.email || "").trim().toLowerCase();
 
   let stopProfile = () => {};
   let stopMemberships = () => {};
+  let stopEmailMemberships = () => {};
   let stopAdmin = () => {};
 
   window.logicStopMemberProfileListeners = () => {
     stopProfile();
     stopMemberships();
+    stopEmailMemberships();
     stopAdmin();
   };
 
@@ -2024,7 +2024,14 @@ window.openMinistryMemberProfile = function(member) {
       roleContainer.appendChild(badge);
     };
 
-    if (isAdmin) addRoleBadge("Admin");
+    if (isAdminManager) {
+      addRoleBadge("Admin Manager");
+    } else if (isAdmin) {
+      addRoleBadge("Admin");
+    } else {
+      addRoleBadge("Member");
+    }
+
     if (hasTeamMember) addRoleBadge("Team Member");
     if (hasTeamLeader) addRoleBadge("Team Leader");
 
@@ -2042,18 +2049,15 @@ window.openMinistryMemberProfile = function(member) {
     onlineDot.title = isOnline ? "Online" : "Offline";
 
     document.getElementById("directoryMemberDepartment").textContent =
-      departments.length ? departments.join(" / ") : "—";
+      departments.length ? departments.join(" / ") : "No ministry team assigned";
 
     document.getElementById("directoryMemberResponsibility").textContent =
       responsibilities.length
         ? responsibilities.join(" / ")
         : "Not assigned yet";
 
-    const savedAbout =
-  profile.about || member.about || "";
-
     document.getElementById("directoryMemberAbout").textContent =
-      savedAbout || "No introduction added.";
+      profile.about || member.about || "No introduction added.";
 
     const joinedDate =
       profile.joinedAt || member.joinedAt;
@@ -2077,54 +2081,113 @@ window.openMinistryMemberProfile = function(member) {
       joinedText;
   }
 
-  // Show the available information immediately.
   renderProfile();
 
-  if (!userId) return;
+  // Listen for the latest saved profile information.
+  if (userId) {
+    stopProfile = onSnapshot(
+      doc(db, "publicProfiles", userId),
+      snapshot => {
+        profile = {
+          ...member,
+          ...(snapshot.exists() ? snapshot.data() : {})
+        };
 
-  // Listen for changes to the member's public profile.
-  stopProfile = onSnapshot(
-    doc(db, "publicProfiles", userId),
-    snapshot => {
-      profile = snapshot.exists() ? snapshot.data() : {};
-      renderProfile();
-    },
-    error => {
-      console.warn("Live profile update failed:", error);
-    }
-  );
+        renderProfile();
+      },
+      error => {
+        console.warn("Live profile update failed:", error);
+      }
+    );
+  }
 
-  // Listen for all of the member's ministry memberships.
-  stopMemberships = onSnapshot(
-    query(
-      collection(db, "departmentMembers"),
-      where("userId", "==", userId)
-    ),
-    snapshot => {
-      memberships = snapshot.docs
-        .map(item => item.data())
-        .filter(item => item.status === "approved");
+  // Keep approved memberships synchronized.
+  const membershipSources = {
+    byUser: new Map(),
+    byEmail: new Map()
+  };
 
-      renderProfile();
-    },
-    error => {
-      console.warn("Live membership update failed:", error);
-    }
-  );
+  function refreshMemberships() {
+    const combined = new Map([
+      ...membershipSources.byUser,
+      ...membershipSources.byEmail
+    ]);
 
-  // Listen for admin status changes.
-  stopAdmin = onSnapshot(
-    doc(db, "admins", userId),
-    snapshot => {
-      isAdmin = snapshot.exists() || profile.isAdmin === true;
-      renderProfile();
-    },
-    error => {
-      console.warn("Live admin status update failed:", error);
-    }
-  );
+    memberships = Array.from(combined.values())
+      .filter(item => item.status === "approved");
+
+    renderProfile();
+  }
+
+  if (userId) {
+    stopMemberships = onSnapshot(
+      query(
+        collection(db, "departmentMembers"),
+        where("userId", "==", userId)
+      ),
+      snapshot => {
+        membershipSources.byUser.clear();
+
+        snapshot.docs.forEach(item => {
+          membershipSources.byUser.set(item.id, item.data());
+        });
+
+        refreshMemberships();
+      },
+      error => {
+        console.warn("Live team membership update failed:", error);
+      }
+    );
+  }
+
+  if (email) {
+    stopEmailMemberships = onSnapshot(
+      query(
+        collection(db, "departmentMembers"),
+        where("email", "==", email)
+      ),
+      snapshot => {
+        membershipSources.byEmail.clear();
+
+        snapshot.docs.forEach(item => {
+          membershipSources.byEmail.set(item.id, item.data());
+        });
+
+        refreshMemberships();
+      },
+      error => {
+        console.warn("Email membership update failed:", error);
+      }
+    );
+  }
+
+  // Listen for the actual account role.
+  if (userId) {
+    stopAdmin = onSnapshot(
+      doc(db, "admins", userId),
+      snapshot => {
+        const adminData = snapshot.exists()
+          ? snapshot.data()
+          : {};
+
+        isAdmin = snapshot.exists();
+
+        isAdminManager =
+          isAdmin && (
+            adminData.canManageAdmins === true ||
+            String(adminData.role || "")
+              .toLowerCase()
+              .includes("manager")
+          );
+
+        renderProfile();
+      },
+      error => {
+        console.warn("Live account role update failed:", error);
+      }
+    );
+  }
 };
-  
   
 
   window.closeMinistryMemberProfile = function() {
