@@ -708,7 +708,7 @@ body.notification-detail-open .bottom-nav {
   </section>
 
 <section class="page" id="notifications">
-  <button class="settings-back" onclick="openPage('home')" aria-label="Back">←</button>
+  <button class="settings-back" onclick="history.back()" aria-label="Back">←</button>
   <div class="eyebrow">STAY CONNECTED</div>
   <h1>Notifications</h1>
 
@@ -718,7 +718,7 @@ body.notification-detail-open .bottom-nav {
 </section>
 
   <section class="page" id="notificationDetails">
-  <button class="settings-back" onclick="openPage('notifications')" aria-label="Back">←</button>
+  <button class="settings-back" onclick="history.back()" aria-label="Back">←</button>
   <div class="notification-detail-card">
   <span class="notification-glow">Notification</span>
   <h1 id="notificationDetailTitle"></h1>
@@ -1329,7 +1329,7 @@ body.admin-user #ministry .ministry-actions {
 }
   </style>
 
-<button class="directory-back" onclick="openPage('ministry')">←</button>
+<button class="directory-back" onclick="history.back()">←</button>
 
 <div id="directoryDepartmentSummary"
   style="display:flex;align-items:center;gap:11px;background:linear-gradient(135deg,#191b2b,#141622);border:1px solid #292b3b;border-radius:14px;padding:12px;margin:0 0 16px">
@@ -1454,7 +1454,7 @@ body.admin-user #ministry .ministry-actions {
   
 
 <section class="page" id="membersDirectory">
-  <button class="directory-back" onclick="openPage('home')">←</button>
+  <button class="directory-back" onclick="history.back()">←</button>
 
   <div class="eyebrow">LOGIC TEENS COMMUNITY</div>
   <h1>Members</h1>
@@ -1518,7 +1518,7 @@ body.admin-user #ministry .ministry-actions {
   
 <section class="page" id="adminDashboard">
 
-  <button class="directory-back" onclick="openPage('home')" style="background:transparent;border:0;outline:none;box-shadow:none;color:white;padding:8px 0;appearance:none;">←</button>
+  <button class="directory-back" onclick="history.back()" style="background:transparent;border:0;outline:none;box-shadow:none;color:white;padding:8px 0;appearance:none;">←</button>
   <div class="eyebrow">LOGIC TEENS MANAGEMENT</div>
   <h1>Admin Dashboard</h1>
   <p class="subtitle">Manage the LOGIC Teens Church Lounge.</p>
@@ -1794,7 +1794,7 @@ body.admin-user #ministry .ministry-actions {
     
   </style>
 
-  <button class="directory-back" onclick="openPage('adminDashboard')">←</button>
+  <button class="directory-back" onclick="history.back()">←</button>
 
   <div class="eyebrow">LOGIC TEENS MANAGEMENT</div>
   <h1>Team Applications</h1>
@@ -1810,7 +1810,7 @@ body.admin-user #ministry .ministry-actions {
   <section class="page" id="adminManageMembers">
 
   <button class="directory-back"
-    onclick="openPage('adminDashboard')">←</button>
+    onclick="history.back()">←</button>
 
   <div class="eyebrow">LOGIC TEENS MANAGEMENT</div>
   <h1>Manage Members</h1>
@@ -1847,7 +1847,7 @@ body.admin-user #ministry .ministry-actions {
 
 <section class="page" id="adminApprovedMembers">
 
-  <button class="directory-back" onclick="openPage('home')">←</button>
+  <button class="directory-back" onclick="history.back()">←</button>
 
   <div class="eyebrow">LOGIC TEENS MANAGEMENT</div>
   <h1>Approved Members</h1>
@@ -2915,7 +2915,7 @@ document.getElementById("profilePictureInput")
 
 <!-- NOTIFICATIONS PAGE -->
 <section class="page" id="notificationSettings">
-  <button class="settings-back" onclick="openPage('settings')" aria-label="Back">←</button>
+  <button class="settings-back" onclick="history.back()" aria-label="Back">←</button>
   <div class="eyebrow">PREFERENCES</div>
   <h1>Notifications</h1>
 
@@ -2968,7 +2968,7 @@ document.getElementById("profilePictureInput")
 
 <!-- PRIVACY AND SAFETY PAGE -->
 <section class="page" id="privacySettings">
-  <button class="settings-back" onclick="openPage('settings')" aria-label="Back">←</button>
+  <button class="settings-back" onclick="history.back()" aria-label="Back">←</button>
   <div class="eyebrow">SAFETY</div>
   <h1>Privacy & Safety</h1>
 
@@ -2980,7 +2980,7 @@ document.getElementById("profilePictureInput")
 
 <!-- INFORMATION AND SUPPORT PAGE -->
 <section class="page" id="supportSettings">
-  <button class="settings-back" onclick="openPage('settings')" aria-label="Back">←</button>
+  <button class="settings-back" onclick="history.back()" aria-label="Back">←</button>
   <div class="eyebrow">INFORMATION</div>
   <h1>Information & Support</h1>
 
