@@ -4131,47 +4131,107 @@ window.renderAdminManageMembers = function() {
       where("status", "==", "approved")
     );
 
-    const [snapshot, adminsSnapshot] = await Promise.all([
-      getDocs(membersQuery),
-      getDocs(collection(db, "admins"))
-    ]);
+    const [snapshot, adminsSnapshot, profilesSnapshot] =
+  await Promise.all([
+    getDocs(membersQuery),
+    getDocs(collection(db, "admins")),
+    getDocs(collection(db, "publicProfiles"))
+  ]);
 
-    const adminIds = new Set(
-      adminsSnapshot.docs.map(item => item.id)
-    );
+const adminIds = new Set(
+  adminsSnapshot.docs.map(item => item.id)
+);
 
-    const groupedMembers = new Map();
+const profilesById = new Map();
+const profilesByEmail = new Map();
 
-    snapshot.forEach(memberDoc => {
-      const data = memberDoc.data();
-      const userId = data.userId || "";
-      const groupKey = userId || `document-${memberDoc.id}`;
+profilesSnapshot.forEach(profileDoc => {
+  const profile = profileDoc.data();
 
-      if (!groupedMembers.has(groupKey)) {
-        groupedMembers.set(groupKey, {
-          ...data,
-          userId,
-          isAdmin: userId ? adminIds.has(userId) : false,
-          memberships: [],
-          membershipIds: [],
-          departments: []
-        });
-      }
+  profilesById.set(profileDoc.id, profile);
 
-      const member = groupedMembers.get(groupKey);
+  const email = String(profile.email || "")
+    .trim()
+    .toLowerCase();
 
-      member.memberships.push(data);
-      member.membershipIds.push(memberDoc.id);
-
-      const department = String(data.department || "").trim();
-
-      if (
-        department &&
-        !member.departments.includes(department)
-      ) {
-        member.departments.push(department);
-      }
+  if (email) {
+    profilesByEmail.set(email, {
+      ...profile,
+      userId: profileDoc.id
     });
+  }
+});
+
+const groupedMembers = new Map();
+
+snapshot.forEach(memberDoc => {
+  const data = memberDoc.data();
+
+  const userId = String(data.userId || "").trim();
+  const email = String(data.email || "")
+    .trim()
+    .toLowerCase();
+
+  const groupKey = email
+    ? `email:${email}`
+    : userId
+      ? `uid:${userId}`
+      : `document:${memberDoc.id}`;
+
+  if (!groupedMembers.has(groupKey)) {
+    const savedProfile =
+      (userId && profilesById.get(userId)) ||
+      (email && profilesByEmail.get(email)) ||
+      {};
+
+    groupedMembers.set(groupKey, {
+      ...data,
+      ...savedProfile,
+      userId: userId || savedProfile.userId || "",
+      email: email || savedProfile.email || "",
+      isAdmin: false,
+      memberships: [],
+      membershipIds: [],
+      departments: []
+    });
+  }
+
+  const member = groupedMembers.get(groupKey);
+
+  member.userId =
+    member.userId || userId;
+
+  member.memberships.push(data);
+  member.membershipIds.push(memberDoc.id);
+
+  const department = String(data.department || "").trim();
+
+  if (
+    department &&
+    !member.departments.includes(department)
+  ) {
+    member.departments.push(department);
+  }
+
+  // Use the saved profile when membership data is incomplete.
+  if (!member.photoURL && data.photoURL) {
+    member.photoURL = data.photoURL;
+  }
+
+  if (!member.fullName && data.fullName) {
+    member.fullName = data.fullName;
+  }
+
+  if (!member.about && data.about) {
+    member.about = data.about;
+  }
+});
+
+groupedMembers.forEach(member => {
+  member.isAdmin = Boolean(
+    member.userId && adminIds.has(member.userId)
+  );
+});
 
     list.innerHTML = "";
 
