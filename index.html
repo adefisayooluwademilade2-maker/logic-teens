@@ -3974,6 +3974,15 @@ window.addEventListener("popstate", (event) => {
     window.logicStopMemberProfileListeners?.();
   }
 
+  // Skip duplicate Admin Dashboard history entries.
+  if (
+    pageBeforeBack === "adminDashboard" &&
+    pageToRestore === "adminDashboard"
+  ) {
+    history.back();
+    return;
+  }
+  
   openPage(pageToRestore, { skipHistory: true });
 
   if (pageToRestore === "membersDirectory") {
