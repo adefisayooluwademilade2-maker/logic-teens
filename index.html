@@ -3696,6 +3696,7 @@ window.loadMembersDirectory = async function() {
     </div>
   `;
 
+    try {
       const [snapshot, adminsSnapshot] = await Promise.all([
       getDocs(collection(db, "publicProfiles")),
       getDocs(collection(db, "admins"))
