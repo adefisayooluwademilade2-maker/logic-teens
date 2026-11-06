@@ -4128,6 +4128,9 @@ role.style.cssText =
 
 window.logicAdminMembersCache = [];
 
+
+window.logicAdminMembersCache = [];
+
 window.loadAdminManageMembers = async function() {
   if (!window.logicIsAdmin) return;
 
@@ -4140,44 +4143,145 @@ window.loadAdminManageMembers = async function() {
   `;
 
   try {
-    const [usersSnapshot, adminsSnapshot] = await Promise.all([
+    const [
+      usersSnapshot,
+      adminsSnapshot,
+      profilesSnapshot,
+      membershipsSnapshot
+    ] = await Promise.all([
       getDocs(collection(db, "users")),
-      getDocs(collection(db, "admins"))
+      getDocs(collection(db, "admins")),
+      getDocs(collection(db, "publicProfiles")),
+      getDocs(collection(db, "departmentMembers"))
     ]);
 
-    const usersById = new Map(
-      usersSnapshot.docs.map(item => [
+    const profilesById = new Map(
+      profilesSnapshot.docs.map(item => [
         item.id,
-        { ...item.data(), userId: item.id }
+        item.data()
       ])
     );
 
-    const adminIds = new Set(
-      adminsSnapshot.docs.map(item => item.id)
+    const membershipsByUser = new Map();
+
+    membershipsSnapshot.docs.forEach(item => {
+      const data = item.data();
+
+      if (data.status !== "approved" || !data.userId) return;
+
+      const userId = String(data.userId).trim();
+
+      if (!membershipsByUser.has(userId)) {
+        membershipsByUser.set(userId, []);
+      }
+
+      membershipsByUser.get(userId).push({
+        ...data,
+        membershipId: item.id
+      });
+    });
+
+    const adminsById = new Map(
+      adminsSnapshot.docs.map(item => [
+        item.id,
+        item.data()
+      ])
     );
 
     const allAccounts = new Map();
 
-    usersById.forEach((account, uid) => {
-      allAccounts.set(uid, {
+    usersSnapshot.docs.forEach(item => {
+      const userId = item.id;
+      const account = item.data();
+      const publicProfile = profilesById.get(userId) || {};
+      const adminData = adminsById.get(userId) || {};
+
+      allAccounts.set(userId, {
+        ...publicProfile,
         ...account,
-        isAdmin: adminIds.has(uid)
+
+        userId,
+
+        fullName:
+          account.fullName ||
+          publicProfile.fullName ||
+          "",
+
+        username:
+          account.username ||
+          publicProfile.username ||
+          "",
+
+        photoURL:
+          account.photoURL ||
+          publicProfile.photoURL ||
+          "",
+
+        about:
+          account.about ||
+          publicProfile.about ||
+          "",
+
+        joinedAt:
+          account.joinedAt ||
+          publicProfile.joinedAt ||
+          "",
+
+        isAdmin: adminsById.has(userId),
+
+        isAdminManager:
+          adminsById.has(userId) && (
+            adminData.canManageAdmins === true ||
+            String(adminData.role || "")
+              .toLowerCase()
+              .includes("manager")
+          ),
+
+        memberships:
+          membershipsByUser.get(userId) || []
       });
     });
 
-    adminsSnapshot.docs.forEach(adminDoc => {
-      const existing = allAccounts.get(adminDoc.id) || {};
+    profilesSnapshot.docs.forEach(item => {
+      if (allAccounts.has(item.id)) return;
 
-      allAccounts.set(adminDoc.id, {
-        ...adminDoc.data(),
-        ...existing,
-        userId: adminDoc.id,
-        isAdmin: true
+      const publicProfile = item.data();
+      const adminData = adminsById.get(item.id) || {};
+
+      allAccounts.set(item.id, {
+        ...publicProfile,
+
+        userId: item.id,
+
+        isAdmin: adminsById.has(item.id),
+
+        isAdminManager:
+          adminsById.has(item.id) && (
+            adminData.canManageAdmins === true ||
+            String(adminData.role || "")
+              .toLowerCase()
+              .includes("manager")
+          ),
+
+        memberships:
+          membershipsByUser.get(item.id) || []
       });
     });
 
-    window.logicAdminMembersCache = Array.from(allAccounts.values())
-      .sort((a, b) =>
+    adminsSnapshot.docs.forEach(item => {
+      if (allAccounts.has(item.id)) return;
+
+      allAccounts.set(item.id, {
+        ...item.data(),
+        userId: item.id,
+        isAdmin: true,
+        memberships:
+          membershipsByUser.get(item.id) || []
+      });
+    });
+
+    window.logicAdminMembersCache =
+      Array.from(allAccounts.values()).sort((a, b) =>
         (a.fullName || "").localeCompare(b.fullName || "")
       );
 
@@ -4194,6 +4298,7 @@ window.loadAdminManageMembers = async function() {
     `;
   }
 };
+
 
 
 window.renderAdminManageMembers = function() {
