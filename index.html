@@ -2071,18 +2071,19 @@ body.admin-user #ministry .ministry-actions {
 
     let joinedText = "Date unavailable";
 
-    if (joinedDate) {
+        if (joinedDate) {
       const date = joinedDate.toDate
         ? joinedDate.toDate()
         : new Date(joinedDate);
 
-              joinedText = date.toLocaleDateString("en-GB", {
+      if (!isNaN(date.getTime())) {
+        joinedText = date.toLocaleDateString("en-GB", {
           month: "long",
           year: "numeric",
           timeZone: "Africa/Lagos"
         });
       }
-    }
+      }
 
     document.getElementById("directoryMemberSince").textContent =
       joinedText;
