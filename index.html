@@ -3937,12 +3937,16 @@ window.renderMembersDirectory = function() {
   `;
 
     try {
-    const membersQuery = query(
-      collection(db, "departmentMembers"),
-      where("department", "==", department),
-      where("status", "==", "approved")
-    );
+    const departmentNames =
+  department === "Social Media Department"
+    ? ["Social Media Department", "Media"]
+    : [department];
 
+const membersQuery = query(
+  collection(db, "departmentMembers"),
+  where("department", "in", departmentNames),
+  where("status", "==", "approved")
+);
     const snapshot = await getDocs(membersQuery);
 
     document.getElementById("directoryDepartmentCount").textContent =
