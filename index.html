@@ -1879,6 +1879,42 @@ body.admin-user #ministry .ministry-actions {
 
   </section>
 
+  <section class="page" id="adminApprovedPeople">
+
+  <button class="directory-back" onclick="history.back()">←</button>
+
+  <div class="eyebrow">LOGIC TEENS MANAGEMENT</div>
+  <h1>Approved Members</h1>
+  <p class="subtitle">
+    View members approved to serve in the LOGIC Teens Ministry Team.
+  </p>
+
+  <div style="margin:22px 0 16px">
+    <input
+      id="adminApprovedPeopleSearch"
+      type="search"
+      placeholder="Search approved members..."
+      oninput="renderAdminApprovedPeople()"
+      style="
+        width:100%;
+        padding:15px;
+        border-radius:12px;
+        border:1px solid var(--line);
+        background:var(--card);
+        color:white;
+        font-size:14px;
+        outline:none;
+      "
+    >
+  </div>
+
+  <div id="adminApprovedPeopleList">
+    <div class="directory-empty">
+      <h3>Loading approved members...</h3>
+    </div>
+  </div>
+
+  </section>
 
 <section class="page" id="adminApprovedMembers">
 
