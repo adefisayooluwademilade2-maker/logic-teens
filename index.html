@@ -4836,16 +4836,16 @@ window.loadAdminManageMembers = async function() {
 
     window.renderAdminManageMembers();
 
-  } catch (error) {
+    } catch (error) {
     console.error("Manage members error:", error);
 
     list.innerHTML = `
       <div class="directory-empty">
         <h3>Couldn't load members</h3>
-        <p>Please try again later.</p>
+        <p>${error.code || error.message || "Unknown error"}</p>
       </div>
     `;
-  }
+                  }
 };
 
 
