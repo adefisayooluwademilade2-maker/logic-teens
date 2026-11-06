@@ -1973,6 +1973,14 @@ body.admin-user #ministry .ministry-actions {
   let stopEmailMemberships = () => {};
   let stopAdmin = () => {};
 
+      window.logicStopMemberProfileListeners = () => {
+    stopProfile();
+    stopUserProfile();
+    stopMemberships();
+    stopEmailMemberships();
+    stopAdmin();
+  };
+
   openPage("ministryMemberProfile");
 
   function renderProfile() {
