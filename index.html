@@ -2134,6 +2134,12 @@ body.admin-user #ministry .ministry-actions {
           doc(db, "departmentMembers", departmentMembershipId)
         );
 
+                await window.logicSendMemberNotification(
+          userId,
+          "Removed from Team",
+          `You have been removed from the ${departmentName}.`
+        );
+
         window.logicNotify("Member removed from this department.");
 
         window.closeMinistryMemberProfile();
@@ -4627,6 +4633,12 @@ window.loadDepartmentMembers = async function(department) {
               doc(db, "departmentMembers", memberDoc.id)
             );
 
+            await window.logicSendMemberNotification(
+              userId,
+              "Removed from Team",
+              `You have been removed from the ${department}.`
+            );
+            
             window.logicNotify("Member removed from this department.");
             await window.loadDepartmentMembers(department);
             await window.loadAdminHomeCounts?.();
