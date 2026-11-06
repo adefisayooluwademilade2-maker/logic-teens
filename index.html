@@ -1958,7 +1958,9 @@ body.admin-user #ministry .ministry-actions {
   window.logicStopMemberProfileListeners?.();
 
   let profile = { ...member };
-  let memberships = [];
+    let memberships = Array.isArray(member.memberships)
+    ? [...member.memberships]
+    : [];
   let isAdmin = member.isAdmin === true;
   let isAdminManager = false;
 
@@ -5387,9 +5389,11 @@ if (savedNotifications) {
     let stopAccountProfile = () => {};
     let stopAccountMemberships = () => {};
     let stopAccountAdmin = () => {};
+        let stopAccountEmailMemberships = () => {};
 
     window.logicStopAccountProfileListeners = () => {
       stopAccountProfile();
+        stopAccountEmailMemberships();
       stopAccountMemberships();
       stopAccountAdmin();
     };
@@ -5541,21 +5545,59 @@ if (savedNotifications) {
       }
     );
 
-    // Keep approved ministry memberships updated.
+        // Keep approved ministry memberships updated by user ID and email.
+    const accountMembershipSources = {
+      byUser: new Map(),
+      byEmail: new Map()
+    };
+
+    function refreshAccountMemberships() {
+      const combined = new Map([
+        ...accountMembershipSources.byUser,
+        ...accountMembershipSources.byEmail
+      ]);
+
+      accountMemberships = Array.from(combined.values())
+        .filter(item => item.status === "approved");
+
+      renderAccountProfile();
+    }
+
     stopAccountMemberships = onSnapshot(
       query(
         collection(db, "departmentMembers"),
         where("userId", "==", user.uid)
       ),
       snapshot => {
-        accountMemberships = snapshot.docs
-          .map(item => item.data())
-          .filter(item => item.status === "approved");
+        accountMembershipSources.byUser.clear();
 
-        renderAccountProfile();
+        snapshot.docs.forEach(item => {
+          accountMembershipSources.byUser.set(item.id, item.data());
+        });
+
+        refreshAccountMemberships();
       },
       error => {
-        console.warn("Account membership listener failed:", error);
+        console.error("Account memberships by ID failed:", error);
+      }
+    );
+
+    stopAccountEmailMemberships = onSnapshot(
+      query(
+        collection(db, "departmentMembers"),
+        where("email", "==", String(user.email || "").trim().toLowerCase())
+      ),
+      snapshot => {
+        accountMembershipSources.byEmail.clear();
+
+        snapshot.docs.forEach(item => {
+          accountMembershipSources.byEmail.set(item.id, item.data());
+        });
+
+        refreshAccountMemberships();
+      },
+      error => {
+        console.error("Account memberships by email failed:", error);
       }
     );
 
