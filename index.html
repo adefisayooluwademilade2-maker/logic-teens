@@ -4341,9 +4341,21 @@ snapshot.forEach(memberDoc => {
 });
 
 groupedMembers.forEach(member => {
+  const adminData = member.userId
+    ? adminsById.get(member.userId) || {}
+    : {};
+
   member.isAdmin = Boolean(
-    member.userId && adminIds.has(member.userId)
+    member.userId && adminsById.has(member.userId)
   );
+
+  member.isAdminManager =
+    member.isAdmin && (
+      adminData.canManageAdmins === true ||
+      String(adminData.role || "")
+        .toLowerCase()
+        .includes("manager")
+    );
 });
 
     list.innerHTML = "";
@@ -4419,10 +4431,11 @@ groupedMembers.forEach(member => {
 
             const roleLabels = [];
 
-      if (member.isAdmin) {
+            if (member.isAdminManager) {
+        roleLabels.push("Admin Manager");
+      } else if (member.isAdmin) {
         roleLabels.push("Admin");
-      }
-
+            }
       if (member.memberships.length > 0) {
         roleLabels.push("Team Member");
       }
