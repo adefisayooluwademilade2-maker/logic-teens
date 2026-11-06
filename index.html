@@ -3942,9 +3942,11 @@ window.renderMembersDirectory = function() {
     list.appendChild(card);
   });
 };
-  
-  window.loadDepartmentMembers = async function(department) {
+
+
+window.loadDepartmentMembers = async function(department) {
   const list = document.getElementById("departmentMemberList");
+  if (!list) return;
 
   list.innerHTML = `
     <div class="directory-empty">
@@ -3952,17 +3954,18 @@ window.renderMembersDirectory = function() {
     </div>
   `;
 
-    try {
+  try {
     const departmentNames =
-  department === "Social Media Department"
-    ? ["Social Media Department", "Media"]
-    : [department];
+      department === "Social Media Department"
+        ? ["Social Media Department", "Media"]
+        : [department];
 
-const membersQuery = query(
-  collection(db, "departmentMembers"),
-  where("department", "in", departmentNames),
-  where("status", "==", "approved")
-);
+    const membersQuery = query(
+      collection(db, "departmentMembers"),
+      where("department", "in", departmentNames),
+      where("status", "==", "approved")
+    );
+
     const snapshot = await getDocs(membersQuery);
 
     document.getElementById("directoryDepartmentCount").textContent =
@@ -3973,23 +3976,24 @@ const membersQuery = query(
     if (snapshot.empty) {
       list.innerHTML = `
         <div class="directory-empty">
-          <h3>No approved members yet</h3>
+          <h3>No team members yet</h3>
           <p>Approved members of this department will appear here.</p>
         </div>
       `;
       return;
     }
 
-        for (const memberDoc of [...snapshot.docs].sort((a, b) => {
-  const aLeader =
-    String(a.data().role || "").toLowerCase().includes("leader");
+    const members = [...snapshot.docs].sort((a, b) => {
+      const aLeader =
+        String(a.data().role || "").toLowerCase().includes("leader");
+      const bLeader =
+        String(b.data().role || "").toLowerCase().includes("leader");
 
-  const bLeader =
-    String(b.data().role || "").toLowerCase().includes("leader");
+      return Number(bLeader) - Number(aLeader);
+    });
 
-  return Number(bLeader) - Number(aLeader);
-})) {
-            const memberData = memberDoc.data();
+    for (const memberDoc of members) {
+      const memberData = memberDoc.data();
       const userId = String(memberData.userId || "").trim();
 
       let publicProfile = {};
@@ -4004,17 +4008,13 @@ const membersQuery = query(
             publicProfile = profileSnap.data();
           }
         } catch (profileError) {
-          console.warn(
-            "Could not load department member profile:",
-            profileError
-          );
+          console.warn("Could not load member profile:", profileError);
         }
       }
 
       const member = {
         ...memberData,
         ...publicProfile,
-
         userId,
 
         isAdmin:
@@ -4048,28 +4048,41 @@ const membersQuery = query(
           memberData.joinedAt ||
           ""
       };
-          
-      const card = document.createElement("button");
-      card.type = "button";
-      card.style.cssText = `
+
+      const row = document.createElement("div");
+
+      row.style.cssText = `
         display:flex;
+        flex-wrap:wrap;
         align-items:center;
-        gap:13px;
-        width:100%;
-        padding:14px 0;
-        background:transparent;
-        border:0;
+        gap:10px;
+        padding:12px 0;
         border-bottom:1px solid var(--line);
-        color:white;
-        text-align:left;
       `;
 
-            const avatar = document.createElement("div");
+      const profileButton = document.createElement("button");
+      profileButton.type = "button";
+
+      profileButton.style.cssText = `
+        display:flex;
+        align-items:center;
+        gap:12px;
+        flex:1;
+        min-width:180px;
+        padding:0;
+        background:transparent;
+        border:0;
+        color:white;
+        text-align:left;
+        cursor:pointer;
+      `;
+
+      const avatar = document.createElement("div");
 
       avatar.style.cssText = `
-        width:48px;
-        height:48px;
-        min-width:48px;
+        width:46px;
+        height:46px;
+        min-width:46px;
         border-radius:50%;
         background:var(--card2);
         color:var(--gold);
@@ -4079,20 +4092,14 @@ const membersQuery = query(
         font-size:17px;
         font-weight:bold;
         overflow:hidden;
-        flex-shrink:0;
       `;
 
       if (member.photoURL) {
         const photo = document.createElement("img");
         photo.src = member.photoURL;
         photo.alt = "";
-        photo.style.cssText = `
-          width:100%;
-          height:100%;
-          border-radius:50%;
-          object-fit:cover;
-          display:block;
-        `;
+        photo.style.cssText =
+          "width:100%;height:100%;object-fit:cover";
 
         photo.onerror = () => {
           photo.remove();
@@ -4107,42 +4114,159 @@ const membersQuery = query(
       }
 
       const info = document.createElement("div");
-      info.style.flex = "1";
-      info.style.minWidth = "0";
+      info.style.cssText = "flex:1;min-width:0";
 
       const name = document.createElement("strong");
       name.textContent = member.fullName;
+      name.style.cssText = "display:block;font-size:13px";
 
-      const accountRole = member.isAdmin ? "Admin" : "Member";
       const isTeamLeader =
-  String(member.role || "").toLowerCase().includes("leader");
+        String(memberData.role || "").toLowerCase().includes("leader");
 
-const role = document.createElement("div");
-
-role.textContent =
-  isTeamLeader ? "Team Leader" : "Team Member";
-
-role.style.cssText =
-  "color:var(--gold);font-size:11px;margin-top:5px";
+      const role = document.createElement("div");
+      role.textContent =
+        isTeamLeader ? "Team Leader" : "Team Member";
+      role.style.cssText =
+        "color:var(--gold);font-size:11px;margin-top:5px";
 
       const responsibility = document.createElement("div");
       responsibility.textContent =
-        member.responsibility || "Not assigned yet";
-
+        memberData.responsibility || "Not assigned yet";
       responsibility.style.cssText =
         "color:var(--muted);font-size:12px;margin-top:4px";
 
       info.append(name, role, responsibility);
-      card.append(avatar, info);
+      profileButton.append(avatar, info);
 
-      card.onclick = () => {
+      profileButton.onclick = () => {
         window.openMinistryMemberProfile({
           ...member,
-          department: department
+          ...memberData,
+          department
         });
       };
 
-      list.appendChild(card);
+      row.appendChild(profileButton);
+
+      if (window.logicIsAdmin) {
+        const actions = document.createElement("div");
+
+        actions.style.cssText = `
+          display:flex;
+          flex-wrap:wrap;
+          gap:6px;
+          width:100%;
+          padding-left:58px;
+        `;
+
+        const makeAction = (label, handler, color) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = label;
+
+          button.style.cssText = `
+            padding:7px 10px;
+            border:1px solid var(--line);
+            border-radius:8px;
+            background:var(--card2);
+            color:${color || "white"};
+            font-size:11px;
+            cursor:pointer;
+          `;
+
+          button.onclick = handler;
+          actions.appendChild(button);
+        };
+
+        makeAction("Edit responsibility", async () => {
+          const current =
+            String(memberData.responsibility || "");
+
+          const answer = window.prompt(
+            "Enter this member's responsibility:",
+            current
+          );
+
+          if (answer === null) return;
+
+          const newResponsibility = answer.trim();
+
+          try {
+            await updateDoc(
+              doc(db, "departmentMembers", memberDoc.id),
+              {
+                responsibility:
+                  newResponsibility || "Not assigned yet"
+              }
+            );
+
+            window.logicNotify("Responsibility updated.");
+            await window.loadDepartmentMembers(department);
+
+          } catch (error) {
+            console.error("Responsibility update error:", error);
+            window.logicNotify("Could not update responsibility.");
+          }
+        });
+
+        makeAction(
+          isTeamLeader ? "Make Team Member" : "Make Team Leader",
+          async () => {
+            const newRole =
+              isTeamLeader ? "Team Member" : "Team Leader";
+
+            const confirmed = await window.logicConfirm(
+              `Change ${member.fullName}'s role to ${newRole}?`,
+              "Change team role?",
+              "Continue"
+            );
+
+            if (!confirmed) return;
+
+            try {
+              await updateDoc(
+                doc(db, "departmentMembers", memberDoc.id),
+                { role: newRole }
+              );
+
+              window.logicNotify("Team role updated.");
+              await window.loadDepartmentMembers(department);
+
+            } catch (error) {
+              console.error("Team role update error:", error);
+              window.logicNotify("Could not change team role.");
+            }
+          }
+        );
+
+        makeAction("Remove from department", async () => {
+          const confirmed = await window.logicConfirm(
+            `Remove ${member.fullName} from ${department}? Their other department memberships will remain.`,
+            "Remove from this department?",
+            "Remove"
+          );
+
+          if (!confirmed) return;
+
+          try {
+            await deleteDoc(
+              doc(db, "departmentMembers", memberDoc.id)
+            );
+
+            window.logicNotify("Member removed from this department.");
+            await window.loadDepartmentMembers(department);
+            await window.loadAdminHomeCounts?.();
+
+          } catch (error) {
+            console.error("Department removal error:", error);
+            window.logicNotify("Could not remove this member.");
+          }
+        }, "#ef7777");
+
+        row.appendChild(actions);
+      }
+
+      list.appendChild(row);
     }
 
   } catch (error) {
@@ -4150,7 +4274,7 @@ role.style.cssText =
 
     document.getElementById("directoryDepartmentCount").textContent =
       "Unavailable";
-      
+
     list.innerHTML = `
       <div class="directory-empty">
         <h3>Couldn't load members</h3>
@@ -4159,7 +4283,8 @@ role.style.cssText =
     `;
   }
 };
-
+                  
+  
 window.logicAdminMembersCache = [];
 
 
