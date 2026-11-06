@@ -2166,11 +2166,12 @@ body.admin-user #ministry .ministry-actions {
     renderProfile();
   }
 
-  if (userId) {
+    if (userId) {
     stopMemberships = onSnapshot(
       query(
         collection(db, "departmentMembers"),
-        where("userId", "==", userId)
+        where("userId", "==", userId),
+        where("status", "==", "approved")
       ),
       snapshot => {
         membershipSources.byUser.clear();
@@ -2191,7 +2192,8 @@ body.admin-user #ministry .ministry-actions {
     stopEmailMemberships = onSnapshot(
       query(
         collection(db, "departmentMembers"),
-        where("email", "==", email)
+        where("email", "==", email),
+        where("status", "==", "approved")
       ),
       snapshot => {
         membershipSources.byEmail.clear();
