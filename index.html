@@ -1967,17 +1967,11 @@ body.admin-user #ministry .ministry-actions {
   const userId = member.userId || "";
   const email = String(member.email || "").trim().toLowerCase();
 
-  let stopProfile = () => {};
+    let stopProfile = () => {};
+  let stopUserProfile = () => {};
   let stopMemberships = () => {};
   let stopEmailMemberships = () => {};
   let stopAdmin = () => {};
-
-  window.logicStopMemberProfileListeners = () => {
-    stopProfile();
-    stopMemberships();
-    stopEmailMemberships();
-    stopAdmin();
-  };
 
   openPage("ministryMemberProfile");
 
