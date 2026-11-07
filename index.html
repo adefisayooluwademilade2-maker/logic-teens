@@ -2069,14 +2069,12 @@ body.admin-user #ministry .ministry-actions {
   let stopUserProfile = () => {};
   let stopMemberships = () => {};
   let stopEmailMemberships = () => {};
-  let stopAdmin = () => {};
 
       window.logicStopMemberProfileListeners = () => {
     stopProfile();
     stopUserProfile();
     stopMemberships();
     stopEmailMemberships();
-    stopAdmin();
   };
 
   openPage("ministryMemberProfile");
