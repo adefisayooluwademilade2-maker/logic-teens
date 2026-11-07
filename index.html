@@ -4012,6 +4012,14 @@ function openPage(page, options = {}) {
     page = "home";
   }
 
+  if (
+    page === "adminEventManager" &&
+    window.logicIsAdmin !== true
+  ) {
+    window.logicNotify("Only Admins can manage events.");
+    page = "home";
+  }
+  
 if (
     (
     page === "adminManagement" ||
@@ -4045,6 +4053,7 @@ document.body.classList.toggle(
       
 [
   "adminDashboard",
+    "adminEventManager",
   "adminManagement",
   "viewAdmins",
   "viewAdminManagers",
