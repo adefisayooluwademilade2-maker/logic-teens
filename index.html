@@ -3891,6 +3891,14 @@ function openPage(page, options = {}) {
   ) {
     page = "home";
   }
+
+  if (
+    page === "adminManagement" &&
+    window.logicCanManageAdmins !== true
+  ) {
+    window.logicNotify("Only an Admin Manager can access Admin Management.");
+    page = window.logicIsAdmin ? "adminDashboard" : "home";
+  }
   
   if (document.body.classList.contains("profile-editing")) {
     closeProfileEditor();
