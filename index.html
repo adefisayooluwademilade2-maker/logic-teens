@@ -1421,6 +1421,37 @@ body.admin-user #ministry .ministry-actions {
         <strong>About Me</strong>
         <span id="directoryMemberAbout">No introduction added.</span>
       </p>
+    
+    </div>
+
+    <div id="adminAccountRoleSection"
+      class="panel"
+      style="display:none;margin-top:18px;text-align:left">
+
+      <strong>Account Role</strong>
+      <p style="font-size:12px;opacity:.7">
+        Controls this person's access to LOGIC Teens management.
+      </p>
+
+      <select id="adminAccountRoleSelect"
+        style="width:100%;margin-top:10px">
+        <option value="member">Member</option>
+        <option value="admin">Admin</option>
+        <option value="adminManager">Admin Manager</option>
+      </select>
+
+      <button type="button"
+        id="adminSaveAccountRole"
+        style="width:100%;margin-top:12px">
+        Save Account Role
+      </button>
+
+      <button type="button"
+        id="adminRemoveAccountRole"
+        style="display:none;width:100%;margin-top:9px">
+        Remove from Admin
+      </button>
+
     </div>
 
     <div class="member-share-row">
