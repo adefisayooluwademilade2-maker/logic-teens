@@ -1603,19 +1603,59 @@ body.admin-user #ministry .ministry-actions {
     <p>Send important announcements to members.</p>
   </div>
 
-  <div class="panel">
+    <button
+    class="panel"
+    id="adminManagementPanel"
+    type="button"
+    hidden
+    onclick="openPage('adminManagement')"
+  >
     <strong>
-      <svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:middle;margin-right:8px" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <svg viewBox="0 0 24 24" width="20" height="20"
+        style="vertical-align:middle;margin-right:8px"
+        fill="none" stroke="currentColor" stroke-width="1.6"
+        stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"/>
         <path d="m9 12 2 2 4-4"/>
       </svg>
       Admin Management
     </strong>
-    <p>Manage who is authorised to administer LOGIC Teens.</p>
-  </div>
+    <p>Appoint and manage LOGIC Teens administrators.</p>
+    </button>
 
 </section>
   
+  <section class="page" id="adminManagement">
+
+  <button class="directory-back"
+    type="button"
+    onclick="openPage('adminDashboard')">
+    ←
+  </button>
+
+  <div class="eyebrow">LOGIC TEENS MANAGEMENT</div>
+  <h1>Admin Management</h1>
+  <p class="subtitle">
+    Appoint and manage the people authorised to administer LOGIC Teens.
+  </p>
+
+  <div class="panel" style="margin-top:22px">
+    <strong>Admin</strong>
+    <p>People with standard administrative access.</p>
+    <div id="adminManagementAdmins">
+      <div class="directory-empty">Loading Admins...</div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:15px">
+    <strong>Admin Manager</strong>
+    <p>People with full administrative management access.</p>
+    <div id="adminManagementManagers">
+      <div class="directory-empty">Loading Admin Managers...</div>
+    </div>
+  </div>
+
+  </section>
   
 <section class="page" id="adminApplications">
 
@@ -1628,7 +1668,7 @@ body.admin-user #ministry .ministry-actions {
   body.management-page-open main {
     padding-top: 7px !important;
   }
-
+  body.management-page-open #adminManagement,
       body.management-page-open #adminApplications,
   body.management-page-open #adminManageMembers,
   body.management-page-open #adminApprovedMembers,
@@ -3869,7 +3909,8 @@ document.body.classList.toggle(
   
       [
     "adminDashboard",
-    "adminApplications",
+"adminManagement",
+"adminApplications",
     "adminManageMembers",
     "adminApprovedMembers",
     "adminApprovedPeople",
@@ -6057,6 +6098,9 @@ onAuthStateChanged(auth, async user => {
     window.logicCanManageAdmins =
       adminData.canManageAdmins === true;
 
+  document.getElementById("adminManagementPanel").hidden =
+  window.logicCanManageAdmins !== true;
+
     document.getElementById("memberHomeTiles").hidden =
       window.logicIsAdmin;
 
@@ -6415,6 +6459,9 @@ if (savedNotifications) {
 
         window.logicCanManageAdmins =
           accountAdminData.canManageAdmins === true;
+
+  document.getElementById("adminManagementPanel").hidden =
+  window.logicCanManageAdmins !== true;
 
         renderAccountProfile();
       },
