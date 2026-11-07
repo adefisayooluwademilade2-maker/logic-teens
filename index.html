@@ -4567,9 +4567,14 @@ window.loadDepartmentMembers = async function(department) {
       role.style.cssText =
         "color:var(--gold);font-size:11px;margin-top:5px";
 
-      const responsibility = document.createElement("div");
+            const responsibility = document.createElement("div");
       responsibility.textContent =
-        memberData.responsibility || "Not assigned yet";
+        String(memberData.responsibility || "").trim() &&
+        !["—", "not assigned", "not assigned yet"].includes(
+          String(memberData.responsibility || "").trim().toLowerCase()
+        )
+          ? String(memberData.responsibility).trim()
+          : "";
       responsibility.style.cssText =
         "color:var(--muted);font-size:12px;margin-top:4px";
 
