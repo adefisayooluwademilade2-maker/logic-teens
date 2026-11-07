@@ -1635,6 +1635,14 @@ body.admin-user #ministry .ministry-actions {
     ←
     </button>
 
+<button
+  type="button"
+  onclick="openPage('accountRoleManagement')"
+  style="float:right;padding:10px 15px;border:1px solid var(--gold);border-radius:10px;background:var(--card);color:var(--gold);font-weight:600"
+>
+  Account Role
+</button>
+    
   <div class="eyebrow">LOGIC TEENS MANAGEMENT</div>
   <h1>Admin Management</h1>
   <p class="subtitle">
@@ -1656,6 +1664,36 @@ body.admin-user #ministry .ministry-actions {
       <div class="directory-empty">Loading Admin Managers...</div>
     </div>
   </div>
+
+  </section>
+
+  <section class="page" id="accountRoleManagement">
+
+  <button class="directory-back"
+    type="button"
+    onclick="openPage('adminManagement')">
+    ←
+  </button>
+
+  <div class="eyebrow">LOGIC TEENS MANAGEMENT</div>
+  <h1>Account Role</h1>
+  <p class="subtitle">Choose the administrative role you want to appoint.</p>
+
+  <button class="panel"
+    type="button"
+    onclick="openPage('addAdminRole')"
+    style="width:100%;text-align:left;margin-top:22px;color:inherit">
+    <strong>Add Admin</strong>
+    <p>Appoint a member as an Admin.</p>
+  </button>
+
+  <button class="panel"
+    type="button"
+    onclick="openPage('addAdminManagerRole')"
+    style="width:100%;text-align:left;margin-top:15px;color:inherit">
+    <strong>Add Admin Manager</strong>
+    <p>Appoint a member as an Admin Manager.</p>
+  </button>
 
   </section>
   
