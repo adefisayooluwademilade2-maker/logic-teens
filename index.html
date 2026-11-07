@@ -2425,16 +2425,13 @@ body.admin-user #ministry .ministry-actions {
   window.closeMinistryMemberProfile = function() {
   window.logicStopMemberProfileListeners?.();
 
-  const returnPage = window.logicMemberProfileReturnPage;
+  const returnPage =
+    window.logicMemberProfileReturnPage || "home";
 
-  // Return to the actual page that opened this profile.
-  if (history.state?.logicPage === "ministryMemberProfile") {
-    history.back();
-    return;
-  }
-
-  // Fallback if the profile was opened without a previous page.
-  openPage(returnPage || "home");
+  // Return directly to the page that opened this profile.
+  openPage(returnPage, {
+    replaceHistory: true
+  });
 
   if (returnPage === "adminApprovedPeople") {
     window.loadAdminApprovedPeople?.();
