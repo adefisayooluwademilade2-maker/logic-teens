@@ -6753,6 +6753,24 @@ onAuthStateChanged(auth, async user => {
     document.body.style.visibility = "visible";
 
   window.logicCurrentUser = user;
+
+  if (stopSavedEvents) stopSavedEvents();
+
+  logicSavedEventIds = new Set();
+
+  stopSavedEvents = onSnapshot(
+    collection(db, "users", user.uid, "savedEvents"),
+    snapshot => {
+      logicSavedEventIds = new Set(
+        snapshot.docs.map(item => item.id)
+      );
+      renderLogicEvents();
+    },
+    error => {
+      console.error("Saved events loading failed:", error);
+    }
+  );
+  
   window.loadTeamApplicationStatus(user);
 
   try {
