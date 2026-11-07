@@ -6191,16 +6191,22 @@ if (savedNotifications) {
           .filter(Boolean)
       )];
 
-            const teamResponsibilities = [...new Set(
+                  const teamResponsibilities = [...new Set(
         accountMemberships.map(item => {
           const team = String(item.department || "").trim();
           const responsibility = String(item.responsibility || "").trim();
+
           if (!team) return "";
-          return `${team} — ${
-            responsibility && responsibility !== "—"
-              ? responsibility
-              : "Not assigned yet"
-          }`;
+
+          const hasResponsibility =
+            responsibility &&
+            responsibility !== "—" &&
+            responsibility.toLowerCase() !== "not assigned" &&
+            responsibility.toLowerCase() !== "not assigned yet";
+
+          return hasResponsibility
+            ? `${team} — ${responsibility}`
+            : team;
         }).filter(Boolean)
       )];
 
@@ -6310,9 +6316,8 @@ if (savedNotifications) {
       const profileResponsibilitySummary =
         document.getElementById("profileResponsibilitySummary");
       if (profileResponsibilitySummary) {
-        profileResponsibilitySummary.textContent =
-          teamResponsibilities.length
-            ? teamResponsibilities.join("\n")
+                profileResponsibilitySummary.textContent =
+          teamResponsibilities.join("\n");
             : "Not assigned yet";
       }
     }
