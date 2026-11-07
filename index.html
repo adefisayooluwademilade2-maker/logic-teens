@@ -4069,7 +4069,11 @@ if (
 }
 
 if (
-  page === "adminManagement" &&
+  (
+    page === "adminManagement" ||
+    page === "viewAdmins" ||
+    page === "viewAdminManagers"
+  ) &&
   window.loadAdminManagement
 ) {
   window.loadAdminManagement();
