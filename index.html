@@ -744,6 +744,23 @@ body.notification-detail-open .bottom-nav {
     <textarea id="eventDescription" rows="4"
       placeholder="Describe the event"></textarea>
 
+    <label for="eventMedia">Event photos and videos</label>
+<input
+  id="eventMedia"
+  type="file"
+  accept="image/*,video/*"
+  multiple
+>
+
+<div id="eventMediaPreview"
+  style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px;">
+</div>
+
+<label for="eventCover">Choose event cover photo</label>
+<select id="eventCover">
+  <option value="">Select a cover after choosing photos</option>
+</select>
+
     <label style="display:flex;align-items:center;gap:10px;margin-top:16px;">
       <input id="eventRegistrationEnabled" type="checkbox">
       Enable event registration
