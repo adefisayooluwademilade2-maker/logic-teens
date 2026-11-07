@@ -3981,6 +3981,13 @@ if (
 ) {
   window.loadTeamApplicationStatus(window.logicCurrentUser);
 }
+
+if (
+  page === "adminManagement" &&
+  window.loadAdminManagement
+) {
+  window.loadAdminManagement();
+}
   
   window.scrollTo(0, 0);
 }
@@ -4224,6 +4231,86 @@ window.serverTimestamp = serverTimestamp;
 window.writeBatch = writeBatch;
 
 window.logicMembersDirectoryCache = [];
+
+  window.loadAdminManagement = async function() {
+  if (window.logicCanManageAdmins !== true) return;
+
+  const adminsList = document.getElementById("adminManagementAdmins");
+  const managersList = document.getElementById("adminManagementManagers");
+
+  adminsList.textContent = "Loading Admins...";
+  managersList.textContent = "Loading Admin Managers...";
+
+  try {
+    const [adminsSnapshot, profilesSnapshot] = await Promise.all([
+      getDocs(collection(db, "admins")),
+      getDocs(collection(db, "publicProfiles"))
+    ]);
+
+    const profilesById = new Map(
+      profilesSnapshot.docs.map(item => [item.id, item.data()])
+    );
+
+    adminsList.replaceChildren();
+    managersList.replaceChildren();
+
+    const adminRecords = adminsSnapshot.docs.map(item => {
+      const data = item.data();
+      const profile = profilesById.get(item.id) || {};
+
+      return {
+        userId: item.id,
+        fullName: profile.fullName || "Name not available",
+        username: profile.username || "",
+        isManager:
+          data.canManageAdmins === true ||
+          data.role === "adminManager"
+      };
+    }).sort((a, b) => a.fullName.localeCompare(b.fullName));
+
+    function addAdminRow(container, person) {
+      const row = document.createElement("div");
+      row.style.padding = "13px 0";
+      row.style.borderBottom = "1px solid var(--line, #292b3b)";
+
+      const name = document.createElement("strong");
+      name.textContent = person.fullName;
+
+      const username = document.createElement("div");
+      username.style.fontSize = "12px";
+      username.style.opacity = "0.7";
+      username.textContent = person.username
+        ? "@" + person.username
+        : " ";
+
+      row.append(name, username);
+      container.appendChild(row);
+    }
+
+    adminRecords.forEach(person => {
+      addAdminRow(
+        person.isManager ? managersList : adminsList,
+        person
+      );
+    });
+
+    if (!adminRecords.some(person => !person.isManager)) {
+      adminsList.textContent = "No Admins appointed yet.";
+    }
+
+    if (!adminRecords.some(person => person.isManager)) {
+      managersList.textContent = "No Admin Managers appointed yet.";
+    }
+
+  } catch (error) {
+    console.error("Admin Management loading error:", error);
+
+    adminsList.textContent = "Could not load administrators.";
+    managersList.textContent =
+      (error.code || "Error") + ": " +
+      (error.message || "Please try again.");
+  }
+};
 
 window.loadMembersDirectory = async function() {
   const list = document.getElementById("membersDirectoryList");
