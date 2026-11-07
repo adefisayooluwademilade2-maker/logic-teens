@@ -1627,45 +1627,70 @@ body.admin-user #ministry .ministry-actions {
 
 </section>
   
-  <section class="page" id="adminManagement">
+  
+<section class="page" id="adminManagement">
 
-    <button class="directory-back"
+  <button class="directory-back"
     type="button"
     onclick="window.logicGoBack('adminDashboard')">
     ←
-    </button>
+  </button>
 
-<button
-  type="button"
-  onclick="openPage('accountRoleManagement')"
-  style="float:right;padding:10px 15px;border:1px solid var(--gold);border-radius:10px;background:var(--card);color:var(--gold);font-weight:600"
->
-  Account Role
-</button>
-    
+  <button
+    type="button"
+    onclick="openPage('accountRoleManagement')"
+    style="float:right;padding:7px 11px;border:1px solid #343047;border-radius:9px;background:linear-gradient(135deg,#20233a,#171526);color:#f5f3f8;font-size:12px;font-weight:600">
+    Account Role
+  </button>
+
   <div class="eyebrow">LOGIC TEENS MANAGEMENT</div>
   <h1>Admin Management</h1>
   <p class="subtitle">
-    Appoint and manage the people authorised to administer LOGIC Teens.
+    Manage the people authorised to administer LOGIC Teens.
   </p>
 
-  <div class="panel" style="margin-top:22px">
+  <button class="panel" type="button"
+    onclick="openPage('viewAdmins')"
+    style="width:100%;text-align:left;margin-top:22px;color:inherit">
     <strong>Admin</strong>
-    <p>People with standard administrative access.</p>
-    <div id="adminManagementAdmins">
-      <div class="directory-empty">Loading Admins...</div>
-    </div>
-  </div>
+    <p>View and manage appointed Admins.</p>
+  </button>
 
-  <div class="panel" style="margin-top:15px">
+  <button class="panel" type="button"
+    onclick="openPage('viewAdminManagers')"
+    style="width:100%;text-align:left;margin-top:15px;color:inherit">
     <strong>Admin Manager</strong>
-    <p>People with full administrative management access.</p>
-    <div id="adminManagementManagers">
-      <div class="directory-empty">Loading Admin Managers...</div>
-    </div>
+    <p>View and manage appointed Admin Managers.</p>
+  </button>
+
+</section>
+
+<section class="page" id="viewAdmins">
+
+  <button class="directory-back" type="button"
+    onclick="openPage('adminManagement')">←</button>
+
+  <div class="eyebrow">ADMIN MANAGEMENT</div>
+  <h1>Admins</h1>
+  <div id="adminManagementAdmins">
+    <div class="directory-empty">Loading Admins...</div>
   </div>
 
-  </section>
+</section>
+
+<section class="page" id="viewAdminManagers">
+
+  <button class="directory-back" type="button"
+    onclick="openPage('adminManagement')">←</button>
+
+  <div class="eyebrow">ADMIN MANAGEMENT</div>
+  <h1>Admin Managers</h1>
+  <div id="adminManagementManagers">
+    <div class="directory-empty">Loading Admin Managers...</div>
+  </div>
+
+</section>
+
 
   <section class="page" id="accountRoleManagement">
 
