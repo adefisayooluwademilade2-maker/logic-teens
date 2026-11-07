@@ -4033,6 +4033,14 @@ if (
 ) {
   window.loadAdminManagement();
 }
+
+if (page === "addAdminRole" && window.loadAccountRoleMembers) {
+  window.loadAccountRoleMembers("admin");
+}
+
+if (page === "addAdminManagerRole" && window.loadAccountRoleMembers) {
+  window.loadAccountRoleMembers("adminManager");
+  }
   
   window.scrollTo(0, 0);
 }
