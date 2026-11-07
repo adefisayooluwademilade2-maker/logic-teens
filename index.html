@@ -4334,24 +4334,78 @@ window.logicMembersDirectoryCache = [];
     }).sort((a, b) => a.fullName.localeCompare(b.fullName));
 
     function addAdminRow(container, person) {
-      const row = document.createElement("div");
-      row.style.padding = "13px 0";
-      row.style.borderBottom = "1px solid var(--line, #292b3b)";
+  const row = document.createElement("div");
+  row.style.cssText =
+    "display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line,#292b3b)";
 
-      const name = document.createElement("strong");
-      name.textContent = person.fullName;
+  const details = document.createElement("div");
+  details.style.flex = "1";
 
-      const username = document.createElement("div");
-      username.style.fontSize = "12px";
-      username.style.opacity = "0.7";
-      username.textContent = person.username
-        ? "@" + person.username
-        : " ";
+  const name = document.createElement("strong");
+  name.textContent = person.fullName;
 
-      row.append(name, username);
-      container.appendChild(row);
-    }
+  const username = document.createElement("div");
+  username.style.cssText = "font-size:12px;opacity:.7";
+  username.textContent = person.username
+    ? "@" + person.username
+    : "";
 
+  details.append(name, username);
+  row.appendChild(details);
+
+  if (person.userId !== auth.currentUser?.uid) {
+    const removeButton = document.createElement("button");
+    removeButton.type = "button";
+    removeButton.textContent = "Remove";
+    removeButton.style.cssText =
+      "padding:8px 12px;border:1px solid #b85c5c;border-radius:9px;background:transparent;color:#e58b8b;font-weight:600";
+
+    removeButton.onclick = async () => {
+      const roleName = person.isManager
+        ? "Admin Manager"
+        : "Admin";
+
+      const confirmed = await window.logicConfirm(
+        "Remove " + person.fullName + " as " + roleName + "?",
+        "Remove Account Role",
+        "Remove"
+      );
+
+      if (!confirmed) return;
+
+      removeButton.disabled = true;
+
+      try {
+        await deleteDoc(doc(db, "admins", person.userId));
+
+        try {
+          await window.logicSendMemberNotification(
+            person.userId,
+            "Account Role Updated",
+            "Your " + roleName +
+            " appointment in LOGIC Teens has been removed."
+          );
+        } catch (notificationError) {
+          console.error("Removal notification error:", notificationError);
+        }
+
+        window.logicNotify(roleName + " appointment removed.");
+        await window.loadAdminManagement();
+
+      } catch (error) {
+        console.error("Account role removal error:", error);
+        window.logicNotify(
+          "Removal failed: " + (error.message || "Please try again.")
+        );
+        removeButton.disabled = false;
+      }
+    };
+
+    row.appendChild(removeButton);
+  }
+
+  container.appendChild(row);
+  }
     adminRecords.forEach(person => {
       addAdminRow(
         person.isManager ? managersList : adminsList,
