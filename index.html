@@ -1658,11 +1658,11 @@ body.admin-user #ministry .ministry-actions {
   
   <section class="page" id="adminManagement">
 
-  <button class="directory-back"
+    <button class="directory-back"
     type="button"
-    onclick="openPage('adminDashboard')">
+    onclick="window.logicGoBack('adminDashboard')">
     ←
-  </button>
+    </button>
 
   <div class="eyebrow">LOGIC TEENS MANAGEMENT</div>
   <h1>Admin Management</h1>
@@ -3981,9 +3981,13 @@ document.body.classList.toggle(
   document.getElementById("menu").classList.remove("open");
 
   if (!options.skipHistory) {
-    const pageState = {
+        const pageState = {
       logicPage: page,
-      logicDepartment: window.logicCurrentDepartment || ""
+      logicDepartment: window.logicCurrentDepartment || "",
+      logicPreviousPage:
+        currentPage ||
+        history.state?.logicPage ||
+        "home"
     };
 
         if (
@@ -4023,6 +4027,26 @@ if (
   window.scrollTo(0, 0);
 }
 
+  window.logicGoBack = function(fallbackPage) {
+  const currentPage =
+    document.querySelector(".page.active")?.id;
+
+  const previousPage =
+    history.state?.logicPreviousPage;
+
+  if (
+    previousPage &&
+    previousPage !== currentPage &&
+    history.state?.logicPage === currentPage
+  ) {
+    history.back();
+    return;
+  }
+
+  openPage(fallbackPage, {
+    replaceHistory: true
+  });
+};
 
 // Restore the last section after refreshing
 const savedPage = location.hash.replace("#", "");
@@ -4081,14 +4105,6 @@ window.addEventListener("popstate", (event) => {
     window.logicStopMemberProfileListeners?.();
   }
 
-  // Skip duplicate Admin Dashboard history entries.
-  if (
-    pageBeforeBack === "adminDashboard" &&
-    pageToRestore === "adminDashboard"
-  ) {
-    history.back();
-    return;
-  }
   
   openPage(pageToRestore, { skipHistory: true });
 
