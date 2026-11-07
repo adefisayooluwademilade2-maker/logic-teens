@@ -6593,8 +6593,15 @@ function renderLogicEvents() {
 function startLogicEvents() {
   if (stopLogicEvents) stopLogicEvents();
 
-  stopLogicEvents = onSnapshot(
-    collection(db, "events"),
+  const eventsQuery = window.logicIsAdmin === true
+  ? collection(db, "events")
+  : query(
+      collection(db, "events"),
+      where("published", "==", true)
+    );
+
+stopLogicEvents = onSnapshot(
+  eventsQuery,
     snapshot => {
       logicEvents = snapshot.docs.map(item => ({
         id: item.id,
@@ -6692,6 +6699,7 @@ onAuthStateChanged(auth, async user => {
       : {};
 
     window.logicIsAdmin = adminSnap.exists();
+    startLogicEvents();
     document.body.classList.toggle(
   "admin-user",
   window.logicIsAdmin
