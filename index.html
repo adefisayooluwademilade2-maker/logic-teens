@@ -3981,17 +3981,24 @@ if (
 document.body.classList.toggle(
   "management-page-open",
   
-      [
-    "adminDashboard",
-"adminManagement",
-"adminApplications",
-    "adminManageMembers",
-    "adminApprovedMembers",
-    "adminApprovedPeople",
-    "ministryDirectory",
-    "membersDirectory",
-    "ministryMemberProfile"
-  ].includes(page)
+      
+[
+  "adminDashboard",
+  "adminManagement",
+  "viewAdmins",
+  "viewAdminManagers",
+  "accountRoleManagement",
+  "addAdminRole",
+  "addAdminManagerRole",
+  "adminApplications",
+  "adminManageMembers",
+  "adminApprovedMembers",
+  "adminApprovedPeople",
+  "ministryDirectory",
+  "membersDirectory",
+  "ministryMemberProfile"
+].includes(page)
+
 );
 
     document.body.classList.toggle(
