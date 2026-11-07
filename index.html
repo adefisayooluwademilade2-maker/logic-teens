@@ -2161,16 +2161,15 @@ body.admin-user #ministry .ministry-actions {
         .filter(Boolean)
     )];
 
-            const teamResponsibilities = [...new Set(
-      memberships.map(item => {
-        const responsibility = String(item.responsibility || "").trim();
-
-        return responsibility &&
-          responsibility !== "—" &&
-          responsibility !== "Not assigned yet"
-            ? responsibility
-            : "Not assigned";
-      })
+                const teamResponsibilities = [...new Set(
+      memberships
+        .map(item => String(item.responsibility || "").trim())
+        .filter(value =>
+          value &&
+          value !== "—" &&
+          value.toLowerCase() !== "not assigned yet" &&
+          value.toLowerCase() !== "not assigned"
+        )
     )];
 
     const hasTeamMember = memberships.length > 0;
