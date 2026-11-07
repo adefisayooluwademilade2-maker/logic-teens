@@ -4369,6 +4369,136 @@ window.logicMembersDirectoryCache = [];
   }
 };
 
+  window.loadAccountRoleMembers = async function(role) {
+  if (window.logicCanManageAdmins !== true) return;
+
+  const isManager = role === "adminManager";
+  const listId = isManager
+    ? "addAdminManagerMembersList"
+    : "addAdminMembersList";
+
+  const list = document.getElementById(listId);
+  if (!list) return;
+
+  list.textContent = "Loading members...";
+
+  try {
+    const [profilesSnapshot, adminsSnapshot] = await Promise.all([
+      getDocs(collection(db, "publicProfiles")),
+      getDocs(collection(db, "admins"))
+    ]);
+
+    const appointedIds = new Set(
+      adminsSnapshot.docs.map(item => item.id)
+    );
+
+    const members = profilesSnapshot.docs
+      .filter(item =>
+        !appointedIds.has(item.id) &&
+        item.data().isAdmin !== true
+      )
+      .map(item => ({
+        userId: item.id,
+        ...item.data()
+      }))
+      .sort((a, b) =>
+        (a.fullName || "").localeCompare(b.fullName || "")
+      );
+
+    list.replaceChildren();
+
+    if (!members.length) {
+      list.textContent = "No eligible members found.";
+      return;
+    }
+
+    members.forEach(member => {
+      const row = document.createElement("div");
+      row.style.cssText =
+        "display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line,#292b3b)";
+
+      const details = document.createElement("div");
+      details.style.flex = "1";
+
+      const name = document.createElement("strong");
+      name.textContent = member.fullName || "Name not available";
+
+      const username = document.createElement("div");
+      username.style.cssText = "font-size:12px;opacity:.7";
+      username.textContent = member.username
+        ? "@" + member.username
+        : "";
+
+      details.append(name, username);
+
+      const addButton = document.createElement("button");
+      addButton.type = "button";
+      addButton.textContent = "+";
+      addButton.style.cssText =
+        "width:40px;height:40px;border:0;border-radius:50%;background:var(--gold);color:#090a12;font-size:25px;font-weight:bold";
+
+      addButton.onclick = async () => {
+        if (window.logicCanManageAdmins !== true) return;
+
+        const roleName = isManager ? "Admin Manager" : "Admin";
+
+        const confirmed = await window.logicConfirm(
+          "Appoint " + (member.fullName || "this member") +
+          " as " + roleName + "?",
+          "Confirm Appointment",
+          "Appoint"
+        );
+
+        if (!confirmed) return;
+
+        addButton.disabled = true;
+
+        try {
+          await setDoc(doc(db, "admins", member.userId), {
+            role: role,
+            canManageAdmins: isManager
+          });
+
+          try {
+            await window.logicSendMemberNotification(
+              member.userId,
+              "Account Role Updated",
+              "You have been appointed as an " + roleName +
+              " in LOGIC Teens."
+            );
+          } catch (notificationError) {
+            console.error("Appointment notification error:", notificationError);
+          }
+
+          window.logicNotify(
+            (member.fullName || "Member") +
+            " appointed as " + roleName + "."
+          );
+
+          await window.loadAccountRoleMembers(role);
+          await window.loadAdminManagement();
+
+        } catch (error) {
+          console.error("Account role appointment error:", error);
+          window.logicNotify(
+            "Appointment failed: " +
+            (error.message || "Please try again.")
+          );
+          addButton.disabled = false;
+        }
+      };
+
+      row.append(details, addButton);
+      list.appendChild(row);
+    });
+
+  } catch (error) {
+    console.error("Account role members error:", error);
+    list.textContent =
+      "Could not load members: " + (error.message || "Please try again.");
+  }
+};
+
 window.loadMembersDirectory = async function() {
   const list = document.getElementById("membersDirectoryList");
 
