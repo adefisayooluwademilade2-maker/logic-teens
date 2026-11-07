@@ -2393,8 +2393,84 @@ body.admin-user #ministry .ministry-actions {
     );
   }
 
-  // Listen for the actual account role.
-  if (userId) {
+  
+  // Listen for and manage the actual account role.
+  const roleSection =
+    document.getElementById("adminAccountRoleSection");
+
+  const roleSelect =
+    document.getElementById("adminAccountRoleSelect");
+
+  const saveRoleButton =
+    document.getElementById("adminSaveAccountRole");
+
+  const removeRoleButton =
+    document.getElementById("adminRemoveAccountRole");
+
+  const canManageThisAccount =
+    window.logicCanManageAdmins === true &&
+    userId &&
+    userId !== window.logicCurrentUser?.uid;
+
+  roleSection.style.display =
+    canManageThisAccount ? "block" : "none";
+
+  if (canManageThisAccount) {
+    let hasAdminRecord = false;
+
+    const removeAccountAccess = async () => {
+      if (!hasAdminRecord) return;
+
+      try {
+        await deleteDoc(doc(db, "admins", userId));
+        window.logicNotify("Admin access removed.");
+      } catch (error) {
+        console.error("Account role removal error:", error);
+        window.logicNotify(
+          "Could not remove access: " +
+          (error.code || error.message)
+        );
+      }
+    };
+
+    saveRoleButton.onclick = async () => {
+      const selectedRole = roleSelect.value;
+
+      try {
+        if (selectedRole === "member") {
+          if (hasAdminRecord) {
+            await deleteDoc(doc(db, "admins", userId));
+          }
+
+          window.logicNotify("Account role set to Member.");
+          return;
+        }
+
+        await setDoc(
+          doc(db, "admins", userId),
+          {
+            role: selectedRole,
+            canManageAdmins: selectedRole === "adminManager"
+          }
+        );
+
+        window.logicNotify(
+          selectedRole === "adminManager"
+            ? "Admin Manager appointed successfully."
+            : "Admin appointed successfully."
+        );
+
+      } catch (error) {
+        console.error("Account role save error:", error);
+        window.logicNotify(
+          "Could not save account role: " +
+          (error.code || error.message)
+        );
+      }
+    };
+
+    removeRoleButton.onclick = removeAccountAccess;
+
     stopAdmin = onSnapshot(
       doc(db, "admins", userId),
       snapshot => {
@@ -2402,23 +2478,36 @@ body.admin-user #ministry .ministry-actions {
           ? snapshot.data()
           : {};
 
-        isAdmin = snapshot.exists();
+        hasAdminRecord = snapshot.exists();
+        isAdmin = hasAdminRecord;
 
         isAdminManager =
-          isAdmin && (
-            adminData.canManageAdmins === true ||
-            String(adminData.role || "")
-              .toLowerCase()
-              .includes("manager")
-          );
+          hasAdminRecord &&
+          adminData.role === "adminManager" &&
+          adminData.canManageAdmins === true;
+
+        roleSelect.value =
+          hasAdminRecord
+            ? (adminData.role || "admin")
+            : "member";
+
+        removeRoleButton.style.display =
+          hasAdminRecord ? "block" : "none";
+
+        removeRoleButton.textContent =
+          isAdminManager
+            ? "Remove from Admin Manager"
+            : "Remove from Admin";
 
         renderProfile();
       },
       error => {
         console.warn("Live account role update failed:", error);
+        roleSection.style.display = "none";
       }
     );
   }
+
 };
   
 
