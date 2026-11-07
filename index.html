@@ -708,7 +708,7 @@ body.notification-detail-open .bottom-nav {
   </section>
 
 <section class="page" id="notifications">
-  <button class="settings-back" onclick="history.back()" aria-label="Back">←</button>
+  <button class="settings-back" onclick=" openPage('home')" aria-label="Back">←</button>
   <div class="eyebrow">STAY CONNECTED</div>
   <h1>Notifications</h1>
 
@@ -718,7 +718,7 @@ body.notification-detail-open .bottom-nav {
 </section>
 
   <section class="page" id="notificationDetails">
-  <button class="settings-back" onclick="history.back()" aria-label="Back">←</button>
+  <button class="settings-back" onclick="openPage('notifications')" aria-label="Back">←</button>
   <div class="notification-detail-card">
   <span class="notification-glow">Notification</span>
   <h1 id="notificationDetailTitle"></h1>
@@ -3183,7 +3183,7 @@ document.getElementById("profilePictureInput")
 
 <!-- NOTIFICATIONS PAGE -->
 <section class="page" id="notificationSettings">
-  <button class="settings-back" onclick="history.back()" aria-label="Back">←</button>
+  <button class="settings-back" onclick="openPage('settings')" aria-label="Back">←</button>
   <div class="eyebrow">PREFERENCES</div>
   <h1>Notifications</h1>
 
@@ -3236,7 +3236,7 @@ document.getElementById("profilePictureInput")
 
 <!-- PRIVACY AND SAFETY PAGE -->
 <section class="page" id="privacySettings">
-  <button class="settings-back" onclick="history.back()" aria-label="Back">←</button>
+  <button class="settings-back" onclick="openPage('settings')" aria-label="Back">←</button>
   <div class="eyebrow">SAFETY</div>
   <h1>Privacy & Safety</h1>
 
@@ -3248,7 +3248,7 @@ document.getElementById("profilePictureInput")
 
 <!-- INFORMATION AND SUPPORT PAGE -->
 <section class="page" id="supportSettings">
-  <button class="settings-back" onclick="history.back()" aria-label="Back">←</button>
+  <button class="settings-back" onclick="openPage('settings')" aria-label="Back">←</button>
   <div class="eyebrow">INFORMATION</div>
   <h1>Information & Support</h1>
 
