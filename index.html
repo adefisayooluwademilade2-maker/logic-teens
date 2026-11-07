@@ -710,6 +710,51 @@ body.notification-detail-open .bottom-nav {
   </div>
   </section>
 
+  <section class="page" id="adminEventManager">
+  <button class="directory-back" onclick="openPage('adminDashboard')"
+    style="background:transparent;border:0;color:white;padding:8px 0;">
+    ← Back
+  </button>
+
+  <div class="eyebrow">LOGIC TEENS MANAGEMENT</div>
+  <h1>Manage Events</h1>
+  <p class="subtitle">Create and manage LOGIC Teens events.</p>
+
+  <div class="panel">
+    <h2>Create Event</h2>
+
+    <label for="eventTitle">Event title</label>
+    <input id="eventTitle" type="text" placeholder="Enter event title">
+
+    <label for="eventDate">Event date</label>
+    <input id="eventDate" type="date">
+
+    <label for="eventTime">Event time</label>
+    <input id="eventTime" type="time">
+
+    <label for="eventLocation">Location</label>
+    <input id="eventLocation" type="text" placeholder="Enter event location">
+
+    <label for="eventDescription">Description</label>
+    <textarea id="eventDescription" rows="4"
+      placeholder="Describe the event"></textarea>
+
+    <label style="display:flex;align-items:center;gap:10px;margin-top:16px;">
+      <input id="eventRegistrationEnabled" type="checkbox">
+      Enable event registration
+    </label>
+
+    <button class="primary" type="button" id="createEventButton">
+      Create Event
+    </button>
+  </div>
+
+  <h2>Your Events</h2>
+  <div id="adminEventsList">
+    <div class="empty">Loading events...</div>
+  </div>
+  </section>
+
 <section class="page" id="notifications">
   <button class="settings-back" onclick=" openPage('home')" aria-label="Back">←</button>
   <div class="eyebrow">STAY CONNECTED</div>
