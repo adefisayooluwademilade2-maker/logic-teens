@@ -6527,15 +6527,19 @@ function updateTimeGreeting(user) {
 let logicEvents = [];
 let stopLogicEvents = null;
 
+
+let logicSavedEventIds = new Set();
+let stopSavedEvents = null;
+
 function renderLogicEvents() {
   const memberList = document.getElementById("eventsList");
   const adminList = document.getElementById("adminEventsList");
+  const filter = document.getElementById("eventFilter")?.value || "all";
 
   const sorted = [...logicEvents].sort((a, b) => {
     const now = new Date();
     const dateA = new Date(a.date + "T" + (a.time || "00:00"));
     const dateB = new Date(b.date + "T" + (b.time || "00:00"));
-
     const aPast = dateA < now;
     const bPast = dateB < now;
 
@@ -6543,31 +6547,58 @@ function renderLogicEvents() {
     return aPast ? dateB - dateA : dateA - dateB;
   });
 
+  const visibleEvents = filter === "saved"
+    ? sorted.filter(event => logicSavedEventIds.has(event.id))
+    : sorted;
+
   memberList.innerHTML = "";
 
-  if (!sorted.length) {
-    memberList.innerHTML =
-      '<div class="empty">No events have been published yet.</div>';
+  if (!visibleEvents.length) {
+    memberList.innerHTML = filter === "saved"
+      ? '<div class="empty">You have not saved any events yet.</div>'
+      : '<div class="empty">No events have been published yet.</div>';
   }
 
-  sorted.forEach(event => {
+  visibleEvents.forEach(event => {
     const card = document.createElement("div");
     card.className = "panel";
 
+    const top = document.createElement("div");
+    top.style.cssText =
+      "display:flex;justify-content:space-between;align-items:center;gap:12px;";
+
     const title = document.createElement("strong");
     title.textContent = event.title;
+
+    const save = document.createElement("button");
+    save.type = "button";
+    save.textContent = logicSavedEventIds.has(event.id) ? "★" : "☆";
+    save.title = logicSavedEventIds.has(event.id)
+      ? "Remove saved event"
+      : "Save event";
+    save.setAttribute(
+      "aria-pressed",
+      logicSavedEventIds.has(event.id) ? "true" : "false"
+    );
+    save.style.cssText =
+      "background:#1b1d2c;color:#d6b779;border:1px solid #292b3b;border-radius:9px;width:36px;height:36px;font-size:21px;flex-shrink:0;";
+
+    save.addEventListener("click", () => toggleSavedEvent(event.id));
+
+    top.append(title, save);
 
     const details = document.createElement("p");
     details.textContent =
       event.date + " · " + (event.time || "Time to be announced");
 
     const location = document.createElement("p");
-    location.textContent = event.location || "Location to be announced";
+    location.textContent = "📍 " +
+      (event.location || "Location to be announced");
 
     const description = document.createElement("p");
     description.textContent = event.description || "";
 
-    card.append(title, details, location, description);
+    card.append(top, details, location, description);
     memberList.appendChild(card);
   });
 
@@ -6594,6 +6625,36 @@ function renderLogicEvents() {
     });
   }
 }
+
+async function toggleSavedEvent(eventId) {
+  const user = window.logicCurrentUser;
+
+  if (!user) return;
+
+  const savedRef = doc(
+    db, "users", user.uid, "savedEvents", eventId
+  );
+
+  try {
+    if (logicSavedEventIds.has(eventId)) {
+      await deleteDoc(savedRef);
+    } else {
+      await setDoc(savedRef, {
+        eventId: eventId,
+        savedAt: serverTimestamp()
+      });
+    }
+  } catch (error) {
+    console.error("Saving event failed:", error);
+    window.logicNotify("Unable to save this event. Please try again.");
+  }
+}
+
+document.getElementById("eventFilter").addEventListener(
+  "change",
+  renderLogicEvents
+);
+
 
 function startLogicEvents() {
   if (stopLogicEvents) stopLogicEvents();
