@@ -5052,10 +5052,15 @@ window.renderAdminApprovedPeople = function() {
       member.memberships.map(item => item.role).filter(Boolean)
     )];
 
-    const responsibilities = [...new Set(
+        const responsibilities = [...new Set(
       member.memberships
         .map(item => String(item.responsibility || "").trim())
-        .filter(value => value && value !== "—" && value !== "Not assigned yet")
+        .filter(value =>
+          value &&
+          value !== "—" &&
+          value.toLowerCase() !== "not assigned yet" &&
+          value.toLowerCase() !== "not assigned"
+        )
     )];
 
     const roleText = document.createElement("div");
@@ -5068,9 +5073,8 @@ window.renderAdminApprovedPeople = function() {
     departmentText.style.cssText =
       "color:var(--muted);font-size:11px;margin-top:5px";
 
-    const responsibilityText = document.createElement("div");
-    responsibilityText.textContent =
-      responsibilities.join(" • ") || "Responsibility not assigned";
+        const responsibilityText = document.createElement("div");
+    responsibilityText.textContent = responsibilities.join(" • ");
     responsibilityText.style.cssText =
       "color:var(--muted);font-size:11px;margin-top:5px";
 
