@@ -3961,9 +3961,13 @@ function openPage(page, options = {}) {
   }
 
 if (
-  (
+    (
     page === "adminManagement" ||
-    page === "accountRoleManagement"
+    page === "accountRoleManagement" ||
+    page === "viewAdmins" ||
+    page === "viewAdminManagers" ||
+    page === "addAdminRole" ||
+    page === "addAdminManagerRole"
   ) &&
   window.logicCanManageAdmins !== true
 ) {
