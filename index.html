@@ -6917,41 +6917,47 @@ actions.style.cssText =
       openLogicEventDetails(event);
     });
 
-    actions.append(detailsButton, save);
+        actions.appendChild(detailsButton);
 
-if (window.logicIsAdmin === true) {
-  const editButton = document.createElement("button");
-  editButton.type = "button";
-  editButton.textContent = "Edit";
-  editButton.style.cssText =
-    "background:#8880bd;color:white;border:0;border-radius:9px;padding:12px 18px;min-height:44px;font-size:14px;font-weight:bold;";
+    if (window.logicIsAdmin === true) {
+      const editButton = document.createElement("button");
+      editButton.type = "button";
+      editButton.textContent = "Edit";
+      editButton.style.cssText =
+        "background:#8880bd;color:white;border:0;border-radius:9px;padding:12px 18px;min-height:44px;font-size:14px;font-weight:bold;";
 
-  editButton.addEventListener("click", () => {
-    startEditLogicEvent(event);
-  });
+      editButton.addEventListener("click", () => {
+        startEditLogicEvent(event);
+      });
 
-  const deleteButton = document.createElement("button");
-  deleteButton.type = "button";
-  deleteButton.textContent = "Delete";
-  deleteButton.style.cssText =
-    "background:#7f2935;color:white;border:0;border-radius:9px;padding:12px 18px;min-height:44px;font-size:14px;font-weight:bold;";
-
-  deleteButton.addEventListener("click", async () => {
-    if (!window.logicIsAdmin) return;
-
-    if (!confirm("Delete this event permanently?")) return;
-
-    try {
-      await deleteDoc(doc(db, "events", event.id));
-      window.logicNotify("Event deleted successfully.");
-    } catch (error) {
-      console.error("Event deletion failed:", error);
-      window.logicNotify("Could not delete this event.");
+      actions.appendChild(editButton);
     }
-  });
 
-  actions.append(editButton, deleteButton);
-}
+    actions.appendChild(save);
+
+    if (window.logicIsAdmin === true) {
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.textContent = "Delete";
+      deleteButton.style.cssText =
+        "background:#7f2935;color:white;border:0;border-radius:9px;padding:12px 18px;min-height:44px;font-size:14px;font-weight:bold;";
+
+      deleteButton.addEventListener("click", async () => {
+        if (!window.logicIsAdmin) return;
+
+        if (!confirm("Delete this event permanently?")) return;
+
+        try {
+          await deleteDoc(doc(db, "events", event.id));
+          window.logicNotify("Event deleted successfully.");
+        } catch (error) {
+          console.error("Event deletion failed:", error);
+          window.logicNotify("Could not delete this event.");
+        }
+      });
+
+      actions.appendChild(deleteButton);
+  }
         content.append(location, actions);
     card.append(hero, content);
 
