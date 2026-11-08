@@ -1,0 +1,12 @@
+
+{
+  "name": "LOGIC Teens Church Lounge",
+  "short_name": "LOGIC Teens",
+  "description": "Grow, Connect, Become.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#090a12",
+  "theme_color": "#090a12"
+}
