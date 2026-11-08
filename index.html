@@ -6766,23 +6766,64 @@ stopLogicEvents = onSnapshot(
 
 // EVENT MEDIA PREVIEW
 let eventPreviewUrls = [];
+let eventCoverPreviewUrl = null;
 
 function eventFileKind(file) {
   const type = (file.type || "").toLowerCase();
   const name = (file.name || "").toLowerCase();
 
-  if (
-    type.startsWith("image/") ||
-    /\.(jpg|jpeg|png|webp|gif|bmp|heic|heif)$/.test(name)
-  ) return "image";
+  if (type.startsWith("image/") ||
+      /\.(jpg|jpeg|png|webp|gif|bmp|heic|heif)$/.test(name)) {
+    return "image";
+  }
 
-  if (
-    type.startsWith("video/") ||
-    /\.(mp4|mov|webm|m4v|3gp)$/.test(name)
-  ) return "video";
+  if (type.startsWith("video/") ||
+      /\.(mp4|mov|webm|m4v|3gp)$/.test(name)) {
+    return "video";
+  }
 
   return "";
 }
+
+window.clearEventCover = function() {
+  const input = document.getElementById("eventCoverFile");
+
+  input.value = "";
+
+  if (eventCoverPreviewUrl) {
+    URL.revokeObjectURL(eventCoverPreviewUrl);
+    eventCoverPreviewUrl = null;
+  }
+
+  document.getElementById("eventCoverImage").removeAttribute("src");
+  document.getElementById("eventCoverPreview").style.display = "none";
+  document.getElementById("eventCoverFileName").textContent =
+    "No image selected";
+};
+
+document.getElementById("eventCoverFile").addEventListener("change", () => {
+  const file = document.getElementById("eventCoverFile").files[0];
+
+  if (!file) return;
+
+  if (eventFileKind(file) !== "image") {
+    window.clearEventCover();
+    window.logicNotify("Please choose an image for the event cover.");
+    return;
+  }
+
+  if (eventCoverPreviewUrl) {
+    URL.revokeObjectURL(eventCoverPreviewUrl);
+  }
+
+  eventCoverPreviewUrl = URL.createObjectURL(file);
+
+  document.getElementById("eventCoverImage").src =
+    eventCoverPreviewUrl;
+
+  document.getElementById("eventCoverPreview").style.display = "block";
+  document.getElementById("eventCoverFileName").textContent = file.name;
+});
 
 document.getElementById("eventMedia").addEventListener("change", () => {
   const files = Array.from(
@@ -6790,36 +6831,10 @@ document.getElementById("eventMedia").addEventListener("change", () => {
   );
 
   const preview = document.getElementById("eventMediaPreview");
-  const coverSelect = document.getElementById("eventCover");
 
   eventPreviewUrls.forEach(url => URL.revokeObjectURL(url));
   eventPreviewUrls = [];
-
   preview.replaceChildren();
-  coverSelect.replaceChildren();
-
-  const imageFiles = files
-    .map((file, index) => ({file, index}))
-    .filter(item => eventFileKind(item.file) === "image");
-
-  const firstOption = document.createElement("option");
-  firstOption.value = "";
-  firstOption.textContent = imageFiles.length
-    ? "Choose cover photo"
-    : "No image selected";
-
-  coverSelect.appendChild(firstOption);
-
-  imageFiles.forEach(item => {
-    const option = document.createElement("option");
-    option.value = String(item.index);
-    option.textContent = item.file.name;
-    coverSelect.appendChild(option);
-  });
-
-  if (imageFiles.length) {
-    coverSelect.value = String(imageFiles[0].index);
-  }
 
   files.forEach(file => {
     const kind = eventFileKind(file);
