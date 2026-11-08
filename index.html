@@ -788,30 +788,46 @@ body.notification-detail-open .bottom-nav {
 </label>
 
 <div style="margin-top:22px;">
-  <label for="eventMedia">Event photos and videos</label>
 
-  <input
-    id="eventMedia"
-    class="event-file-input"
-    type="file"
-    accept="image/*,video/*,.jpg,.jpeg,.png,.webp,.gif,.mp4,.mov"
-    multiple
-  >
+  <label>Choose event cover photo</label>
 
-  <label for="eventMedia" class="event-upload-button">
-    + Choose photos or videos
-  </label>
+  <input id="eventCoverFile" type="file"
+    accept="image/*" style="display:none;">
+
+  <button type="button" class="event-upload-button"
+    onclick="document.getElementById('eventCoverFile').click()">
+    + Choose event photo
+  </button>
+
+  <div id="eventCoverPreview"
+    style="display:none;position:relative;margin:12px 0;">
+    <img id="eventCoverImage"
+      style="width:100%;height:190px;object-fit:cover;border-radius:12px;">
+    <button type="button"
+      onclick="clearEventCover()"
+      style="position:absolute;right:8px;top:8px;width:30px;height:30px;border:0;border-radius:50%;background:#090a12;color:white;font-size:19px;">
+      ×
+    </button>
+  </div>
+
+  <p id="eventCoverFileName"
+    style="font-size:12px;color:#d6b779;">No image selected</p>
+
+  <label for="eventMedia">Additional event photos and videos</label>
+
+  <input id="eventMedia" class="event-file-input"
+    type="file" accept="image/*,video/*" multiple>
+
+  <button type="button" class="event-upload-button"
+    onclick="document.getElementById('eventMedia').click()">
+    + Choose multiple photos or videos
+  </button>
 
   <div id="eventMediaPreview"
     style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px;">
   </div>
 
-  <label for="eventCover">Choose event cover photo</label>
-  <select id="eventCover">
-    <option value="">Select a cover after choosing photos</option>
-  </select>
 </div>
-
     <button class="primary" type="button" id="createEventButton">
       Create Event
     </button>
