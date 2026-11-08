@@ -6825,9 +6825,8 @@ function renderLogicEvents() {
       "color:#b9b7c7;font-size:13px;margin:0 0 13px;";
 
     const actions = document.createElement("div");
-    "display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:10px;";
-      "display:flex;align-items:center;justify-content:space-between;gap:10px;";
-
+actions.style.cssText =
+  "display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:10px;";
     const detailsButton = document.createElement("button");
     detailsButton.type = "button";
     detailsButton.textContent = "View Event Details";
