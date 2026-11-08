@@ -7234,39 +7234,37 @@ if (!resourceType) {
 }
 
 
-// CREATE EVENT
+// CREATE OR UPDATE EVENT
 document.getElementById("createEventButton").addEventListener(
   "click",
   async () => {
-    if (window.logicIsAdmin !== true) {
-      window.logicNotify("You cannot create events.");
-      return;
-    }
+    if (window.logicIsAdmin !== true) return;
 
     const title = document.getElementById("eventTitle").value.trim();
     const date = document.getElementById("eventDate").value;
     const time = document.getElementById("eventTime").value;
+    const endTime = document.getElementById("eventEndTime").value;
     const location = document.getElementById("eventLocation").value.trim();
-    const description =
-      document.getElementById("eventDescription").value.trim();
-
+    const description = document.getElementById("eventDescription").value.trim();
     const registrationEnabled =
       document.getElementById("eventRegistrationEnabled").checked;
 
-        const coverFile =
-      document.getElementById("eventCoverFile").files[0];
-
-    const files = Array.from(
-      document.getElementById("eventMedia").files
-    );
+    const coverFile = document.getElementById("eventCoverFile").files[0];
+    const files = Array.from(document.getElementById("eventMedia").files);
+    const isEditing = Boolean(logicEditingEventId);
 
     if (!title || !date || !time || !location || !description) {
       window.logicNotify("Please complete all event details.");
       return;
     }
 
-    if (!coverFile || eventFileKind(coverFile) !== "image") {
+    if (!isEditing && (!coverFile || eventFileKind(coverFile) !== "image")) {
       window.logicNotify("Choose an event cover photo first.");
+      return;
+    }
+
+    if (coverFile && eventFileKind(coverFile) !== "image") {
+      window.logicNotify("The event cover must be an image.");
       return;
     }
 
@@ -7274,57 +7272,77 @@ document.getElementById("createEventButton").addEventListener(
     button.disabled = true;
 
     try {
-      const uploadedMedia = [];
+      let uploadedMedia = isEditing
+        ? [...(logicEditingEventData.media || [])]
+        : [];
 
-      button.textContent = "Creating event...";
+      let coverUrl = isEditing
+        ? logicEditingEventData.coverUrl
+        : "";
 
-      const coverResult = await uploadEventMedia(coverFile);
-      uploadedMedia.push(coverResult);
+      button.textContent = isEditing
+        ? "Saving changes..."
+        : "Creating event...";
 
-      for (let i = 0; i < files.length; i++) {
-        button.textContent = "Creating event...";
-        
-        const result = await uploadEventMedia(files[i]);
+      if (coverFile) {
+        const coverResult = await uploadEventMedia(coverFile);
+
+        uploadedMedia = uploadedMedia.filter(
+          item => item.url !== coverUrl
+        );
+
+        uploadedMedia.unshift(coverResult);
+        coverUrl = coverResult.url;
+      }
+
+      for (const file of files) {
+        button.textContent = "Uploading media...";
+        const result = await uploadEventMedia(file);
         uploadedMedia.push(result);
       }
 
-      button.textContent = "Creating event...";
-
-      const eventRef = doc(collection(db, "events"));
-
-      await setDoc(eventRef, {
+      const eventData = {
         title,
         date,
         time,
+        endTime,
         location,
         description,
         registrationEnabled,
         media: uploadedMedia,
-        coverUrl: coverResult.url,
-        published: true,
-        createdBy: window.logicCurrentUser.uid,
-        createdAt: serverTimestamp()
-      });
+        coverUrl,
+        published: true
+      };
 
-      document.getElementById("eventTitle").value = "";
-      document.getElementById("eventDate").value = "";
-      document.getElementById("eventTime").value = "";
-      document.getElementById("eventLocation").value = "";
-      document.getElementById("eventDescription").value = "";
-      document.getElementById("eventRegistrationEnabled").checked = false;
-      document.getElementById("eventMedia").value = "";
-      document.getElementById("eventMediaPreview").replaceChildren();
+      if (isEditing) {
+        await updateDoc(
+          doc(db, "events", logicEditingEventId),
+          eventData
+        );
+      } else {
+        const eventRef = doc(collection(db, "events"));
 
-      window.clearEventCover();
+        await setDoc(eventRef, {
+          ...eventData,
+          createdBy: window.logicCurrentUser.uid,
+          createdAt: serverTimestamp()
+        });
+      }
+
+      window.cancelEventEdit();
 
       eventPreviewUrls.forEach(url => URL.revokeObjectURL(url));
       eventPreviewUrls = [];
 
-      window.logicNotify("Event created successfully.");
+      window.logicNotify(
+        isEditing
+          ? "Event updated successfully."
+          : "Event created successfully."
+      );
 
     } catch (error) {
-      console.error("Event creation/upload failed:", error);
-      window.logicNotify(error.message || "Could not create event.");
+      console.error("Event save failed:", error);
+      window.logicNotify(error.message || "Could not save event.");
     } finally {
       button.disabled = false;
       button.textContent = "Create Event";
