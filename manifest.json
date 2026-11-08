@@ -8,12 +8,12 @@
   "orientation": "portrait",
   "background_color": "#090a12",
   "theme_color": "#090a12",
-  "icons": [
-    {
-      "src": "./logic-logo.png",
-      "sizes": "752x401",
-      "type": "image/png",
-      "purpose": "any"
-    }
-  ]
+"icons": [
+  {
+    "src": "./logic-app-icon.png",
+    "sizes": "512x512",
+    "type": "image/png",
+    "purpose": "any"
+  }
+]
 }
