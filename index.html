@@ -752,6 +752,14 @@ body.notification-detail-open .bottom-nav {
   </div>
   </section>
 
+  <section class="page" id="logicEventDetailsPage">
+  <button onclick="openPage('event')"
+    style="background:transparent;border:0;color:#d6b779;font-size:16px;padding:12px 0;">
+    ← Back to Events
+  </button>
+  <div id="logicEventDetailsContent"></div>
+  </section>
+
   <section class="page" id="adminEventManager">
   <button class="directory-back" onclick="openPage('adminDashboard')"
     style="background:transparent;border:0;color:white;padding:8px 0;">
@@ -6610,6 +6618,60 @@ let stopLogicEvents = null;
 let logicSavedEventIds = new Set();
 let stopSavedEvents = null;
 
+  function openLogicEventDetails(event) {
+  const page = document.getElementById("logicEventDetailsContent");
+  page.innerHTML = "";
+
+  const title = document.createElement("h1");
+  title.textContent = event.title || "Event";
+  page.appendChild(title);
+
+  if (event.coverUrl) {
+    const cover = document.createElement("img");
+    cover.src = event.coverUrl;
+    cover.style.cssText = "width:100%;height:auto;max-height:420px;object-fit:cover;border-radius:14px;";
+    page.appendChild(cover);
+  }
+
+  function addDetail(label, value) {
+    const item = document.createElement("div");
+    item.style.cssText = "padding:13px 0;border-bottom:1px solid #292b3b;";
+    const heading = document.createElement("strong");
+    heading.textContent = label;
+    heading.style.color = "#d6b779";
+    const content = document.createElement("p");
+    content.textContent = value || "Not provided";
+    content.style.cssText = "color:#eee;margin:7px 0 0;line-height:1.6;";
+    item.append(heading, content);
+    page.appendChild(item);
+  }
+
+  addDetail("DATE", event.date);
+  addDetail("TIME", event.time);
+  addDetail("EVENT LOCATION", event.location);
+  addDetail("ABOUT THIS EVENT", event.description);
+
+  (event.media || []).forEach(item => {
+    if (!item.url || item.url === event.coverUrl) return;
+
+    if (item.type === "video") {
+      const video = document.createElement("video");
+      video.src = item.url;
+      video.controls = true;
+      video.playsInline = true;
+      video.style.cssText = "display:block;width:100%;height:auto;max-height:75vh;background:#000;margin:18px 0;border-radius:12px;";
+      page.appendChild(video);
+    } else {
+      const image = document.createElement("img");
+      image.src = item.url;
+      image.alt = item.name || event.title;
+      image.style.cssText = "display:block;width:100%;height:auto;margin:18px 0;border-radius:12px;";
+      page.appendChild(image);
+    }
+  });
+
+  openPage("logicEventDetailsPage");
+}
 
 function renderLogicEvents() {
   const memberList = document.getElementById("eventsList");
