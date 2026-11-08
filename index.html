@@ -6997,19 +6997,19 @@ document.getElementById("createEventButton").addEventListener(
     try {
       const uploadedMedia = [];
 
-      button.textContent = "Uploading cover photo...";
+      button.textContent = "Creating event...";
 
       const coverResult = await uploadEventMedia(coverFile);
       uploadedMedia.push(coverResult);
 
       for (let i = 0; i < files.length; i++) {
-        bbutton.textContent = "Creating event...";
+        button.textContent = "Creating event...";
         
         const result = await uploadEventMedia(files[i]);
         uploadedMedia.push(result);
       }
 
-      button.textContent = "publishing event...";
+      button.textContent = "Creating event...";
 
       const eventRef = doc(collection(db, "events"));
 
