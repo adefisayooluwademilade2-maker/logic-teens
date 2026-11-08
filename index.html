@@ -4287,13 +4287,80 @@ if (page === "addAdminManagerRole" && window.loadAccountRoleMembers) {
     history.state?.logicPage === currentPage
   ) {
     history.back();
+    return true;
+  }
+
+  if (!fallbackPage || fallbackPage === currentPage) {
+    return false;
+  }
+
+  openPage(fallbackPage, { skipHistory: true });
+
+  const fallbackState = {
+    logicPage: fallbackPage,
+    logicDepartment: window.logicCurrentDepartment || ""
+  };
+
+  history.replaceState(
+    fallbackState,
+    "",
+    "#" + fallbackPage
+  );
+
+  history.pushState(
+    fallbackState,
+    "",
+    "#" + fallbackPage
+  );
+
+  return false;
+};
+
+
+// One central handler for all page Back buttons.
+document.addEventListener("click", function(event) {
+  const backButton = event.target.closest(
+    ".directory-back, .settings-back, #logicEventDetailsPage > button:first-child"
+  );
+
+  if (!backButton) return;
+
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  const currentPage =
+    document.querySelector(".page.active")?.id;
+
+  if (currentPage === "ministryMemberProfile") {
+    window.closeMinistryMemberProfile?.();
     return;
   }
 
-  openPage(fallbackPage, {
-    replaceHistory: true
-  });
-};
+  const fallbackPages = {
+    logicEventDetailsPage: "event",
+    adminEventManager: "adminDashboard",
+    notifications: "home",
+    notificationDetails: "notifications",
+    ministryDirectory: "ministry",
+    membersDirectory: "home",
+    adminDashboard: "home",
+    adminManagement: "adminDashboard",
+    viewAdmins: "adminManagement",
+    viewAdminManagers: "adminManagement",
+    accountRoleManagement: "adminManagement",
+    addAdminRole: "accountRoleManagement",
+    addAdminManagerRole: "accountRoleManagement",
+    adminApplications: "adminDashboard",
+    adminManageMembers: "adminDashboard",
+    adminApprovedPeople: "adminDashboard",
+    adminApprovedMembers: "adminDashboard",
+    notificationSettings: "settings",
+    privacySettings: "settings",
+    supportSettings: "settings"
+  };
+
+  window.logicGoBack(fallbackPages[currentPage] || "home");
+}, true);
 
 // Restore the last section after refreshing
 const savedPage = location.hash.replace("#", "");
