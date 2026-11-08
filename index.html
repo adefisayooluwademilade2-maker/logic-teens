@@ -2630,7 +2630,19 @@ body.management-page-open #ministryMemberProfile {
   const returnPage =
     window.logicMemberProfileReturnPage || "home";
 
-  // Return directly to the page that opened this profile.
+  const currentPage =
+    document.querySelector(".page.active")?.id;
+
+  // Return through the real history entry when possible.
+  if (
+    history.state?.logicPage === currentPage &&
+    history.state?.logicPreviousPage === returnPage
+  ) {
+    history.back();
+    return;
+  }
+
+  // Safe fallback when the previous history entry is unavailable.
   openPage(returnPage, {
     replaceHistory: true
   });
