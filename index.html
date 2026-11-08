@@ -7008,30 +7008,7 @@ actions.style.cssText =
     }
 
     sorted.forEach(event => {
-      const card = createEventCard(event);
-      const deleteButton = document.createElement("button");
-
-      deleteButton.type = "button";
-      deleteButton.textContent = "Delete Event";
-      deleteButton.style.cssText =
-        "margin:0 15px 15px;background:#7f2935;color:white;border:0;border-radius:9px;padding:10px 14px;font-size:12px;";
-
-      deleteButton.addEventListener("click", async () => {
-        if (!window.logicIsAdmin) return;
-
-        if (!confirm("Delete this event permanently?")) return;
-
-        try {
-          await deleteDoc(doc(db, "events", event.id));
-          window.logicNotify("Event deleted successfully.");
-        } catch (error) {
-          console.error("Event deletion failed:", error);
-          window.logicNotify("Could not delete this event.");
-        }
-      });
-
-      card.appendChild(deleteButton);
-      adminList.appendChild(card);
+            adminList.appendChild(createEventCard(event));
     });
   }
 }
