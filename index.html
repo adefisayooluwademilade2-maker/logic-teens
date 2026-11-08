@@ -192,6 +192,27 @@ input,textarea,select {
   border:0;padding:13px 18px;border-radius:11px;
   font-weight:bold;width:100%;
 }
+
+.event-file-input {
+  display:none !important;
+}
+
+.event-upload-button {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  padding:14px;
+  margin:10px 0;
+  background:#1b1d2c;
+  color:#d6b779;
+  border:1px solid #292b3b;
+  border-radius:11px;
+  font-size:13px;
+  font-weight:bold;
+  cursor:pointer;
+}
+  
   .primary:disabled {
   opacity:0.5;
   cursor:not-allowed;
@@ -744,27 +765,36 @@ body.notification-detail-open .bottom-nav {
     <textarea id="eventDescription" rows="4"
       placeholder="Describe the event"></textarea>
 
-    <label for="eventMedia">Event photos and videos</label>
-<input
-  id="eventMedia"
-  type="file"
-  accept="image/*,video/*"
-  multiple
->
-
-<div id="eventMediaPreview"
-  style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px;">
-</div>
-
-<label for="eventCover">Choose event cover photo</label>
-<select id="eventCover">
-  <option value="">Select a cover after choosing photos</option>
-</select>
-
     <label style="display:flex;align-items:center;gap:10px;margin-top:16px;">
-      <input id="eventRegistrationEnabled" type="checkbox">
-      Enable event registration
-    </label>
+  <input id="eventRegistrationEnabled" type="checkbox"
+    style="width:18px;height:18px;margin:0;accent-color:#d6b779;">
+  Enable event registration
+</label>
+
+<div style="margin-top:22px;">
+  <label for="eventMedia">Event photos and videos</label>
+
+  <input
+    id="eventMedia"
+    class="event-file-input"
+    type="file"
+    accept="image/*,video/*,.jpg,.jpeg,.png,.webp,.gif,.mp4,.mov"
+    multiple
+  >
+
+  <label for="eventMedia" class="event-upload-button">
+    + Choose photos or videos
+  </label>
+
+  <div id="eventMediaPreview"
+    style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px;">
+  </div>
+
+  <label for="eventCover">Choose event cover photo</label>
+  <select id="eventCover">
+    <option value="">Select a cover after choosing photos</option>
+  </select>
+</div>
 
     <button class="primary" type="button" id="createEventButton">
       Create Event
@@ -6705,6 +6735,23 @@ stopLogicEvents = onSnapshot(
 // EVENT MEDIA PREVIEW
 let eventPreviewUrls = [];
 
+function eventFileKind(file) {
+  const type = (file.type || "").toLowerCase();
+  const name = (file.name || "").toLowerCase();
+
+  if (
+    type.startsWith("image/") ||
+    /\.(jpg|jpeg|png|webp|gif|bmp|heic|heif)$/.test(name)
+  ) return "image";
+
+  if (
+    type.startsWith("video/") ||
+    /\.(mp4|mov|webm|m4v|3gp)$/.test(name)
+  ) return "video";
+
+  return "";
+}
+
 document.getElementById("eventMedia").addEventListener("change", () => {
   const files = Array.from(
     document.getElementById("eventMedia").files
@@ -6720,14 +6767,15 @@ document.getElementById("eventMedia").addEventListener("change", () => {
   coverSelect.replaceChildren();
 
   const imageFiles = files
-    .map((file, index) => ({ file, index }))
-    .filter(item => item.file.type.startsWith("image/"));
+    .map((file, index) => ({file, index}))
+    .filter(item => eventFileKind(item.file) === "image");
 
   const firstOption = document.createElement("option");
   firstOption.value = "";
   firstOption.textContent = imageFiles.length
     ? "Choose cover photo"
     : "No image selected";
+
   coverSelect.appendChild(firstOption);
 
   imageFiles.forEach(item => {
@@ -6742,29 +6790,34 @@ document.getElementById("eventMedia").addEventListener("change", () => {
   }
 
   files.forEach(file => {
+    const kind = eventFileKind(file);
     const url = URL.createObjectURL(file);
     eventPreviewUrls.push(url);
 
     const item = document.createElement("div");
-    item.style.cssText = "background:#1b1d2c;border-radius:10px;overflow:hidden;";
+    item.style.cssText =
+      "background:#1b1d2c;border-radius:10px;overflow:hidden;";
 
-    if (file.type.startsWith("video/")) {
+    if (kind === "video") {
       const video = document.createElement("video");
       video.src = url;
       video.controls = true;
-      video.style.cssText = "width:100%;height:130px;object-fit:cover;";
+      video.style.cssText =
+        "width:100%;height:130px;object-fit:cover;";
       item.appendChild(video);
-    } else if (file.type.startsWith("image/")) {
+    } else if (kind === "image") {
       const image = document.createElement("img");
       image.src = url;
       image.alt = file.name;
-      image.style.cssText = "width:100%;height:130px;object-fit:cover;";
+      image.style.cssText =
+        "width:100%;height:130px;object-fit:cover;";
       item.appendChild(image);
     }
 
     const name = document.createElement("p");
     name.textContent = file.name;
     name.style.cssText = "font-size:11px;padding:5px;margin:0;";
+
     item.appendChild(name);
     preview.appendChild(item);
   });
@@ -6779,9 +6832,11 @@ async function uploadEventMedia(file) {
     throw new Error("Please log in again.");
   }
 
-  const resourceType = file.type.startsWith("video/")
-    ? "video"
-    : "image";
+  const resourceType = eventFileKind(file);
+
+if (!resourceType) {
+  throw new Error("Unsupported file: " + file.name);
+  }
 
   const maxSize = resourceType === "video"
     ? 100 * 1024 * 1024
