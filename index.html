@@ -7048,30 +7048,7 @@ async function toggleSavedEvent(eventId) {
 
   try {
     if (logicSavedEventIds.has(eventId)) {
-      await deleteDoc(savedRef);
-    } else {
-      await setDoc(savedRef, {
-        eventId: eventId,
-        savedAt: serverTimestamp()
-      });
-    }
-  } catch (error) {
-    console.error("Saving event failed:", error);
-    window.logicNotify("Unable to save this event. Please try again.");
-  }
-}
-
-document.getElementById("eventFilter").addEventListener(
-  "change",
-  renderLogicEvents
-);
-
-
-function startLogicEvents() {
-  if (stopLogicEvents) stopLogicEvents();
-
-  const eventsQuery = window.logicIsAdmin === true
-  ? collection(db, "events")
+            adminList.appendChild(createEventCard(event));
   : query(
       collection(db, "events"),
       where("published", "==", true)
