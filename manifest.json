@@ -1,4 +1,3 @@
-
 {
   "name": "LOGIC Teens Church Lounge",
   "short_name": "LOGIC Teens",
@@ -8,5 +7,13 @@
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#090a12",
-  "theme_color": "#090a12"
+  "theme_color": "#090a12",
+  "icons": [
+    {
+      "src": "./logic-logo.png",
+      "sizes": "752x401",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
 }
