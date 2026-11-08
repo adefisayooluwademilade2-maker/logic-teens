@@ -6640,6 +6640,65 @@ let stopLogicEvents = null;
 let logicSavedEventIds = new Set();
 let stopSavedEvents = null;
 
+  let logicEditingEventId = null;
+let logicEditingEventData = null;
+
+function startEditLogicEvent(event) {
+  if (!window.logicIsAdmin) return;
+
+  logicEditingEventId = event.id;
+  logicEditingEventData = event;
+
+  document.getElementById("eventTitle").value = event.title || "";
+  document.getElementById("eventDate").value = event.date || "";
+  document.getElementById("eventTime").value = event.time || "";
+  document.getElementById("eventEndTime").value = event.endTime || "";
+  document.getElementById("eventLocation").value = event.location || "";
+  document.getElementById("eventDescription").value = event.description || "";
+  document.getElementById("eventRegistrationEnabled").checked =
+    event.registrationEnabled === true;
+
+  document.getElementById("eventCoverFile").value = "";
+  document.getElementById("eventMedia").value = "";
+  document.getElementById("eventMediaPreview").replaceChildren();
+
+  if (event.coverUrl) {
+    document.getElementById("eventCoverImage").src = event.coverUrl;
+    document.getElementById("eventCoverPreview").style.display = "block";
+    document.getElementById("eventCoverFileName").textContent =
+      "Current event cover photo";
+  }
+
+  document.getElementById("createEventButton").textContent = "Save Changes";
+  document.getElementById("cancelEventEditButton").style.display = "block";
+
+  openPage("adminEventManager");
+  document.getElementById("eventTitle").scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+}
+
+window.cancelEventEdit = function() {
+  logicEditingEventId = null;
+  logicEditingEventData = null;
+
+  document.getElementById("eventTitle").value = "";
+  document.getElementById("eventDate").value = "";
+  document.getElementById("eventTime").value = "";
+  document.getElementById("eventEndTime").value = "";
+  document.getElementById("eventLocation").value = "";
+  document.getElementById("eventDescription").value = "";
+  document.getElementById("eventRegistrationEnabled").checked = false;
+  document.getElementById("eventMedia").value = "";
+  document.getElementById("eventMediaPreview").replaceChildren();
+
+  window.clearEventCover();
+
+  document.getElementById("createEventButton").textContent = "Create Event";
+  document.getElementById("cancelEventEditButton").style.display = "none";
+};
+
   function openLogicEventDetails(event) {
   const page = document.getElementById("logicEventDetailsContent");
   page.innerHTML = "";
