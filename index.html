@@ -7003,14 +7003,13 @@ document.getElementById("createEventButton").addEventListener(
       uploadedMedia.push(coverResult);
 
       for (let i = 0; i < files.length; i++) {
-        button.textContent =
-          "Uploading " + (i + 1) + " of " + files.length + "...";
-
+        bbutton.textContent = "Creating event...";
+        
         const result = await uploadEventMedia(files[i]);
         uploadedMedia.push(result);
       }
 
-      button.textContent = "Publishing event...";
+      button.textContent = "publishing event...";
 
       const eventRef = doc(collection(db, "events"));
 
