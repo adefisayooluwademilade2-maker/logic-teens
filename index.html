@@ -791,6 +791,8 @@ body.event-details-open main {
 
     <label for="eventTime">Event time</label>
     <input id="eventTime" type="time">
+    <label for="eventEndTime">Event end time</label>
+<input id="eventEndTime" type="time">
 
     <label for="eventLocation">Location</label>
     <input id="eventLocation" type="text" placeholder="Enter event location">
@@ -847,8 +849,14 @@ body.event-details-open main {
 
 </div>
     <button class="primary" type="button" id="createEventButton">
-      Create Event
-    </button>
+  Create Event
+</button>
+
+<button type="button" id="cancelEventEditButton"
+  onclick="cancelEventEdit()"
+  style="display:none;width:100%;margin-top:10px;background:#292b3b;color:white;border:0;border-radius:10px;padding:14px;font-size:15px;">
+  Cancel Edit
+</button>
   </div>
 
   <h2>Your Events</h2>
