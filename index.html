@@ -7749,6 +7749,15 @@ window.openDailyVerse = async function() {
 })();
 </script>
 
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js")
+      .then(() => console.log("LOGIC Teens PWA ready."))
+      .catch(error => console.error("PWA registration failed:", error));
+  });
+}
+</script>
   
 </body>
 </html>
