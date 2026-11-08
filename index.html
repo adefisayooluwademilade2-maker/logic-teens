@@ -4294,25 +4294,16 @@ if (page === "addAdminManagerRole" && window.loadAccountRoleMembers) {
     return false;
   }
 
-  openPage(fallbackPage, { skipHistory: true });
-
-  const fallbackState = {
-    logicPage: fallbackPage,
-    logicDepartment: window.logicCurrentDepartment || ""
-  };
+    openPage(fallbackPage, { skipHistory: true });
 
   history.replaceState(
-    fallbackState,
+    {
+      logicPage: fallbackPage,
+      logicDepartment: window.logicCurrentDepartment || ""
+    },
     "",
     "#" + fallbackPage
   );
-
-  history.pushState(
-    fallbackState,
-    "",
-    "#" + fallbackPage
-  );
-
   return false;
 };
 
