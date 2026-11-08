@@ -6974,24 +6974,22 @@ document.getElementById("createEventButton").addEventListener(
     const registrationEnabled =
       document.getElementById("eventRegistrationEnabled").checked;
 
+        const coverFile =
+      document.getElementById("eventCoverFile").files[0];
+
     const files = Array.from(
       document.getElementById("eventMedia").files
     );
-
-    const coverIndex = document.getElementById("eventCover").value;
 
     if (!title || !date || !time || !location || !description) {
       window.logicNotify("Please complete all event details.");
       return;
     }
 
-    if (
-  files.length &&
-  !files.some(file => eventFileKind(file) === "image")
-) {
-  window.logicNotify("Choose at least one image for the event cover.");
-  return;
-  }
+    if (!coverFile || eventFileKind(coverFile) !== "image") {
+      window.logicNotify("Choose an event cover photo first.");
+      return;
+    }
 
     const button = document.getElementById("createEventButton");
     button.disabled = true;
@@ -6999,22 +6997,18 @@ document.getElementById("createEventButton").addEventListener(
     try {
       const uploadedMedia = [];
 
+      button.textContent = "Uploading cover photo...";
+
+      const coverResult = await uploadEventMedia(coverFile);
+      uploadedMedia.push(coverResult);
+
       for (let i = 0; i < files.length; i++) {
         button.textContent =
           "Uploading " + (i + 1) + " of " + files.length + "...";
 
         const result = await uploadEventMedia(files[i]);
-
-        uploadedMedia.push({
-          ...result,
-          fileIndex: i
-        });
+        uploadedMedia.push(result);
       }
-
-      const selectedCover = uploadedMedia.find(
-        item => item.fileIndex === Number(coverIndex)
-          && item.type === "image"
-      );
 
       button.textContent = "Publishing event...";
 
@@ -7027,8 +7021,8 @@ document.getElementById("createEventButton").addEventListener(
         location,
         description,
         registrationEnabled,
-        media: uploadedMedia.map(({ fileIndex, ...item }) => item),
-        coverUrl: selectedCover?.url || "",
+        media: uploadedMedia,
+        coverUrl: coverResult.url,
         published: true,
         createdBy: window.logicCurrentUser.uid,
         createdAt: serverTimestamp()
@@ -7042,11 +7036,13 @@ document.getElementById("createEventButton").addEventListener(
       document.getElementById("eventRegistrationEnabled").checked = false;
       document.getElementById("eventMedia").value = "";
       document.getElementById("eventMediaPreview").replaceChildren();
-      document.getElementById("eventCover").innerHTML =
-        '<option value="">Select a cover after choosing photos</option>';
+
+      window.clearEventCover();
 
       eventPreviewUrls.forEach(url => URL.revokeObjectURL(url));
       eventPreviewUrls = [];
+
+      window.logicNotify("Event created successfully.");
 
       window.logicNotify("Event created successfully.");
 
