@@ -1,8 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg"
      width="512" height="512"
      viewBox="0 0 512 512">
-  <image href="./logic-logo.png"
-         x="0" y="0"
-         width="512" height="512"
-         preserveAspectRatio="none"/>
+  <image
+    href="https://raw.githubusercontent.com/adefisayooluwademilade2-maker/logic-teens/main/logic-logo.png"
+    x="0" y="0"
+    width="512" height="512"
+    preserveAspectRatio="none"/>
 </svg>
