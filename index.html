@@ -419,7 +419,17 @@ body.bible-open header {
 body.notification-detail-open footer,
 body.notification-detail-open .bottom-nav {
   display: none !important;
+  }
+
+  body.event-details-open header,
+body.event-details-open footer,
+body.event-details-open .bottom-nav {
+  display: none !important;
 }
+
+body.event-details-open main {
+  padding-top: 12px;
+    }
 
 /* Remove the line above bottom navigation */
 .members-directory-tools {
@@ -755,7 +765,7 @@ body.notification-detail-open .bottom-nav {
   <section class="page" id="logicEventDetailsPage">
   <button onclick="openPage('event')"
     style="background:transparent;border:0;color:#d6b779;font-size:16px;padding:12px 0;">
-    ← Back to Events
+    ←
   </button>
   <div id="logicEventDetailsContent"></div>
   </section>
@@ -4173,6 +4183,10 @@ document.body.classList.toggle(
   );
   
   document.body.classList.toggle("bible-open", page === "bible");
+  document.body.classList.toggle(
+  "event-details-open",
+  page === "logicEventDetailsPage"
+);
   document.body.classList.toggle(
   "notification-detail-open",
   page === "notificationDetails"
