@@ -6939,12 +6939,12 @@ document.getElementById("createEventButton").addEventListener(
     }
 
     if (
-      files.length &&
-      !files.some(file => file.type.startsWith("image/"))
-    ) {
-      window.logicNotify("Choose at least one image for the event cover.");
-      return;
-    }
+  files.length &&
+  !files.some(file => eventFileKind(file) === "image")
+) {
+  window.logicNotify("Choose at least one image for the event cover.");
+  return;
+  }
 
     const button = document.getElementById("createEventButton");
     button.disabled = true;
