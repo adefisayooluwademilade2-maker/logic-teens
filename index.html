@@ -6799,15 +6799,12 @@ function renderLogicEvents() {
 
     details.appendChild(gallery);
 
-    detailsButton.addEventListener("click", () => {
-      details.hidden = !details.hidden;
-      detailsButton.textContent = details.hidden
-        ? "View Event Details"
-        : "Hide Event Details";
+        detailsButton.addEventListener("click", () => {
+      openLogicEventDetails(event);
     });
 
     actions.append(detailsButton, save);
-    content.append(location, actions, details);
+        content.append(location, actions);
     card.append(hero, content);
 
     return card;
