@@ -4152,6 +4152,15 @@ if (
   const target = document.getElementById(page);
   if (!target) return;
 
+    if (currentPage === "logicEventDetailsPage" && page !== currentPage) {
+    document
+      .querySelectorAll("#logicEventDetailsContent video")
+      .forEach(video => {
+        video.pause();
+        video.currentTime = 0;
+      });
+  }
+
   document.querySelectorAll(".page").forEach(p =>
     p.classList.remove("active")
   );
