@@ -2642,10 +2642,19 @@ body.management-page-open #ministryMemberProfile {
     return;
   }
 
-  // Safe fallback when the previous history entry is unavailable.
+  // Safe fallback without recording the profile as the previous page.
   openPage(returnPage, {
-    replaceHistory: true
+    skipHistory: true
   });
+
+  history.replaceState(
+    {
+      logicPage: returnPage,
+      logicDepartment: window.logicCurrentDepartment || ""
+    },
+    "",
+    "#" + returnPage
+  );
 
   if (returnPage === "adminApprovedPeople") {
     window.loadAdminApprovedPeople?.();
