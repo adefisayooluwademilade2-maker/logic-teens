@@ -8058,13 +8058,15 @@ document.getElementById("sendAnnouncementButton")
         collection(db, "users")
       );
 
-      const recipientIds = new Set(
-        usersSnapshot.docs.map(userDoc => userDoc.id)
-      );
+      const allRecipients = usersSnapshot.docs
+  .filter(userDoc => {
+    const settings =
+      userDoc.data().notificationSettings || {};
 
-      recipientIds.add(user.uid);
-
-      const allRecipients = Array.from(recipientIds);
+    return settings.enabled !== false &&
+           settings.churchAnnouncements !== false;
+  })
+  .map(userDoc => userDoc.id);
       const batchSize = 450;
 
       // Save in-app notifications.
