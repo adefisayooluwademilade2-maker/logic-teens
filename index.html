@@ -7924,6 +7924,107 @@ window.startNotificationListener(user);
   document.body.style.visibility = "visible";
 });
 
+// SEND ANNOUNCEMENT TO EVERY LOGIC TEENS ACCOUNT
+document.getElementById("sendAnnouncementButton")
+  .addEventListener("click", async () => {
+
+    const button = document.getElementById("sendAnnouncementButton");
+    const titleInput = document.getElementById("announcementTitle");
+    const messageInput = document.getElementById("announcementMessage");
+    const status = document.getElementById("announcementStatus");
+
+    const title = titleInput.value.trim();
+    const message = messageInput.value.trim();
+    const user = auth.currentUser;
+
+    if (!user) {
+      status.textContent = "Please sign in first.";
+      return;
+    }
+
+    if (!title || !message) {
+      status.textContent = "Enter both a title and a message.";
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Sending...";
+    status.textContent = "Sending to everyone...";
+
+    try {
+      // Confirm that the sender is an administrator.
+      const adminSnap = await getDoc(
+        doc(db, "admins", user.uid)
+      );
+
+      if (!adminSnap.exists()) {
+        throw new Error("You are not authorised to send announcements.");
+      }
+
+      // Get every registered account with a user profile.
+      const usersSnapshot = await getDocs(
+        collection(db, "users")
+      );
+
+      const recipientIds = new Set(
+        usersSnapshot.docs.map(userDoc => userDoc.id)
+      );
+
+      // Always include the sending administrator.
+      recipientIds.add(user.uid);
+
+      const allRecipients = Array.from(recipientIds);
+
+      // Firestore allows a maximum of 500 writes per batch.
+      const batchSize = 450;
+
+      for (let i = 0; i < allRecipients.length; i += batchSize) {
+
+        const batch = writeBatch(db);
+
+        const group = allRecipients.slice(
+          i,
+          i + batchSize
+        );
+
+        group.forEach(recipientId => {
+
+          const notificationRef = doc(
+            collection(db, "users", recipientId, "notifications")
+          );
+
+          batch.set(notificationRef, {
+            title: title,
+            message: message,
+            type: "announcement",
+            read: false,
+            createdAt: serverTimestamp()
+          });
+
+        });
+
+        await batch.commit();
+      }
+
+      status.textContent =
+        "Announcement sent successfully to " +
+        allRecipients.length + " accounts.";
+
+      titleInput.value = "";
+      messageInput.value = "";
+
+    } catch (error) {
+      console.error("Announcement sending error:", error);
+
+      status.textContent =
+        "Announcement could not be sent. Please try again.";
+    }
+
+    button.disabled = false;
+    button.textContent = "Send Announcement";
+
+  });
+  
 // Logout button
 document.getElementById("logoutButton").addEventListener("click", async () => {
   const button = document.getElementById("logoutButton");
