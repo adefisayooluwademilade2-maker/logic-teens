@@ -6993,12 +6993,23 @@ window.openEventMediaGallery = function(items) {
     "color:#d6b779;font-size:17px;";
 
   const close = document.createElement("button");
-  close.type = "button";
-  close.textContent = "✕";
   close.style.cssText =
-    "background:#1b1d2c;color:white;border:1px solid #36384a;border-radius:9px;padding:9px 13px;";
+  "width:30px;height:30px;padding:0;background:#1b1d2c;color:white;border:1px solid #36384a;border-radius:8px;font-size:13px;";
 
-  close.addEventListener("click", () => overlay.remove());
+history.pushState(
+  {...(history.state || {}), logicEventGallery:true},
+  "",
+  location.href
+);
+
+const closeGallery = () => {
+  overlay.remove();
+  window.removeEventListener("popstate", closeGallery);
+};
+
+window.addEventListener("popstate", closeGallery);
+
+close.addEventListener("click", () => history.back());
 
   header.append(heading, close);
   overlay.appendChild(header);
