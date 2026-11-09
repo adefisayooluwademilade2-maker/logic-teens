@@ -7046,6 +7046,106 @@ close.addEventListener("click", () => history.back());
   overlay.appendChild(grid);
   document.body.appendChild(overlay);
 };
+
+window.renderEventEditMediaPreview = function() {
+  const preview = document.getElementById("eventMediaPreview");
+
+  eventPreviewUrls.forEach(url => URL.revokeObjectURL(url));
+  eventPreviewUrls = [];
+  preview.replaceChildren();
+
+  preview.style.display = "grid";
+  preview.style.gridTemplateColumns = "repeat(3,minmax(0,1fr))";
+  preview.style.gap = "8px";
+
+  const newItems = (window.logicPendingEventMedia || []).map(file => {
+    const url = URL.createObjectURL(file);
+    eventPreviewUrls.push(url);
+    return {
+      file,
+      url,
+      type: eventFileKind(file),
+      isNew: true
+    };
+  });
+
+  const savedItems = (logicEditingEventData?.media || [])
+    .filter(item =>
+      item.url &&
+      item.url !== logicEditingEventData.coverUrl &&
+      !logicRemovedEventMediaUrls.has(item.url)
+    )
+    .map(item => ({...item, isNew:false}));
+
+  const allItems = [...newItems, ...savedItems];
+  const visibleItems = allItems.length > 4
+    ? allItems.slice(0, 3)
+    : allItems;
+
+  visibleItems.forEach(item => {
+    const board = document.createElement("div");
+    board.style.cssText =
+      "height:70px;position:relative;background:#1b1d2c;border-radius:8px;overflow:hidden;";
+
+    const media = item.type === "video"
+      ? document.createElement("video")
+      : document.createElement("img");
+
+    media.src = item.url;
+
+    if (item.type === "video") {
+      media.controls = true;
+      media.playsInline = true;
+    } else {
+      media.alt = "Event photo";
+    }
+
+    media.style.cssText =
+      "width:100%;height:100%;object-fit:cover;";
+
+    board.appendChild(media);
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "×";
+    remove.style.cssText =
+      "position:absolute;top:3px;right:3px;width:21px;height:21px;padding:0;border:0;border-radius:50%;background:#090a12;color:white;font-size:16px;z-index:2;";
+
+    remove.addEventListener("click", () => {
+      if (item.isNew) {
+        window.logicPendingEventMedia =
+          window.logicPendingEventMedia.filter(file => file !== item.file);
+        const transfer = new DataTransfer();
+        window.logicPendingEventMedia.forEach(file => transfer.items.add(file));
+        document.getElementById("eventMedia").files = transfer.files;
+      } else {
+        logicRemovedEventMediaUrls.add(item.url);
+      }
+
+      window.renderEventEditMediaPreview();
+    });
+
+    board.appendChild(remove);
+    preview.appendChild(board);
+  });
+
+  if (allItems.length > 4) {
+    const more = document.createElement("button");
+    more.type = "button";
+    more.textContent = "+" + (allItems.length - 3);
+    more.style.cssText =
+      "height:70px;background:#1b1d2c;color:#d6b779;border:1px solid #36384a;border-radius:8px;font-size:20px;font-weight:bold;";
+
+    more.addEventListener("click", () => {
+      window.openEventMediaGallery(allItems.slice(3));
+    });
+
+    preview.appendChild(more);
+  }
+
+  document.getElementById("cancelEventMediaButton").style.display =
+    allItems.length ? "block" : "none";
+};
   
 function startEditLogicEvent(event) {
   if (!window.logicIsAdmin) return;
