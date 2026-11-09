@@ -7720,21 +7720,25 @@ try {
   );
   }
 
-    const savedNotifications = data.notificationSettings;
+    const savedNotifications = data.notificationSettings || {};
 
-if (savedNotifications) {
-  document.getElementById("masterNotifications").checked =
-    savedNotifications.enabled !== false;
+[
+  "churchAnnouncements",
+  "bibleNotifications",
+  "eventReminders",
+  "ministryUpdates"
+].forEach(key => {
+  const input = document.getElementById(key);
+  if (!input) return;
 
-  ["churchAnnouncements", "bibleNotifications", "eventReminders", "ministryUpdates"].forEach(key => {
-    if (typeof savedNotifications[key] === "boolean") {
-      document.getElementById(key).checked =
-        savedNotifications[key];
-    }
-  });
-
-  window.updateNotificationControls?.();
-    }
+  if (typeof savedNotifications[key] === "boolean") {
+    input.checked = savedNotifications[key];
+    localStorage.setItem(
+      "logicNotification_" + key,
+      String(savedNotifications[key])
+    );
+  }
+});
 
        let accountProfile = {
       ...data,
