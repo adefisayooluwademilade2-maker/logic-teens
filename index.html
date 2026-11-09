@@ -7275,7 +7275,13 @@ function renderLogicEvents() {
       deleteCoverButton.addEventListener("click", async e => {
         e.stopPropagation();
         if (!window.logicIsAdmin) return;
-        if (!confirm("Delete this event permanently?")) return;
+        const confirmed = await window.logicConfirm(
+  "Delete this event permanently?",
+  "Delete Event",
+  "Delete"
+);
+
+if (!confirmed) return;
 
         try {
           await deleteDoc(doc(db, "events", event.id));
