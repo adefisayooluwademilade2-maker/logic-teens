@@ -8043,10 +8043,12 @@ document.getElementById("sendAnnouncementButton")
 
     button.disabled = true;
     button.textContent = "Sending...";
-    status.textContent = "Sending to everyone...";
+    status.textContent = "Sending announcement to everyone...";
+
+    let inAppSaved = false;
 
     try {
-      // Confirm that the sender is an administrator.
+      // Confirm administrator access.
       const adminSnap = await getDoc(
         doc(db, "admins", user.uid)
       );
@@ -8055,7 +8057,7 @@ document.getElementById("sendAnnouncementButton")
         throw new Error("You are not authorised to send announcements.");
       }
 
-      // Get every registered account with a user profile.
+      // Get all registered accounts.
       const usersSnapshot = await getDocs(
         collection(db, "users")
       );
@@ -8064,14 +8066,12 @@ document.getElementById("sendAnnouncementButton")
         usersSnapshot.docs.map(userDoc => userDoc.id)
       );
 
-      // Always include the sending administrator.
       recipientIds.add(user.uid);
 
       const allRecipients = Array.from(recipientIds);
-
-      // Firestore allows a maximum of 500 writes per batch.
       const batchSize = 450;
 
+      // Save in-app notifications.
       for (let i = 0; i < allRecipients.length; i += batchSize) {
 
         const batch = writeBatch(db);
@@ -8100,16 +8100,76 @@ document.getElementById("sendAnnouncementButton")
         await batch.commit();
       }
 
-            status.textContent = "Announcement sent successfully.";
+      inAppSaved = true;
 
       titleInput.value = "";
       messageInput.value = "";
 
+      status.textContent = "In-app announcement sent. Sending phone notifications...";
+
+      // Get a fresh Firebase login token.
+      const idToken = await user.getIdToken(true);
+
+      let cursor = null;
+      let totalSent = 0;
+      let totalFailed = 0;
+      let totalSkipped = 0;
+      let totalProcessed = 0;
+
+      // Send phone notifications in batches until all devices are checked.
+      do {
+        const response = await fetch(
+          "https://logic-teens-push.adefisayooluwademilade2.workers.dev/send",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + idToken
+            },
+            body: JSON.stringify({
+              title: title,
+              body: message,
+              url: "https://adefisayooluwademilade2-maker.github.io/logic-teens/?notification=announcement",
+              cursor: cursor
+            })
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          throw new Error(
+            result.error || "Phone notifications could not be sent."
+          );
+        }
+
+        totalSent += result.sent || 0;
+        totalFailed += result.failed || 0;
+        totalSkipped += result.skipped || 0;
+        totalProcessed += result.processed || 0;
+
+        cursor = result.nextCursor || null;
+
+        status.textContent =
+          "Checking devices... " + totalProcessed + " processed.";
+
+      } while (cursor);
+
+      status.textContent =
+        "Announcement sent successfully! Phone notifications sent: " +
+        totalSent +
+        ". Failed: " +
+        totalFailed +
+        ". Skipped: " +
+        totalSkipped +
+        ".";
+
     } catch (error) {
       console.error("Announcement sending error:", error);
 
-      status.textContent =
-        "Announcement could not be sent. Please try again.";
+      status.textContent = inAppSaved
+        ? "In-app announcement was sent, but phone notifications stopped: " + error.message
+        : error.message || "Announcement could not be sent. Please try again.";
     }
 
     button.disabled = false;
