@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "logic-teens-v2";
+const CACHE_NAME = "logic-teens-v3";
 
 const APP_FILES = [
   "./",
@@ -10,14 +10,10 @@ const APP_FILES = [
 
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(APP_FILES))
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(APP_FILES))
+      .then(() => self.skipWaiting())
   );
-});
-
-self.addEventListener("message", event => {
-  if (event.data === "ACTIVATE_UPDATE") {
-    self.skipWaiting();
-  }
 });
 
 self.addEventListener("activate", event => {
