@@ -7651,8 +7651,8 @@ document.getElementById("eventMedia").addEventListener("change", () => {
 
     const item = document.createElement("div");
     item.style.cssText =
-      "height:90px;background:#1b1d2c;border-radius:8px;overflow:hidden;";
-
+      "height:70px;background:#1b1d2c;border-radius:8px;overflow:hidden;";
+    
     if (kind === "video") {
       const video = document.createElement("video");
       video.src = url;
@@ -7666,7 +7666,7 @@ document.getElementById("eventMedia").addEventListener("change", () => {
       image.src = url;
       image.alt = "Event photo";
       image.style.cssText =
-        "width:100%;height:100%;object-fit:cover;";
+        "width:100%;height:100%;object-fit:contain;;";
       item.appendChild(image);
     }
 
