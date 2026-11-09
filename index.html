@@ -218,6 +218,32 @@ input,textarea,select {
   font-weight:bold;
   cursor:pointer;
 }
+
+.event-registration-toggle {
+  appearance:none;
+  -webkit-appearance:none;
+  width:19px !important;
+  height:19px;
+  flex:0 0 19px;
+  margin:0 !important;
+  border:1px solid #d6b779;
+  border-radius:5px;
+  background:#1b1d2c;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+}
+
+.event-registration-toggle:checked {
+  background:#d6b779;
+}
+
+.event-registration-toggle:checked::after {
+  content:"✓";
+  color:#090a12;
+  font-size:14px;
+  font-weight:bold;
+  }
   
   .primary:disabled {
   opacity:0.5;
@@ -813,8 +839,8 @@ body.event-details-open main {
       placeholder="Describe the event"></textarea>
 
     <label style="display:flex;align-items:center;gap:10px;margin-top:16px;">
-  <input id="eventRegistrationEnabled" type="checkbox"
-    style="width:18px;height:18px;margin:0;accent-color:#d6b779;">
+  <input id="eventRegistrationEnabled" class="event-registration-toggle"
+  type="checkbox">
   Enable event registration
 </label>
 
