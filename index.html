@@ -7451,18 +7451,15 @@ document.getElementById("eventCoverFile").addEventListener("change", () => {
 
 document.getElementById("eventMedia").addEventListener("change", () => {
   const input = document.getElementById("eventMedia");
-  const newFiles = Array.from(input.files);
+  const newlySelected = Array.from(input.files);
+  const previous = window.logicPendingEventMedia || [];
   const combined = new DataTransfer();
 
-  const existing = Array.from(input.dataset.previousFiles ? [] : input.files);
-
-  const allFiles = window.logicPendingEventMedia || [];
-
-  [...allFiles, ...newFiles].forEach(file => {
-    const duplicate = Array.from(combined.files).some(existingFile =>
-      existingFile.name === file.name &&
-      existingFile.size === file.size &&
-      existingFile.lastModified === file.lastModified
+  [...previous, ...newlySelected].forEach(file => {
+    const duplicate = Array.from(combined.files).some(existing =>
+      existing.name === file.name &&
+      existing.size === file.size &&
+      existing.lastModified === file.lastModified
     );
 
     if (!duplicate) combined.items.add(file);
@@ -7490,6 +7487,7 @@ document.getElementById("eventMedia").addEventListener("change", () => {
       const video = document.createElement("video");
       video.src = url;
       video.controls = true;
+      video.playsInline = true;
       video.style.cssText =
         "width:100%;height:90px;object-fit:cover;";
       item.appendChild(video);
