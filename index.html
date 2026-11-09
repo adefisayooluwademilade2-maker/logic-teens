@@ -8192,7 +8192,7 @@ window.openDailyVerse = async function() {
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     let reloading = false;
-    let currentVersion = null;
+    let currentCommit = null;
 
     const reloadOnce = () => {
       if (!reloading) {
@@ -8217,27 +8217,31 @@ if ("serviceWorker" in navigator) {
           await registration.update();
 
           const response = await fetch(
-            "./version.json?t=" + Date.now(),
+            "https://api.github.com/repos/adefisayooluwademilade2-maker/logic-teens/commits?sha=main&per_page=1&t=" + Date.now(),
             { cache: "no-store" }
           );
 
           if (!response.ok) return;
 
-          const data = await response.json();
+          const commits = await response.json();
 
-          if (currentVersion === null) {
-            currentVersion = data.version;
-          } else if (data.version !== currentVersion) {
+          if (!commits.length) return;
+
+          const latestCommit = commits[0].sha;
+
+          if (currentCommit === null) {
+            currentCommit = latestCommit;
+          } else if (latestCommit !== currentCommit) {
             reloadOnce();
           }
 
         } catch (error) {
-          console.log("Update check will retry later.");
+          console.log("Automatic update check will retry.");
         }
       };
 
       await checkForUpdates();
-      setInterval(checkForUpdates, 60000);
+      setInterval(checkForUpdates, 300000);
 
       document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "visible") {
@@ -8245,13 +8249,14 @@ if ("serviceWorker" in navigator) {
         }
       });
 
+      console.log("LOGIC TEENS automatic updates enabled.");
+
     } catch (error) {
       console.error("PWA registration failed:", error);
     }
   });
 }
-</script>
-
+            </script>
   
 </body>
 </html>
