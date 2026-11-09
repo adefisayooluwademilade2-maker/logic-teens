@@ -257,6 +257,7 @@ input,textarea,select {
   
 /* SETTINGS TOGGLE SWITCHES */
 #masterNotifications,
+#phoneNotifications,
 .notification-option {
   appearance: none;
   -webkit-appearance: none;
@@ -286,16 +287,19 @@ input,textarea,select {
 }
 
 #masterNotifications:checked,
+   #phoneNotifications:checked,
 .notification-option:checked {
   background: #008751;
 }
 
 #masterNotifications:checked::before,
+  #phoneNotifications:checked::before,
 .notification-option:checked::before {
   transform: translateX(21px);
 }
 
 #masterNotifications:disabled,
+  #phoneNotifications:disabled,
 .notification-option:disabled {
   opacity: .4;
   cursor: not-allowed;
@@ -3530,19 +3534,13 @@ document.getElementById("profilePictureInput")
     </p>
     </div>
 
-  <div class="panel" style="margin-top:18px">
+    <div class="panel" style="margin-top:18px">
     <label style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-      <span>
-        <strong>Notifications</strong>
-        <small style="display:block;color:#aaa;margin-top:5px">
-          Turn all notifications on or off.
-        </small>
-      </span>
-      <input id="masterNotifications" type="checkbox"
-        style="width:22px;height:22px"
-        onchange="toggleAllNotificationSettings(this.checked)">
+      <strong>Phone Notifications</strong>
+      <input id="phoneNotifications" type="checkbox"
+        onchange="window.setLogicPhoneNotifications(this.checked)">
     </label>
-  </div>
+    </div>
 
   <h3 style="margin-top:25px">Choose what you receive</h3>
 
@@ -3616,6 +3614,12 @@ const notificationKeys = [
 function loadNotificationSettings() {
   const master = document.getElementById("masterNotifications");
   if (!master) return;
+    const phoneToggle = document.getElementById("phoneNotifications");
+
+  if (phoneToggle) {
+    phoneToggle.checked =
+      localStorage.getItem("logicPhoneNotificationsEnabled") === "true";
+  }
 
   master.checked =
     localStorage.getItem("logicNotificationsEnabled") !== "false";
@@ -4649,42 +4653,45 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-window.enableLogicPhoneNotifications = async function() {
-  const status = document.getElementById("phoneNotificationStatus");
-  const button = document.getElementById("enablePhoneNotifications");
+window.setLogicPhoneNotifications = async function(enabled) {
+  const toggle = document.getElementById("phoneNotifications");
+  const user = window.logicCurrentUser;
+  const deviceId = localStorage.getItem("logicPushDeviceId");
+
+  toggle.disabled = true;
 
   try {
-    const user = window.logicCurrentUser;
+    if (!enabled) {
+      if (user && deviceId) {
+        await deleteDoc(
+          doc(db, "users", user.uid, "pushTokens", deviceId)
+        );
+      }
+
+      localStorage.setItem("logicPhoneNotificationsEnabled", "false");
+      return;
+    }
 
     if (!user || !user.emailVerified) {
-      status.textContent = "Please sign in first.";
-      return;
+      throw new Error("Please sign in first.");
     }
 
     if (!("Notification" in window) ||
-        !("serviceWorker" in navigator)) {
-      status.textContent = "Your browser does not support phone notifications.";
-      return;
+        !("serviceWorker" in navigator) ||
+        !(await isSupported())) {
+      throw new Error("Phone notifications are not supported.");
     }
 
-    if (!(await isSupported())) {
-      status.textContent = "Phone notifications are not supported on this browser.";
-      return;
-    }
-
-    button.disabled = true;
-    status.textContent = "Requesting notification permission...";
-
-    const permission = await Notification.requestPermission();
+    const permission =
+      Notification.permission === "granted"
+        ? "granted"
+        : await Notification.requestPermission();
 
     if (permission !== "granted") {
-      status.textContent = "Notification permission was not granted.";
-      return;
+      throw new Error("Notification permission was not granted.");
     }
 
     const registration = await navigator.serviceWorker.ready;
-
-    status.textContent = "Registering this device...";
 
     const token = await getToken(getMessaging(app), {
       vapidKey: "BIzKv2c6mTotg0SRmooJKfvcrlvMRS0IHtsirtqscJOyUA7AHW24NKkjNqDpRIE-ofbnEbdsjVVBYbTpdDSj7dE",
@@ -4692,18 +4699,18 @@ window.enableLogicPhoneNotifications = async function() {
     });
 
     if (!token) {
-      throw new Error("Firebase did not return a device token.");
+      throw new Error("No notification token was returned.");
     }
 
-    let deviceId = localStorage.getItem("logicPushDeviceId");
+    let currentDeviceId = deviceId;
 
-    if (!deviceId) {
-      deviceId = crypto.randomUUID();
-      localStorage.setItem("logicPushDeviceId", deviceId);
+    if (!currentDeviceId) {
+      currentDeviceId = crypto.randomUUID();
+      localStorage.setItem("logicPushDeviceId", currentDeviceId);
     }
 
     await setDoc(
-      doc(db, "users", user.uid, "pushTokens", deviceId),
+      doc(db, "users", user.uid, "pushTokens", currentDeviceId),
       {
         token: token,
         platform: "web",
@@ -4712,12 +4719,14 @@ window.enableLogicPhoneNotifications = async function() {
       { merge: true }
     );
 
-    status.textContent = "Phone notifications are enabled on this device.";
+    localStorage.setItem("logicPhoneNotificationsEnabled", "true");
+
   } catch (error) {
-    console.error("Phone notification setup error:", error);
-    status.textContent = "Could not enable notifications. Please try again.";
+    console.error("Phone notification error:", error);
+    toggle.checked = false;
+    localStorage.setItem("logicPhoneNotificationsEnabled", "false");
   } finally {
-    button.disabled = false;
+    toggle.disabled = false;
   }
 };
   
