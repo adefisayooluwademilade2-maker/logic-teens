@@ -8188,24 +8188,12 @@ window.openDailyVerse = async function() {
 </script>
 
 
+
 <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
-    let reloading = false;
     let currentCommit = null;
-
-    const reloadOnce = () => {
-      if (!reloading) {
-        reloading = true;
-        window.location.reload();
-      }
-    };
-
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (navigator.serviceWorker.controller) {
-        reloadOnce();
-      }
-    });
+    let updateAvailable = false;
 
     try {
       const registration = await navigator.serviceWorker.register(
@@ -8224,7 +8212,6 @@ if ("serviceWorker" in navigator) {
           if (!response.ok) return;
 
           const commits = await response.json();
-
           if (!commits.length) return;
 
           const latestCommit = commits[0].sha;
@@ -8232,7 +8219,12 @@ if ("serviceWorker" in navigator) {
           if (currentCommit === null) {
             currentCommit = latestCommit;
           } else if (latestCommit !== currentCommit) {
-            reloadOnce();
+            updateAvailable = true;
+            currentCommit = latestCommit;
+
+            console.log(
+              "LOGIC TEENS update ready. It will apply when the app is reopened or reloaded."
+            );
           }
 
         } catch (error) {
@@ -8256,7 +8248,8 @@ if ("serviceWorker" in navigator) {
     }
   });
 }
-            </script>
+</script>
+
   
 </body>
 </html>
