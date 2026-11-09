@@ -8188,15 +8188,22 @@ window.openDailyVerse = async function() {
 </script>
 
 
+<script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     let reloading = false;
-    const hadController = !!navigator.serviceWorker.controller;
+    let currentVersion = null;
 
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (hadController && !reloading) {
+    const reloadOnce = () => {
+      if (!reloading) {
         reloading = true;
         window.location.reload();
+      }
+    };
+
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (navigator.serviceWorker.controller) {
+        reloadOnce();
       }
     });
 
@@ -8208,13 +8215,28 @@ if ("serviceWorker" in navigator) {
       const checkForUpdates = async () => {
         try {
           await registration.update();
+
+          const response = await fetch(
+            "./version.json?t=" + Date.now(),
+            { cache: "no-store" }
+          );
+
+          if (!response.ok) return;
+
+          const data = await response.json();
+
+          if (currentVersion === null) {
+            currentVersion = data.version;
+          } else if (data.version !== currentVersion) {
+            reloadOnce();
+          }
+
         } catch (error) {
           console.log("Update check will retry later.");
         }
       };
 
       await checkForUpdates();
-
       setInterval(checkForUpdates, 60000);
 
       document.addEventListener("visibilitychange", () => {
@@ -8223,13 +8245,12 @@ if ("serviceWorker" in navigator) {
         }
       });
 
-      console.log("LOGIC TEENS automatic updates enabled.");
-
     } catch (error) {
       console.error("PWA registration failed:", error);
     }
   });
 }
+</script>
 
   
 </body>
