@@ -6979,8 +6979,10 @@ function startEditLogicEvent(event) {
   document.getElementById("eventRegistrationEnabled").checked =
     event.registrationEnabled === true;
 
-  document.getElementById("eventCoverFile").value = "";
+    document.getElementById("eventCoverFile").value = "";
   document.getElementById("eventMedia").value = "";
+  window.logicPendingEventMedia = [];
+  document.getElementById("cancelEventMediaButton").style.display = "none";
   document.getElementById("eventMediaPreview").replaceChildren();
 
   if (event.coverUrl) {
