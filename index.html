@@ -7192,6 +7192,8 @@ window.cancelEventEdit = function() {
   logicEditingEventId = null;
   logicEditingEventData = null;
 
+  logicRemovedEventMediaUrls = new Set();
+  
   document.getElementById("eventTitle").value = "";
   document.getElementById("eventDate").value = "";
   document.getElementById("eventTime").value = "";
@@ -7208,6 +7210,8 @@ window.cancelEventEdit = function() {
 
   document.getElementById("createEventButton").textContent = "Create Event";
   document.getElementById("cancelEventEditButton").style.display = "none";
+
+  openPage("event");
 };
 
   function openLogicEventDetails(event) {
