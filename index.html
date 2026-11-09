@@ -7765,28 +7765,58 @@ document.getElementById("cancelEventMediaButton").addEventListener("click", () =
   const preview = document.getElementById("eventMediaPreview");
   preview.replaceChildren();
 
-  if (logicEditingEventData) {
-    (logicEditingEventData.media || []).forEach(item => {
-      if (!item.url || item.url === logicEditingEventData.coverUrl) return;
+if (logicEditingEventData) {
+  const existingMedia = (logicEditingEventData.media || []).filter(
+    item => item.url && item.url !== logicEditingEventData.coverUrl
+  );
 
-      const element = item.type === "video"
-        ? document.createElement("video")
-        : document.createElement("img");
+  preview.style.display = "grid";
+  preview.style.gridTemplateColumns = "repeat(3,minmax(0,1fr))";
+  preview.style.gap = "8px";
 
-      element.src = item.url;
+  const visibleMedia = existingMedia.length > 4
+    ? existingMedia.slice(0, 3)
+    : existingMedia;
 
-      if (item.type === "video") {
-        element.controls = true;
-        element.playsInline = true;
-      }
+  visibleMedia.forEach(item => {
+    const board = document.createElement("div");
+    board.style.cssText =
+      "height:70px;background:#1b1d2c;border-radius:8px;overflow:hidden;";
 
-      element.style.cssText =
-        "width:100%;height:90px;object-fit:cover;border-radius:8px;";
+    const media = item.type === "video"
+      ? document.createElement("video")
+      : document.createElement("img");
 
-      preview.appendChild(element);
+    media.src = item.url;
+
+    if (item.type === "video") {
+      media.controls = true;
+      media.playsInline = true;
+    } else {
+      media.alt = "Event photo";
+    }
+
+    media.style.cssText =
+      "width:100%;height:100%;object-fit:cover;";
+
+    board.appendChild(media);
+    preview.appendChild(board);
+  });
+
+  if (existingMedia.length > 4) {
+    const more = document.createElement("button");
+    more.type = "button";
+    more.textContent = "+" + (existingMedia.length - 3);
+    more.style.cssText =
+      "height:70px;background:#1b1d2c;color:#d6b779;border:1px solid #36384a;border-radius:8px;font-size:20px;font-weight:bold;";
+
+    more.addEventListener("click", () => {
+      window.openEventMediaGallery(existingMedia);
     });
-  }
 
+    preview.appendChild(more);
+  }
+  }
   document.getElementById("cancelEventMediaButton").style.display = "none";
 });
   
