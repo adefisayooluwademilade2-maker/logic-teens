@@ -4626,7 +4626,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
+let logicForegroundListenerStarted = false;
+  
 window.setLogicPhoneNotifications = async function(enabled) {
   const toggle = document.getElementById("phoneNotifications");
   const status = document.getElementById("phoneNotificationsStatus");
@@ -4698,6 +4699,26 @@ window.setLogicPhoneNotifications = async function(enabled) {
       { merge: true }
     );
 
+if (!logicForegroundListenerStarted) {
+  onMessage(getMessaging(app), async payload => {
+    const data = payload.data || {};
+    const notification = payload.notification || {};
+    const registration = await navigator.serviceWorker.ready;
+
+    await registration.showNotification(
+      notification.title || data.title || "LOGIC TEENS",
+      {
+        body: notification.body || data.body || "You have a new notification.",
+        data: {
+          url: data.url || "./"
+        }
+      }
+    );
+  });
+
+  logicForegroundListenerStarted = true;
+  }
+  
     localStorage.setItem("logicPhoneNotificationsEnabled", "true");
 
     toggle.checked = true;
