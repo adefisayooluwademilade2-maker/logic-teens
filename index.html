@@ -7047,7 +7047,9 @@ window.cancelEventEdit = function() {
   document.getElementById("eventLocation").value = "";
   document.getElementById("eventDescription").value = "";
   document.getElementById("eventRegistrationEnabled").checked = false;
-  document.getElementById("eventMedia").value = "";
+    document.getElementById("eventMedia").value = "";
+  window.logicPendingEventMedia = [];
+  document.getElementById("cancelEventMediaButton").style.display = "none";
   document.getElementById("eventMediaPreview").replaceChildren();
 
   window.clearEventCover();
@@ -7507,7 +7509,41 @@ document.getElementById("eventMedia").addEventListener("change", () => {
     window.logicPendingEventMedia.length ? "block" : "none";
 });
 
+document.getElementById("cancelEventMediaButton").addEventListener("click", () => {
+  document.getElementById("eventMedia").value = "";
+  window.logicPendingEventMedia = [];
 
+  eventPreviewUrls.forEach(url => URL.revokeObjectURL(url));
+  eventPreviewUrls = [];
+
+  const preview = document.getElementById("eventMediaPreview");
+  preview.replaceChildren();
+
+  if (logicEditingEventData) {
+    (logicEditingEventData.media || []).forEach(item => {
+      if (!item.url || item.url === logicEditingEventData.coverUrl) return;
+
+      const element = item.type === "video"
+        ? document.createElement("video")
+        : document.createElement("img");
+
+      element.src = item.url;
+
+      if (item.type === "video") {
+        element.controls = true;
+        element.playsInline = true;
+      }
+
+      element.style.cssText =
+        "width:100%;height:90px;object-fit:cover;border-radius:8px;";
+
+      preview.appendChild(element);
+    });
+  }
+
+  document.getElementById("cancelEventMediaButton").style.display = "none";
+});
+  
 // UPLOAD EVENT MEDIA
 async function uploadEventMedia(file) {
   const user = window.logicCurrentUser;
