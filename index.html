@@ -8060,6 +8060,13 @@ try {
     console.error("Profile loading error:", error);
   }
 
+if (
+  localStorage.getItem("logicPhoneNotificationsEnabled") === "true" &&
+  Notification.permission === "granted"
+) {
+  await window.setLogicPhoneNotifications(true);
+}
+  
 window.startNotificationListener(user);
   updateTimeGreeting(user);
   document.body.style.visibility = "visible";
