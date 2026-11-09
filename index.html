@@ -7855,34 +7855,45 @@ document.getElementById("createEventButton").addEventListener(
     button.disabled = true;
 
     try {
-      let uploadedMedia = isEditing
-        ? [...(logicEditingEventData.media || [])]
-        : [];
+      const savedMedia = isEditing
+  ? (logicEditingEventData.media || []).filter(item =>
+      !logicRemovedEventMediaUrls.has(item.url)
+    )
+  : [];
 
-      let coverUrl = isEditing
-        ? logicEditingEventData.coverUrl
-        : "";
+let uploadedMedia = savedMedia;
 
-      button.textContent = isEditing
-        ? "Saving changes..."
-        : "Creating event...";
+let coverUrl = isEditing
+  ? logicEditingEventData.coverUrl
+  : "";
 
-      if (coverFile) {
-        const coverResult = await uploadEventMedia(coverFile);
+button.textContent = isEditing
+  ? "Saving changes..."
+  : "Creating event...";
 
-        uploadedMedia = uploadedMedia.filter(
-          item => item.url !== coverUrl
-        );
+if (coverFile) {
+  const coverResult = await uploadEventMedia(coverFile);
 
-        uploadedMedia.unshift(coverResult);
-        coverUrl = coverResult.url;
-      }
+  uploadedMedia = uploadedMedia.filter(
+    item => item.url !== coverUrl
+  );
 
-      for (const file of files) {
-        button.textContent = "Uploading media...";
-        const result = await uploadEventMedia(file);
-        uploadedMedia.push(result);
-      }
+  uploadedMedia.unshift(coverResult);
+  coverUrl = coverResult.url;
+}
+
+const newlyUploadedMedia = [];
+
+for (const file of files) {
+  button.textContent = "Uploading media...";
+  const result = await uploadEventMedia(file);
+  newlyUploadedMedia.push(result);
+}
+
+const insertionIndex =
+  uploadedMedia.findIndex(item => item.url === coverUrl) === 0 ? 1 : 0;
+
+uploadedMedia.splice(insertionIndex, 0, ...newlyUploadedMedia);
 
       const eventData = {
         title,
