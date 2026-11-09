@@ -7091,7 +7091,7 @@ function startEditLogicEvent(event) {
   visibleExistingMedia.forEach(item => {
     const previewItem = document.createElement("div");
     previewItem.style.cssText =
-      "height:70px;background:#1b1d2c;border-radius:8px;overflow:hidden;";
+      "height:70px;position:relative;background:#1b1d2c;border-radius:8px;overflow:hidden;";
 
     if (item.type === "video") {
       const video = document.createElement("video");
@@ -7111,6 +7111,19 @@ function startEditLogicEvent(event) {
       previewItem.appendChild(image);
     }
 
+const remove = document.createElement("button");
+remove.type = "button";
+remove.textContent = "×";
+remove.style.cssText =
+  "position:absolute;top:3px;right:3px;width:21px;height:21px;padding:0;border:0;border-radius:50%;background:#090a12;color:white;font-size:16px;z-index:2;";
+
+remove.addEventListener("click", () => {
+  logicRemovedEventMediaUrls.add(item.url);
+  previewItem.remove();
+});
+
+previewItem.appendChild(remove);
+  
     mediaPreview.appendChild(previewItem);
   });
 
