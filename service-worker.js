@@ -49,7 +49,7 @@ self.addEventListener("activate", event => {
 messaging.onBackgroundMessage(payload => {
   const data = payload.data || {};
 
-  self.registration.showNotification(
+  return self.registration.showNotification(
     data.title || "LOGIC TEENS",
     {
       body: data.body || "You have a new notification.",
