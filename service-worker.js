@@ -1,5 +1,23 @@
 
-const CACHE_NAME = "logic-teens-v3";
+importScripts(
+  "https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"
+);
+importScripts(
+  "https://www.gstatic.com/firebasejs/12.19.0/firebase-messaging-compat.js"
+);
+
+firebase.initializeApp({
+  apiKey: "AIzaSyA3rI1PVBHOGN24VLqgAKBiI50BkYlXW_o",
+  authDomain: "logic-teens.firebaseapp.com",
+  projectId: "logic-teens",
+  storageBucket: "logic-teens.firebasestorage.app",
+  messagingSenderId: "542931056170",
+  appId: "1:542931056170:web:7c9f7951bd5150618f3553"
+});
+
+const messaging = firebase.messaging();
+
+const CACHE_NAME = "logic-teens-v4";
 
 const APP_FILES = [
   "./",
@@ -25,6 +43,46 @@ self.addEventListener("activate", event => {
           .map(key => caches.delete(key))
       )
     ).then(() => self.clients.claim())
+  );
+});
+
+messaging.onBackgroundMessage(payload => {
+  const data = payload.data || {};
+
+  self.registration.showNotification(
+    data.title || "LOGIC TEENS",
+    {
+      body: data.body || "You have a new notification.",
+      icon: "./logic-app-icon.png",
+      badge: "./logic-app-icon.png",
+      data: {
+        url: data.url || "./"
+      }
+    }
+  );
+});
+
+self.addEventListener("notificationclick", event => {
+  event.notification.close();
+
+  const targetUrl = new URL(
+    event.notification.data?.url || "./",
+    self.location.origin
+  ).href;
+
+  event.waitUntil(
+    clients.matchAll({
+      type: "window",
+      includeUncontrolled: true
+    }).then(windowClients => {
+      for (const client of windowClients) {
+        if ("focus" in client) {
+          return client.navigate(targetUrl).then(() => client.focus());
+        }
+      }
+
+      return clients.openWindow(targetUrl);
+    })
   );
 });
 
