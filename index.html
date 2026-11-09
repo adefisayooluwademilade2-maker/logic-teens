@@ -6505,16 +6505,21 @@ window.rejectTeamApplication = async function(applicationId) {
   });
 };
 
-  window.saveNotificationSettingsToFirebase = async function() {
+  // SAVE NOTIFICATION PREFERENCES TO FIREBASE
+window.saveNotificationSettingsToFirebase = async function() {
   const user = auth.currentUser;
   if (!user) return;
 
   const settings = {
-    enabled: document.getElementById("masterNotifications").checked,
-    churchAnnouncements: document.getElementById("churchAnnouncements").checked,
-    bibleNotifications: document.getElementById("bibleNotifications").checked,
-    eventReminders: document.getElementById("eventReminders").checked,
-    ministryUpdates: document.getElementById("ministryUpdates").checked
+    enabled: true,
+    churchAnnouncements:
+      document.getElementById("churchAnnouncements")?.checked !== false,
+    bibleNotifications:
+      document.getElementById("bibleNotifications")?.checked !== false,
+    eventReminders:
+      document.getElementById("eventReminders")?.checked !== false,
+    ministryUpdates:
+      document.getElementById("ministryUpdates")?.checked !== false
   };
 
   try {
@@ -6525,6 +6530,9 @@ window.rejectTeamApplication = async function(applicationId) {
     );
   } catch (error) {
     console.error("Notification settings error:", error);
+    if (window.logicNotify) {
+      window.logicNotify("Could not save notification settings.");
+    }
   }
 };
 
