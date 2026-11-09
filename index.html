@@ -1813,7 +1813,7 @@ body.admin-user #ministry .ministry-actions {
   <label for="announcementMessage">Message</label>
   <textarea
     id="announcementMessage"
-    rows="6"
+    rows="10"
     placeholder="Write your announcement..."
   ></textarea>
 
@@ -8006,9 +8006,7 @@ document.getElementById("sendAnnouncementButton")
         await batch.commit();
       }
 
-      status.textContent =
-        "Announcement sent successfully to " +
-        allRecipients.length + " accounts.";
+            status.textContent = "Announcement sent successfully.";
 
       titleInput.value = "";
       messageInput.value = "";
@@ -8352,16 +8350,14 @@ if ("serviceWorker" in navigator) {
 
           const latestCommit = commits[0].sha;
 
-          if (currentCommit === null) {
+                    if (currentCommit === null) {
             currentCommit = latestCommit;
           } else if (latestCommit !== currentCommit) {
-            updateAvailable = true;
             currentCommit = latestCommit;
 
-            console.log(
-              "LOGIC TEENS update ready. It will apply when the app is reopened or reloaded."
-            );
-          }
+            console.log("LOGIC TEENS update detected. Refreshing app...");
+            window.location.reload();
+                    }
 
         } catch (error) {
           console.log("Automatic update check will retry.");
