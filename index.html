@@ -4465,25 +4465,25 @@ window.logicRequestedStartingPage = startingPage;
 window.logicCurrentDepartment =
   history.state?.logicDepartment || "";
 
-openPage(startingPage, { skipHistory: true });
+openPage("home", { skipHistory: true });
 
 history.replaceState(
   {
-    logicPage: startingPage,
+    logicPage: "home",
     logicDepartment: window.logicCurrentDepartment
   },
   "",
-  "#" + startingPage
+  "#home"
 );
 
 // Keep the user inside the lounge when using phone Back
 history.pushState(
   {
-    logicPage: startingPage,
+    logicPage: "home",
     logicDepartment: window.logicCurrentDepartment
   },
   "",
-  "#" + startingPage
+  "#home"
 );
 
 
