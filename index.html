@@ -7059,10 +7059,14 @@ function startEditLogicEvent(event) {
   mediaPreview.style.gridTemplateColumns = "repeat(2,minmax(0,1fr))";
   mediaPreview.style.gap = "8px";
 
-  existingMedia.slice(0, 4).forEach(item => {
+    const visibleExistingMedia = existingMedia.length > 4
+    ? existingMedia.slice(0, 3)
+    : existingMedia;
+
+  visibleExistingMedia.forEach(item => {
     const previewItem = document.createElement("div");
     previewItem.style.cssText =
-      "height:90px;background:#1b1d2c;border-radius:8px;overflow:hidden;";
+      "height:70px;background:#1b1d2c;border-radius:8px;overflow:hidden;";
 
     if (item.type === "video") {
       const video = document.createElement("video");
@@ -7071,19 +7075,33 @@ function startEditLogicEvent(event) {
       video.playsInline = true;
       video.preload = "metadata";
       video.style.cssText =
-        "width:100%;height:100%;object-fit:cover;";
+        "width:100%;height:100%;object-fit:contain;";
       previewItem.appendChild(video);
     } else {
       const image = document.createElement("img");
       image.src = item.url;
       image.alt = "Event photo";
       image.style.cssText =
-        "width:100%;height:100%;object-fit:cover;";
+        "width:100%;height:100%;object-fit:contain;";
       previewItem.appendChild(image);
     }
 
     mediaPreview.appendChild(previewItem);
   });
+
+  if (existingMedia.length > 4) {
+    const more = document.createElement("button");
+    more.type = "button";
+    more.textContent = "+" + (existingMedia.length - 3);
+    more.style.cssText =
+      "height:70px;background:#1b1d2c;color:#d6b779;border:1px solid #36384a;border-radius:8px;font-size:20px;font-weight:bold;";
+
+    more.addEventListener("click", () => {
+      window.openEventMediaGallery(existingMedia);
+    });
+
+    mediaPreview.appendChild(more);
+  }
   
   document.getElementById("createEventButton").textContent = "Save Changes";
   document.getElementById("cancelEventEditButton").style.display = "block";
