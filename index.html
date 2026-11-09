@@ -4460,6 +4460,8 @@ const startingPage = validPages.includes(savedPage)
   ? savedPage
   : "home";
 
+window.logicRequestedStartingPage = startingPage;
+  
 window.logicCurrentDepartment =
   history.state?.logicDepartment || "";
 
