@@ -1789,7 +1789,41 @@ body.admin-user #ministry .ministry-actions {
 
 </section>
   
-  
+<section class="page" id="adminAnnouncements">
+
+  <button class="directory-back"
+    onclick="openPage('adminDashboard')"
+    style="background:transparent;border:0;color:white;padding:8px 0;">
+    ←
+  </button>
+
+  <div class="eyebrow">STAY CONNECTED</div>
+  <h1>Announcements</h1>
+  <p class="subtitle">Send an important message to everyone in LOGIC Teens.</p>
+
+  <label for="announcementTitle">Title</label>
+  <input
+    type="text"
+    id="announcementTitle"
+    placeholder="Enter announcement title"
+    maxlength="100"
+  >
+
+  <label for="announcementMessage">Message</label>
+  <textarea
+    id="announcementMessage"
+    rows="6"
+    placeholder="Write your announcement..."
+  ></textarea>
+
+  <button class="primary" type="button" id="sendAnnouncementButton">
+    Send Announcement
+  </button>
+
+  <p id="announcementStatus" class="subtitle"></p>
+
+</section>
+
 <section class="page" id="adminManagement">
 
   <button class="directory-back"
