@@ -7813,8 +7813,9 @@ document.getElementById("createEventButton").addEventListener(
         });
       }
 
-      window.cancelEventEdit();
-
+            window.cancelEventEdit();
+      openPage("adminEventManager");
+  
       eventPreviewUrls.forEach(url => URL.revokeObjectURL(url));
       eventPreviewUrls = [];
 
