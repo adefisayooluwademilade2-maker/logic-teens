@@ -7284,7 +7284,7 @@ function renderLogicEvents() {
     const hero = document.createElement("div");
     hero.style.cssText =
       "height:210px;position:relative;background:linear-gradient(135deg,#302543,#171526);";
-
+    
     if (event.coverUrl) {
       const image = document.createElement("img");
       image.src = event.coverUrl;
@@ -7294,6 +7294,27 @@ function renderLogicEvents() {
       hero.appendChild(image);
     }
 
+        const status = getEventStatus(event);
+
+    const statusBadge = document.createElement("span");
+    statusBadge.textContent =
+      status === "now" ? "NOW FEATURING" :
+      status === "upcoming" ? "UPCOMING" :
+      "PAST EVENT";
+
+    const badgeColor = status === "now"
+      ? ["#183F2B", "#65D995"]
+      : status === "upcoming"
+        ? ["#183D68", "#75B9FF"]
+        : ["#292B3B", "#C4C2D0"];
+
+    statusBadge.style.cssText =
+      "position:absolute;top:12px;left:12px;z-index:3;padding:5px 9px;border-radius:6px;background:" +
+      badgeColor[0] + ";color:" + badgeColor[1] +
+      ";font-size:10px;font-weight:700;letter-spacing:.4px;";
+
+    hero.appendChild(statusBadge);
+  
     const overlay = document.createElement("div");
     overlay.style.cssText =
       "position:absolute;inset:0;background:linear-gradient(transparent,rgba(9,10,18,.95));display:flex;flex-direction:column;justify-content:flex-end;padding:18px;";
