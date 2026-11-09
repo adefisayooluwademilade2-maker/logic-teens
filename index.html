@@ -6667,6 +6667,36 @@ message.textContent = fullMessage.length > 55
       notificationList.appendChild(card);
     });
 
+  const requestedAnnouncementId =
+  new URLSearchParams(window.location.search).get("announcementId");
+
+if (requestedAnnouncementId) {
+  const matchedNotification = snapshot.docs.find(
+    notificationDoc =>
+      notificationDoc.data().announcementId === requestedAnnouncementId
+  );
+
+  if (matchedNotification) {
+    const item = matchedNotification.data();
+
+    document.getElementById("notificationDetailTitle").textContent =
+      item.title || "Announcement";
+
+    document.getElementById("notificationDetailMessage").textContent =
+      item.message || "";
+
+    if (!item.read) {
+      updateDoc(
+        doc(db, "users", user.uid, "notifications", matchedNotification.id),
+        { read: true }
+      );
+    }
+
+    window.history.replaceState({}, "", window.location.pathname);
+    openPage("notificationDetails");
+  }
+      }
+
     badge.textContent = unread;
     badge.hidden = unread === 0;
 
