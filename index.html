@@ -7059,7 +7059,7 @@ function startEditLogicEvent(event) {
   );
 
   const mediaPreview = document.getElementById("eventMediaPreview");
-  mediaPreview.style.gridTemplateColumns = "repeat(2,minmax(0,1fr))";
+  mediaPreview.style.gridTemplateColumns = "repeat(3,minmax(0,1fr))";
   mediaPreview.style.gap = "8px";
 
     const visibleExistingMedia = existingMedia.length > 4
@@ -7659,7 +7659,7 @@ document.getElementById("eventMedia").addEventListener("change", () => {
   preview.replaceChildren();
 
   preview.style.display = "grid";
-  preview.style.gridTemplateColumns = "repeat(2,minmax(0,1fr))";
+  preview.style.gridTemplateColumns = "repeat(3,minmax(0,1fr))";
   preview.style.gap = "8px";
 
   const files = window.logicPendingEventMedia;
