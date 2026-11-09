@@ -6976,6 +6976,7 @@ let stopSavedEvents = null;
 
   let logicEditingEventId = null;
 let logicEditingEventData = null;
+  let logicRemovedEventMediaUrls = new Set();
 
 window.openEventMediaGallery = function(items) {
   const overlay = document.createElement("div");
