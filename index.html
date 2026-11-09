@@ -7119,7 +7119,7 @@ remove.style.cssText =
 
 remove.addEventListener("click", () => {
   logicRemovedEventMediaUrls.add(item.url);
-  previewItem.remove();
+  window.renderEventEditMediaPreview();
 });
 
 previewItem.appendChild(remove);
