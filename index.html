@@ -8243,14 +8243,7 @@ document.getElementById("sendAnnouncementButton")
 
       } while (cursor);
 
-      status.textContent =
-        "Announcement sent successfully! Phone notifications sent: " +
-        totalSent +
-        ". Failed: " +
-        totalFailed +
-        ". Skipped: " +
-        totalSkipped +
-        ".";
+      status.textContent = "Announcement sent successfully!";
 
     } catch (error) {
       console.error("Announcement sending error:", error);
