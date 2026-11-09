@@ -55,32 +55,35 @@ self.addEventListener("activate", event => {
   );
 });
 
-// BACKGROUND PUSH NOTIFICATIONS
-messaging.onBackgroundMessage(payload => {
-  const data = payload.data || {};
-  const notification = payload.notification || {};
 
-  const title =
-    notification.title ||
-    data.title ||
-    "LOGIC TEENS";
+  // BACKGROUND PUSH NOTIFICATIONS
+  messaging.onBackgroundMessage(payload => {
+    const data = payload.data || {};
+    const notification = payload.notification || {};
 
-  const body =
-    notification.body ||
-    data.body ||
-    "You have a new notification.";
+    const title = "LOGIC TEENS CHURCH";
 
-  const targetUrl = data.url || "./";
+    const body =
+      notification.body ||
+      data.body ||
+      "You have a new notification.";
 
-  return self.registration.showNotification(title, {
-    body: body,
-    icon: "./logic-app-icon.png",
-    badge: "./logic-app-icon.png",
-    data: {
-      url: targetUrl
-    }
+    const targetUrl = data.url || "./";
+
+    const appIcon = new URL(
+      "./logic-app-icon.png",
+      self.registration.scope
+    ).href;
+
+    return self.registration.showNotification(title, {
+      body: body,
+      icon: appIcon,
+      badge: appIcon,
+      data: {
+        url: targetUrl
+      }
+    });
   });
-});
 
 // NOTIFICATION CLICK
 self.addEventListener("notificationclick", event => {
