@@ -8128,6 +8128,7 @@ document.getElementById("sendAnnouncementButton")
       const batchSize = 450;
 
       // Save in-app notifications.
+      const announcementId = crypto.randomUUID();
       for (let i = 0; i < allRecipients.length; i += batchSize) {
 
         const batch = writeBatch(db);
