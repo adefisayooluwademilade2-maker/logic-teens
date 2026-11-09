@@ -7176,70 +7176,7 @@ function startEditLogicEvent(event) {
       "Current event cover photo";
   }
 
-    const existingMedia = (event.media || []).filter(item =>
-    item.url && item.url !== event.coverUrl
-  );
-
-  const mediaPreview = document.getElementById("eventMediaPreview");
-  mediaPreview.style.gridTemplateColumns = "repeat(3,minmax(0,1fr))";
-  mediaPreview.style.gap = "8px";
-
-    const visibleExistingMedia = existingMedia.length > 4
-    ? existingMedia.slice(0, 3)
-    : existingMedia;
-
-  visibleExistingMedia.forEach(item => {
-    const previewItem = document.createElement("div");
-    previewItem.style.cssText =
-      "height:70px;position:relative;background:#1b1d2c;border-radius:8px;overflow:hidden;";
-
-    if (item.type === "video") {
-      const video = document.createElement("video");
-      video.src = item.url;
-      video.controls = true;
-      video.playsInline = true;
-      video.preload = "metadata";
-      video.style.cssText =
-        "width:100%;height:100%;object-fit:cover;";
-      previewItem.appendChild(video);
-    } else {
-      const image = document.createElement("img");
-      image.src = item.url;
-      image.alt = "Event photo";
-      image.style.cssText =
-        "width:100%;height:100%;object-fit:cover;";
-      previewItem.appendChild(image);
-    }
-
-const remove = document.createElement("button");
-remove.type = "button";
-remove.textContent = "×";
-remove.style.cssText =
-  "position:absolute;top:3px;right:3px;width:21px;height:21px;padding:0;border:0;border-radius:50%;background:#090a12;color:white;font-size:16px;z-index:2;";
-
-remove.addEventListener("click", () => {
-  logicRemovedEventMediaUrls.add(item.url);
-  window.renderEventEditMediaPreview();
-});
-
-previewItem.appendChild(remove);
-  
-    mediaPreview.appendChild(previewItem);
-  });
-
-  if (existingMedia.length > 4) {
-    const more = document.createElement("button");
-    more.type = "button";
-    more.textContent = "+" + (existingMedia.length - 3);
-    more.style.cssText =
-      "height:70px;background:#1b1d2c;color:#d6b779;border:1px solid #36384a;border-radius:8px;font-size:20px;font-weight:bold;";
-
-    more.addEventListener("click", () => {
-      window.openEventMediaGallery(existingMedia);
-    });
-
-    mediaPreview.appendChild(more);
-  }
+    window.renderEventEditMediaPreview();
   
   document.getElementById("createEventButton").textContent = "Save Changes";
   document.getElementById("cancelEventEditButton").style.display = "block";
