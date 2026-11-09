@@ -7185,17 +7185,29 @@ function renderLogicEvents() {
     return dateA - dateB;
   });
 
-  const visibleEvents = filter === "saved"
-    ? sorted.filter(event => logicSavedEventIds.has(event.id))
-    : sorted;
-
-  const upcoming = visibleEvents.filter(event =>
-    new Date(event.date + "T" + (event.time || "23:59")) >= now
+    const savedEvents = sorted.filter(event =>
+    logicSavedEventIds.has(event.id)
   );
 
-  const past = visibleEvents.filter(event =>
-    new Date(event.date + "T" + (event.time || "23:59")) < now
+  const visibleEvents = filter === "saved"
+    ? savedEvents
+    : sorted;
+
+  const getEventEnd = event =>
+    new Date(
+      event.date + "T" + (event.endTime || event.time || "23:59")
+    );
+
+  let upcoming = visibleEvents.filter(event =>
+    getEventEnd(event) >= now
+  );
+
+  let past = visibleEvents.filter(event =>
+    getEventEnd(event) < now
   ).reverse();
+
+  if (filter === "upcoming") past = [];
+  if (filter === "past") upcoming = [];
 
   memberList.innerHTML = "";
 
