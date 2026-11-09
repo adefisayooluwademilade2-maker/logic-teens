@@ -6993,6 +6993,7 @@ window.openEventMediaGallery = function(items) {
     "color:#d6b779;font-size:17px;";
 
   const close = document.createElement("button");
+  close.textContent = "✕";
   close.style.cssText =
   "width:30px;height:30px;padding:0;background:#1b1d2c;color:white;border:1px solid #36384a;border-radius:8px;font-size:13px;";
 
@@ -7691,7 +7692,7 @@ document.getElementById("eventMedia").addEventListener("change", () => {
 
     const item = document.createElement("div");
     item.style.cssText =
-      "height:70px;background:#1b1d2c;border-radius:8px;overflow:hidden;";
+      "height:70px;position:relative;background:#1b1d2c;border-radius:8px;overflow:hidden;";
     
     if (kind === "video") {
       const video = document.createElement("video");
@@ -7710,6 +7711,29 @@ document.getElementById("eventMedia").addEventListener("change", () => {
       item.appendChild(image);
     }
 
+const remove = document.createElement("button");
+remove.type = "button";
+remove.textContent = "×";
+remove.style.cssText =
+  "position:absolute;top:3px;right:3px;width:21px;height:21px;padding:0;border:0;border-radius:50%;background:#090a12;color:white;font-size:16px;z-index:2;";
+
+remove.addEventListener("click", () => {
+  const remaining = window.logicPendingEventMedia.filter(
+    selected => selected !== file
+  );
+
+  const transfer = new DataTransfer();
+  remaining.forEach(selected => transfer.items.add(selected));
+
+  window.logicPendingEventMedia = remaining;
+  document.getElementById("eventMedia").files = transfer.files;
+  document.getElementById("eventMedia").dispatchEvent(
+    new Event("change")
+  );
+});
+
+item.appendChild(remove);
+    
     preview.appendChild(item);
   });
 
