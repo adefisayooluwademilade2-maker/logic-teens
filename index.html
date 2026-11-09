@@ -3515,6 +3515,21 @@ document.getElementById("profilePictureInput")
   <div class="eyebrow">PREFERENCES</div>
   <h1>Notifications</h1>
 
+    <div class="panel" style="margin-top:18px">
+    <strong>Phone Notifications</strong>
+    <p style="color:#aaa;font-size:13px">
+      Receive LOGIC TEENS alerts on your phone, even when the app is closed.
+    </p>
+    <button class="primary-btn" id="enablePhoneNotifications"
+      onclick="window.enableLogicPhoneNotifications()">
+      Enable Phone Notifications
+    </button>
+    <p id="phoneNotificationStatus"
+      style="color:#aaa;font-size:13px;margin-top:10px">
+      Phone notifications are not enabled yet.
+    </p>
+    </div>
+
   <div class="panel" style="margin-top:18px">
     <label style="display:flex;align-items:center;justify-content:space-between;gap:12px">
       <span>
