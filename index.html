@@ -7240,17 +7240,35 @@ function renderLogicEvents() {
     ? savedEvents
     : sorted;
 
+    const getEventStart = event =>
+    new Date(event.date + "T" + (event.time || "00:00"));
+
   const getEventEnd = event =>
     new Date(
       event.date + "T" + (event.endTime || event.time || "23:59")
     );
 
+  const getEventStatus = event => {
+    const start = getEventStart(event);
+    const end = getEventEnd(event);
+
+    if (now > end) return "past";
+
+    if (event.endTime && now >= start && now <= end) {
+      return "now";
+    }
+
+    if (now < start) return "upcoming";
+
+    return "past";
+  };
+
   let upcoming = visibleEvents.filter(event =>
-    getEventEnd(event) >= now
+    getEventStatus(event) !== "past"
   );
 
   let past = visibleEvents.filter(event =>
-    getEventEnd(event) < now
+    getEventStatus(event) === "past"
   ).reverse();
 
   if (filter === "upcoming") past = [];
