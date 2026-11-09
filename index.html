@@ -7078,14 +7078,14 @@ function startEditLogicEvent(event) {
       video.playsInline = true;
       video.preload = "metadata";
       video.style.cssText =
-        "width:100%;height:100%;object-fit:contain;";
+        "width:100%;height:100%;object-fit:cover;";
       previewItem.appendChild(video);
     } else {
       const image = document.createElement("img");
       image.src = item.url;
       image.alt = "Event photo";
       image.style.cssText =
-        "width:100%;height:100%;object-fit:contain;";
+        "width:100%;height:100%;object-fit:cover;";
       previewItem.appendChild(image);
     }
 
@@ -7687,7 +7687,7 @@ document.getElementById("eventMedia").addEventListener("change", () => {
       image.src = url;
       image.alt = "Event photo";
       image.style.cssText =
-        "width:100%;height:100%;object-fit:contain;;";
+        "width:100%;height:100%;object-fit:cover;";
       item.appendChild(image);
     }
 
@@ -7699,7 +7699,7 @@ document.getElementById("eventMedia").addEventListener("change", () => {
     more.type = "button";
     more.textContent = "+" + (files.length - 3);
     more.style.cssText =
-      "height:90px;background:#1b1d2c;color:#d6b779;border:1px solid #36384a;border-radius:8px;font-size:23px;font-weight:bold;";
+      "height:70px;background:#1b1d2c;color:#d6b779;border:1px solid #36384a;border-radius:8px;font-size:23px;font-weight:bold;";
 
     more.addEventListener("click", () => {
       window.openEventMediaGallery(files);
