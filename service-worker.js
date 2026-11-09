@@ -64,9 +64,11 @@ self.addEventListener("activate", event => {
     const title = "LOGIC TEENS CHURCH";
 
     const body =
-      notification.body ||
-      data.body ||
-      "You have a new notification.";
+  data.title ||
+  notification.title ||
+  notification.body ||
+  data.body ||
+  "You have a new notification.";
 
     const targetUrl = data.url || "./";
 
