@@ -4699,16 +4699,24 @@ window.setLogicPhoneNotifications = async function(enabled) {
       { merge: true }
     );
 
+
 if (!logicForegroundListenerStarted) {
   onMessage(getMessaging(app), async payload => {
     const data = payload.data || {};
     const notification = payload.notification || {};
     const registration = await navigator.serviceWorker.ready;
 
+    const appIcon = new URL(
+      "./logic-app-icon.png",
+      window.location.href
+    ).href;
+
     await registration.showNotification(
-      notification.title || data.title || "LOGIC TEENS",
+      "LOGIC TEENS CHURCH",
       {
         body: notification.body || data.body || "You have a new notification.",
+        icon: appIcon,
+        badge: appIcon,
         data: {
           url: data.url || "./"
         }
@@ -4717,7 +4725,8 @@ if (!logicForegroundListenerStarted) {
   });
 
   logicForegroundListenerStarted = true;
-  }
+}
+
   
     localStorage.setItem("logicPhoneNotificationsEnabled", "true");
 
