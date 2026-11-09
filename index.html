@@ -4611,6 +4611,12 @@ import {
   reauthenticateWithCredential,
   verifyBeforeUpdateEmail
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+import {
+  getMessaging,
+  getToken,
+  isSupported
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-messaging.js";
   
 import {
   getFirestore,
@@ -4643,6 +4649,78 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+window.enableLogicPhoneNotifications = async function() {
+  const status = document.getElementById("phoneNotificationStatus");
+  const button = document.getElementById("enablePhoneNotifications");
+
+  try {
+    const user = window.logicCurrentUser;
+
+    if (!user || !user.emailVerified) {
+      status.textContent = "Please sign in first.";
+      return;
+    }
+
+    if (!("Notification" in window) ||
+        !("serviceWorker" in navigator)) {
+      status.textContent = "Your browser does not support phone notifications.";
+      return;
+    }
+
+    if (!(await isSupported())) {
+      status.textContent = "Phone notifications are not supported on this browser.";
+      return;
+    }
+
+    button.disabled = true;
+    status.textContent = "Requesting notification permission...";
+
+    const permission = await Notification.requestPermission();
+
+    if (permission !== "granted") {
+      status.textContent = "Notification permission was not granted.";
+      return;
+    }
+
+    const registration = await navigator.serviceWorker.ready;
+
+    status.textContent = "Registering this device...";
+
+    const token = await getToken(getMessaging(app), {
+      vapidKey: "BIzKv2c6mTotg0SRmooJKfvcrlvMRS0IHtsirtqscJOyUA7AHW24NKkjNqDpRIE-ofbnEbdsjVVBYbTpdDSj7dE",
+      serviceWorkerRegistration: registration
+    });
+
+    if (!token) {
+      throw new Error("Firebase did not return a device token.");
+    }
+
+    let deviceId = localStorage.getItem("logicPushDeviceId");
+
+    if (!deviceId) {
+      deviceId = crypto.randomUUID();
+      localStorage.setItem("logicPushDeviceId", deviceId);
+    }
+
+    await setDoc(
+      doc(db, "users", user.uid, "pushTokens", deviceId),
+      {
+        token: token,
+        platform: "web",
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    status.textContent = "Phone notifications are enabled on this device.";
+  } catch (error) {
+    console.error("Phone notification setup error:", error);
+    status.textContent = "Could not enable notifications. Please try again.";
+  } finally {
+    button.disabled = false;
+  }
+};
+  
 // Make Firebase available to the other page scripts.
 window.db = db;
 window.doc = doc;
