@@ -2,10 +2,12 @@
 importScripts(
   "https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"
 );
+
 importScripts(
   "https://www.gstatic.com/firebasejs/12.19.0/firebase-messaging-compat.js"
 );
 
+// FIREBASE INITIALIZATION
 firebase.initializeApp({
   apiKey: "AIzaSyA3rI1PVBHOGN24VLqgAKBiI50BkYlXW_o",
   authDomain: "logic-teens.firebaseapp.com",
@@ -17,7 +19,9 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-const CACHE_NAME = "logic-teens-v4";
+// CACHE VERSION
+const CACHE_NAME = "logic-teens-v5";
+const CACHE_PREFIX = "logic-teens-";
 
 const APP_FILES = [
   "./",
@@ -26,6 +30,7 @@ const APP_FILES = [
   "./manifest.json"
 ];
 
+// INSTALL
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -34,78 +39,126 @@ self.addEventListener("install", event => {
   );
 });
 
+// ACTIVATE
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
         keys
-          .filter(key => key !== CACHE_NAME)
+          .filter(key =>
+            key.startsWith(CACHE_PREFIX) &&
+            key !== CACHE_NAME
+          )
           .map(key => caches.delete(key))
       )
     ).then(() => self.clients.claim())
   );
 });
 
+// BACKGROUND PUSH NOTIFICATIONS
 messaging.onBackgroundMessage(payload => {
   const data = payload.data || {};
+  const notification = payload.notification || {};
 
-  return self.registration.showNotification(
-    data.title || "LOGIC TEENS",
-    {
-      body: data.body || "You have a new notification.",
-      icon: "./logic-app-icon.png",
-      badge: "./logic-app-icon.png",
-      data: {
-        url: data.url || "./"
-      }
+  const title =
+    notification.title ||
+    data.title ||
+    "LOGIC TEENS";
+
+  const body =
+    notification.body ||
+    data.body ||
+    "You have a new notification.";
+
+  const targetUrl = data.url || "./";
+
+  return self.registration.showNotification(title, {
+    body: body,
+    icon: "./logic-app-icon.png",
+    badge: "./logic-app-icon.png",
+    data: {
+      url: targetUrl
     }
-  );
+  });
 });
 
+// NOTIFICATION CLICK
 self.addEventListener("notificationclick", event => {
   event.notification.close();
 
-  const targetUrl = new URL(
-    event.notification.data?.url || "./",
-    self.location.origin
-  ).href;
+  event.waitUntil((async () => {
+    const scopeUrl = new URL(self.registration.scope);
 
-  event.waitUntil(
-    clients.matchAll({
+    let targetUrl;
+
+    try {
+      targetUrl = new URL(
+        event.notification.data?.url || "./",
+        scopeUrl
+      );
+
+      if (
+        targetUrl.origin !== scopeUrl.origin ||
+        !targetUrl.pathname.startsWith(scopeUrl.pathname)
+      ) {
+        targetUrl = scopeUrl;
+      }
+    } catch (error) {
+      targetUrl = scopeUrl;
+    }
+
+    const windowClients = await clients.matchAll({
       type: "window",
       includeUncontrolled: true
-    }).then(windowClients => {
-      for (const client of windowClients) {
-        if ("focus" in client) {
-          return client.navigate(targetUrl).then(() => client.focus());
-        }
-      }
+    });
 
-      return clients.openWindow(targetUrl);
-    })
-  );
+    const appClient = windowClients.find(client =>
+      client.url.startsWith(scopeUrl.href)
+    );
+
+    if (appClient) {
+      try {
+        await appClient.navigate(targetUrl.href);
+        await appClient.focus();
+        return;
+      } catch (error) {
+        console.error("Could not focus app window:", error);
+      }
+    }
+
+    await clients.openWindow(targetUrl.href);
+  })());
 });
 
+// OFFLINE NAVIGATION SUPPORT
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
 
   const url = new URL(event.request.url);
+
   if (url.origin !== self.location.origin) return;
 
-  if (event.request.mode === "navigate") {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
+  if (event.request.mode !== "navigate") return;
+
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        if (response.ok) {
           const copy = response.clone();
+
           caches.open(CACHE_NAME).then(cache =>
             cache.put(event.request, copy)
           );
-          return response;
-        })
-        .catch(async () =>
-          (await caches.match(event.request)) ||
-          (await caches.match("./index.html"))
-        )
-    );
-  }
+        }
+
+        return response;
+      })
+      .catch(async () => {
+        return (
+          await caches.match(event.request) ||
+          await caches.match("./index.html")
+        );
+      })
+  );
 });
+    
