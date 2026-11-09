@@ -7052,6 +7052,7 @@ function startEditLogicEvent(event) {
 
   logicEditingEventId = event.id;
   logicEditingEventData = event;
+  logicRemovedEventMediaUrls = new Set();
 
   document.getElementById("eventTitle").value = event.title || "";
   document.getElementById("eventDate").value = event.date || "";
