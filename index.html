@@ -3590,6 +3590,8 @@ document.getElementById("profilePictureInput")
 </section>
 
 <script>
+// NOTIFICATION PREFERENCES
+
 const notificationKeys = [
   "churchAnnouncements",
   "bibleNotifications",
@@ -3598,46 +3600,28 @@ const notificationKeys = [
 ];
 
 function loadNotificationSettings() {
-  const master = document.getElementById("masterNotifications");
-  if (!master) return;
-    const phoneToggle = document.getElementById("phoneNotifications");
+  const phoneToggle = document.getElementById("phoneNotifications");
 
   if (phoneToggle) {
     phoneToggle.checked =
       localStorage.getItem("logicPhoneNotificationsEnabled") === "true";
   }
 
-  master.checked =
-    localStorage.getItem("logicNotificationsEnabled") !== "false";
-
   notificationKeys.forEach(key => {
     const input = document.getElementById(key);
-    input.checked =
-      localStorage.getItem("logicNotification_" + key) !== "false";
-  });
+    if (!input) return;
 
-  updateNotificationControls();
-}
-
-function updateNotificationControls() {
-  const master = document.getElementById("masterNotifications");
-
-  notificationKeys.forEach(key => {
-    document.getElementById(key).disabled = !master.checked;
+    const saved = localStorage.getItem("logicNotification_" + key);
+    input.checked = saved === null ? true : saved === "true";
   });
 }
 
-function toggleAllNotificationSettings(enabled) {
-  localStorage.setItem("logicNotificationsEnabled", enabled);
-  updateNotificationControls();
-
-  if (window.saveNotificationSettingsToFirebase) {
-    window.saveNotificationSettingsToFirebase();
-  }
-}
+window.updateNotificationControls = function() {
+  // Each notification category works independently.
+};
 
 function saveNotificationPreference(key, enabled) {
-  localStorage.setItem("logicNotification_" + key, enabled);
+  localStorage.setItem("logicNotification_" + key, String(enabled));
 
   if (window.saveNotificationSettingsToFirebase) {
     window.saveNotificationSettingsToFirebase();
