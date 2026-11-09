@@ -6992,12 +6992,18 @@ function startEditLogicEvent(event) {
       "Current event cover photo";
   }
 
-  (event.media || []).forEach(item => {
-    if (!item.url || item.url === event.coverUrl) return;
+    const existingMedia = (event.media || []).filter(item =>
+    item.url && item.url !== event.coverUrl
+  );
 
+  const mediaPreview = document.getElementById("eventMediaPreview");
+  mediaPreview.style.gridTemplateColumns = "repeat(2,minmax(0,1fr))";
+  mediaPreview.style.gap = "8px";
+
+  existingMedia.slice(0, 4).forEach(item => {
     const previewItem = document.createElement("div");
     previewItem.style.cssText =
-      "background:#1b1d2c;border-radius:10px;overflow:hidden;margin-bottom:10px;";
+      "height:90px;background:#1b1d2c;border-radius:8px;overflow:hidden;";
 
     if (item.type === "video") {
       const video = document.createElement("video");
@@ -7006,24 +7012,18 @@ function startEditLogicEvent(event) {
       video.playsInline = true;
       video.preload = "metadata";
       video.style.cssText =
-        "width:100%;height:130px;object-fit:cover;";
+        "width:100%;height:100%;object-fit:cover;";
       previewItem.appendChild(video);
     } else {
       const image = document.createElement("img");
       image.src = item.url;
-      image.alt = item.name || "Event image";
+      image.alt = "Event photo";
       image.style.cssText =
-        "width:100%;height:130px;object-fit:cover;";
+        "width:100%;height:100%;object-fit:cover;";
       previewItem.appendChild(image);
     }
 
-    const label = document.createElement("p");
-    label.textContent = item.name || "Existing event media";
-    label.style.cssText =
-      "font-size:11px;padding:7px;margin:0;color:#d0ced9;";
-    previewItem.appendChild(label);
-
-    document.getElementById("eventMediaPreview").appendChild(previewItem);
+    mediaPreview.appendChild(previewItem);
   });
   
   document.getElementById("createEventButton").textContent = "Save Changes";
