@@ -3640,6 +3640,16 @@ document.getElementById("profilePictureInput")
   <div class="eyebrow">PREFERENCES</div>
   <h1>Notifications</h1>
 
+  
+<div class="panel" style="margin-top:18px">
+  <label style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <strong>All Notifications</strong>
+    <input id="masterNotifications" type="checkbox"
+      onchange="saveAllNotificationPreference(this.checked)">
+  </label>
+</div>
+  
+
       <div class="panel" style="margin-top:18px">
     <label style="display:flex;align-items:center;justify-content:space-between;gap:12px">
       <strong>Phone Notifications</strong>
