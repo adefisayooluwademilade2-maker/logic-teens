@@ -3787,6 +3787,7 @@ function saveAllNotificationPreference(enabled) {
     input.checked = enabled
       ? (saved === null ? true : saved === "true")
       : false;
+    input.disabled = !enabled;
   });
 
   const notificationList = document.getElementById("notificationList");
