@@ -8405,6 +8405,17 @@ try {
 
     const savedNotifications = data.notificationSettings || {};
 
+    const masterInput = document.getElementById("masterNotifications");
+
+if (masterInput && typeof savedNotifications.enabled === "boolean") {
+  masterInput.checked = savedNotifications.enabled;
+
+  localStorage.setItem(
+    "logicAllNotificationsEnabled",
+    String(savedNotifications.enabled)
+  );
+  }
+
 [
   "churchAnnouncements",
   "bibleNotifications",
