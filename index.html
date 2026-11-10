@@ -7110,12 +7110,16 @@ let activeVideo = null;
   close.style.cssText =
     "width:38px;height:38px;padding:0;background:#1b1d2c;color:white;border:1px solid #36384a;border-radius:50%;font-size:17px;";
 
-  const stage = document.createElement("div");
-  stage.style.cssText =
-    const mediaRow = document.createElement("div");
+  
+const stage = document.createElement("div");
+const mediaRow = document.createElement("div");
+
 mediaRow.style.cssText =
   "display:flex;align-items:center;justify-content:center;gap:8px;width:100%;";
+
+stage.style.cssText =
   "position:relative;flex:1;min-width:0;height:min(58vh,520px);min-height:180px;display:flex;align-items:center;justify-content:center;background:transparent;overflow:hidden;touch-action:pan-y;";
+
   const makeArrow = (symbol, side) => {
     const button = document.createElement("button");
     button.type = "button";
