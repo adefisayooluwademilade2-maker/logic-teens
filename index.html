@@ -8484,12 +8484,18 @@ if (masterInput && typeof savedNotifications.enabled === "boolean") {
   if (!input) return;
 
   if (typeof savedNotifications[key] === "boolean") {
-    input.checked = savedNotifications[key];
     localStorage.setItem(
       "logicNotification_" + key,
       String(savedNotifications[key])
     );
   }
+
+  const saved = localStorage.getItem("logicNotification_" + key);
+  const masterEnabled =
+    localStorage.getItem("logicAllNotificationsEnabled") !== "false";
+
+  input.checked =
+    masterEnabled && (saved === null || saved === "true");
 });
 
        let accountProfile = {
