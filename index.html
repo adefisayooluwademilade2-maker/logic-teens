@@ -7278,9 +7278,10 @@ window.openEventMediaGallery = function(items, startIndex = 0) {
   stage.style.height = "min(58vh,520px)";
   stage.style.minHeight = "180px";
 
+    viewer.style.maxWidth = "100%";
+
   viewer.append(header, stage);
-  popup.appendChild(viewer);
-  overlay.appendChild(popup);
+  overlay.appendChild(viewer);
   document.body.appendChild(overlay);
 
   showItem();
