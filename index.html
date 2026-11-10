@@ -3756,6 +3756,21 @@ function loadNotificationSettings() {
   });
 }
 
+  function saveNotificationPreference(key, enabled) {
+  if (!notificationKeys.includes(key)) return;
+
+  const masterEnabled =
+    localStorage.getItem("logicAllNotificationsEnabled") !== "false";
+
+  if (!masterEnabled) return;
+
+  localStorage.setItem("logicNotification_" + key, String(enabled));
+
+  if (window.saveNotificationSettingsToFirebase) {
+    window.saveNotificationSettingsToFirebase();
+  }
+  }
+
 function saveAllNotificationPreference(enabled) {
   localStorage.setItem("logicAllNotificationsEnabled", String(enabled));
 
