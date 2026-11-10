@@ -188,6 +188,68 @@ input,textarea,select {
   background:#0f111b;color:white;
 }
 
+.logic-event-filter {
+  position: relative;
+  margin: 12px 0 18px;
+  max-width: 100%;
+}
+
+#eventFilterTrigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 15px;
+  background: #141622;
+  color: white;
+  border: 1px solid #36384a;
+  border-radius: 12px;
+  font: 14px Arial;
+  text-align: left;
+  cursor: pointer;
+}
+
+#eventFilterArrow {
+  color: #d6b779;
+  font-size: 19px;
+}
+
+#eventFilterOptions {
+  display: none;
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  padding: 5px;
+  background: #1b1d2c;
+  border: 1px solid #36384a;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.4);
+}
+
+#eventFilterOptions.show {
+  display: block;
+}
+
+#eventFilterOptions button {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  background: transparent;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  text-align: left;
+  font: 13px Arial;
+  cursor: pointer;
+}
+
+#eventFilterOptions button.selected {
+  color: #d6b779;
+  background: #292541;
+  }
+  
 #announcementMessage {
   font-size: 17px;
   line-height: 1.6;
