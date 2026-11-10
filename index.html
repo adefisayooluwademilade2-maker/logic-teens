@@ -8442,6 +8442,18 @@ if (masterInput && typeof savedNotifications.enabled === "boolean") {
   );
   }
 
+      const notificationList = document.getElementById("notificationList");
+  const notificationBadge = document.getElementById("unreadNotificationCount");
+
+  if (notificationList) {
+    notificationList.style.display =
+      savedNotifications.enabled === false ? "none" : "";
+  }
+
+  if (notificationBadge) {
+    notificationBadge.hidden = savedNotifications.enabled === false;
+  }
+
 [
   "churchAnnouncements",
   "bibleNotifications",
