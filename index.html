@@ -7079,34 +7079,190 @@ let logicEditingEventData = null;
   let logicRemovedEventMediaUrls = new Set();
 
 window.openEventMediaGallery = function(items) {
-  const overlay = document.createElement("div");
+  if (!items || !items.length) return;
 
+  let currentIndex = 0;
+  let touchStartX = 0;
+  let touchStartY = 0;
+  const generatedUrls = [];
+
+  const overlay = document.createElement("div");
   overlay.style.cssText =
-    "position:fixed;inset:0;z-index:100002;background:rgba(9,10,18,.97);padding:20px;overflow-y:auto;";
+    "position:fixed;inset:0;z-index:100002;background:rgba(9,10,18,.98);display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;";
+
+  const viewer = document.createElement("div");
+  viewer.style.cssText =
+    "width:100%;max-width:680px;display:flex;flex-direction:column;gap:12px;";
 
   const header = document.createElement("div");
   header.style.cssText =
-    "display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;";
+    "display:flex;align-items:center;justify-content:space-between;color:#d6b779;font-size:14px;";
 
-  const heading = document.createElement("strong");
-  heading.textContent = "Event Gallery";
-  heading.style.cssText =
-    "color:#d6b779;font-size:17px;";
+  const counter = document.createElement("span");
 
   const close = document.createElement("button");
+  close.type = "button";
   close.textContent = "✕";
   close.style.cssText =
-  "width:30px;height:30px;padding:0;background:#1b1d2c;color:white;border:1px solid #36384a;border-radius:8px;font-size:13px;";
+    "width:38px;height:38px;padding:0;background:#1b1d2c;color:white;border:1px solid #36384a;border-radius:50%;font-size:17px;";
 
-history.pushState(
-  {...(history.state || {}), logicEventGallery:true},
-  "",
-  location.href
-);
+  const stage = document.createElement("div");
+  stage.style.cssText =
+    "position:relative;width:100%;height:min(70vh,680px);min-height:240px;display:flex;align-items:center;justify-content:center;background:#141622;border-radius:14px;overflow:hidden;touch-action:pan-y;";
 
-const closeGallery = () => {
-  overlay.remove();
-  window.removeEventListener("popstate", closeGallery);
+  const makeArrow = (symbol, side) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = symbol;
+    button.style.cssText =
+      `position:absolute;top:50%;${side}:10px;transform:translateY(-50%);z-index:3;width:42px;height:42px;border:1px solid #555064;border-radius:50%;background:rgba(9,10,18,.8);color:#d6b779;font-size:25px;`;
+    return button;
+  };
+
+  const previous = makeArrow("‹", "left");
+  const next = makeArrow("›", "right");
+
+  const closeGallery = () => {
+    overlay.remove();
+    window.removeEventListener("popstate", closeGallery);
+    document.removeEventListener("keydown", handleEscape);
+
+    generatedUrls.forEach(url => URL.revokeObjectURL(url));
+  };
+
+  const handleEscape = event => {
+    if (event.key === "Escape" && overlay.isConnected) {
+      history.back();
+    }
+  };
+
+  history.pushState(
+    {...(history.state || {}), logicEventGallery:true},
+    "",
+    location.href
+  );
+
+  window.addEventListener("popstate", closeGallery);
+  document.addEventListener("keydown", handleEscape);
+
+  close.addEventListener("click", () => history.back());
+
+  const showItem = () => {
+    const item = items[currentIndex];
+    const type = item.type || eventFileKind(item.file || item);
+    let url = item.url;
+
+    if (!url) {
+      url = URL.createObjectURL(item.file || item);
+      generatedUrls.push(url);
+    }
+
+    stage.replaceChildren();
+
+    counter.textContent =
+      `${currentIndex + 1} / ${items.length}`;
+
+    const media = type === "video"
+      ? document.createElement("video")
+      : document.createElement("img");
+
+    media.src = url;
+    media.style.cssText =
+      "width:100%;height:100%;object-fit:contain;background:#141622;";
+
+    if (type === "video") {
+      media.controls = false;
+      media.playsInline = true;
+      media.setAttribute("playsinline", "");
+      media.setAttribute("controlslist", "nodownload noplaybackrate noremoteplayback");
+      media.disablePictureInPicture = true;
+      media.disableRemotePlayback = true;
+
+      const playButton = document.createElement("button");
+      playButton.type = "button";
+      playButton.textContent = "▶";
+      playButton.style.cssText =
+        "position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border:1px solid #d6b779;border-radius:50%;background:rgba(9,10,18,.85);color:#d6b779;font-size:23px;z-index:2;";
+
+      const toggleVideo = () => {
+        if (media.paused) {
+          media.play().then(() => {
+            playButton.textContent = "Ⅱ";
+          }).catch(() => {
+            playButton.textContent = "▶";
+          });
+        } else {
+          media.pause();
+          playButton.textContent = "▶";
+        }
+      };
+
+      playButton.addEventListener("click", toggleVideo);
+      media.addEventListener("click", toggleVideo);
+      media.addEventListener("ended", () => {
+        playButton.textContent = "▶";
+      });
+
+      stage.append(media, playButton);
+      media.addEventListener("contextmenu", event => event.preventDefault());
+    } else {
+      media.alt = item.name || "Event photo";
+      media.addEventListener("contextmenu", event => event.preventDefault());
+      stage.appendChild(media);
+    }
+
+    previous.disabled = currentIndex === 0;
+    next.disabled = currentIndex === items.length - 1;
+
+    previous.style.opacity = previous.disabled ? ".25" : "1";
+    next.style.opacity = next.disabled ? ".25" : "1";
+  };
+
+  previous.addEventListener("click", () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+      showItem();
+    }
+  });
+
+  next.addEventListener("click", () => {
+    if (currentIndex < items.length - 1) {
+      currentIndex++;
+      showItem();
+    }
+  });
+
+  stage.addEventListener("touchstart", event => {
+    touchStartX = event.changedTouches[0].screenX;
+    touchStartY = event.changedTouches[0].screenY;
+  }, {passive:true});
+
+  stage.addEventListener("touchend", event => {
+    const differenceX =
+      event.changedTouches[0].screenX - touchStartX;
+
+    const differenceY =
+      event.changedTouches[0].screenY - touchStartY;
+
+    if (Math.abs(differenceX) < 50 ||
+        Math.abs(differenceX) < Math.abs(differenceY)) return;
+
+    if (differenceX < 0 && currentIndex < items.length - 1) {
+      currentIndex++;
+      showItem();
+    } else if (differenceX > 0 && currentIndex > 0) {
+      currentIndex--;
+      showItem();
+    }
+  }, {passive:true});
+
+  header.append(counter, close);
+  stage.append(previous, next);
+  viewer.append(header, stage);
+  overlay.appendChild(viewer);
+  document.body.appendChild(overlay);
+
+  showItem();
 };
 
 window.addEventListener("popstate", closeGallery);
