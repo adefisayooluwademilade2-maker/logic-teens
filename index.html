@@ -8502,6 +8502,7 @@ if (masterInput && typeof savedNotifications.enabled === "boolean") {
 
   input.checked =
     masterEnabled && (saved === null || saved === "true");
+  input.disabled = !masterEnabled;
 });
 
        let accountProfile = {
