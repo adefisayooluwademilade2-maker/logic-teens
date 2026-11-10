@@ -7225,6 +7225,7 @@ let activeVideo = null;
       media.addEventListener("contextmenu", event => event.preventDefault());
       stage.appendChild(media);
     }
+   stage.append(previous, next);
 
     previous.disabled = currentIndex === 0;
     next.disabled = currentIndex === items.length - 1;
