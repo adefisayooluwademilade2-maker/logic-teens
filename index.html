@@ -4964,27 +4964,37 @@ window.logicMembersDirectoryCache = [];
   list.textContent = "Loading members...";
 
   try {
-    const [profilesSnapshot, adminsSnapshot] = await Promise.all([
-      getDocs(collection(db, "publicProfiles")),
-      getDocs(collection(db, "admins"))
-    ]);
+    const [usersSnapshot, profilesSnapshot, adminsSnapshot] =
+  await Promise.all([
+    getDocs(collection(db, "users")),
+    getDocs(collection(db, "publicProfiles")),
+    getDocs(collection(db, "admins"))
+  ]);
 
-    const appointedIds = new Set(
-      adminsSnapshot.docs.map(item => item.id)
-    );
+const profilesById = new Map(
+  profilesSnapshot.docs.map(item => [
+    item.id,
+    item.data()
+  ])
+);
 
-    const members = profilesSnapshot.docs
-      .filter(item =>
-        !appointedIds.has(item.id) &&
-        item.data().isAdmin !== true
-      )
-      .map(item => ({
-        userId: item.id,
-        ...item.data()
-      }))
-      .sort((a, b) =>
-        (a.fullName || "").localeCompare(b.fullName || "")
-      );
+const appointedIds = new Set(
+  adminsSnapshot.docs.map(item => item.id)
+);
+
+const members = usersSnapshot.docs
+  .map(item => ({
+    userId: item.id,
+    ...item.data(),
+    ...(profilesById.get(item.id) || {})
+  }))
+  .filter(member =>
+    !appointedIds.has(member.userId) &&
+    member.isAdmin !== true
+  )
+  .sort((a, b) =>
+    (a.fullName || "").localeCompare(b.fullName || "")
+  );
 
     list.replaceChildren();
 
