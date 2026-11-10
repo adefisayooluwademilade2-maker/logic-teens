@@ -4999,15 +4999,6 @@ const appointedIds = new Set(
   adminsSnapshot.docs.map(item => item.id)
 );
 
-const members = Array.from(accountsById.values())
-  .filter(member =>
-    !appointedIds.has(member.userId) &&
-    member.isAdmin !== true
-  )
-  .sort((a, b) =>
-    (a.fullName || "").localeCompare(b.fullName || "")
-  );
-
     list.replaceChildren();
 
     if (!members.length) {
