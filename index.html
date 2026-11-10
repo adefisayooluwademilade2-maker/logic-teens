@@ -8802,8 +8802,7 @@ document.getElementById("sendAnnouncementButton")
     const settings =
       userDoc.data().notificationSettings || {};
 
-    return settings.enabled !== false &&
-           settings.churchAnnouncements !== false;
+    return settings.churchAnnouncements !== false;
   })
   .map(userDoc => userDoc.id);
       const batchSize = 450;
