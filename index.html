@@ -8295,6 +8295,8 @@ openPage(window.logicRequestedStartingPage, {
 
     document.getElementById("adminHomeTiles").hidden =
       !window.logicIsAdmin;
+document.body.style.visibility = "visible";
+  
     if (window.logicIsAdmin) {
   await window.loadAdminHomeCounts();
   }
