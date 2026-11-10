@@ -7203,8 +7203,22 @@ window.openEventMediaGallery = function(items, startIndex = 0) {
         }
       };
 
-      playButton.addEventListener("click", toggleVideo);
-      media.addEventListener("click", toggleVideo);
+            playButton.addEventListener("click", () => {
+        media.play().then(() => {
+          playButton.style.display = "none";
+        }).catch(() => {
+          playButton.style.display = "block";
+        });
+      });
+
+      media.addEventListener("play", () => {
+        playButton.style.display = "none";
+      });
+
+      media.addEventListener("pause", () => {
+        playButton.style.display = "block";
+        playButton.textContent = "▶";
+      });
       media.addEventListener("ended", () => {
         playButton.textContent = "▶";
       });
