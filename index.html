@@ -8021,16 +8021,9 @@ onAuthStateChanged(auth, async user => {
     window.logicCanManageAdmins =
       adminData.canManageAdmins === true;
 
-if (window.logicIsAdmin) {
-  const requestedPage =
-    window.logicRequestedStartingPage === "home"
-      ? "adminDashboard"
-      : window.logicRequestedStartingPage;
-
-  openPage(requestedPage, {
-    replaceHistory: true
-  });
-  }
+openPage(window.logicRequestedStartingPage, {
+  replaceHistory: true
+});
 
   document.getElementById("adminManagementPanel").hidden =
   window.logicCanManageAdmins !== true;
