@@ -6745,17 +6745,17 @@ window.saveNotificationSettingsToFirebase = async function() {
   const user = auth.currentUser;
   if (!user) return;
 
-  const settings = {
+    const settings = {
     enabled:
-  document.getElementById("masterNotifications")?.checked !== false,
+      document.getElementById("masterNotifications")?.checked !== false,
     churchAnnouncements:
-      document.getElementById("churchAnnouncements")?.checked !== false,
+      localStorage.getItem("logicNotification_churchAnnouncements") !== "false",
     bibleNotifications:
-      document.getElementById("bibleNotifications")?.checked !== false,
+      localStorage.getItem("logicNotification_bibleNotifications") !== "false",
     eventReminders:
-      document.getElementById("eventReminders")?.checked !== false,
+      localStorage.getItem("logicNotification_eventReminders") !== "false",
     ministryUpdates:
-      document.getElementById("ministryUpdates")?.checked !== false
+      localStorage.getItem("logicNotification_ministryUpdates") !== "false"
   };
 
   try {
