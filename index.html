@@ -3767,8 +3767,7 @@ function saveAllNotificationPreference(enabled) {
   }
 
   if (badge) {
-    badge.hidden = !enabled;
-    if (!enabled) badge.textContent = "0";
+    badge.hidden = !enabled || badge.textContent === "0";
   }
 
   if (window.saveNotificationSettingsToFirebase) {
