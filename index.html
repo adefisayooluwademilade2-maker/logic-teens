@@ -8296,9 +8296,10 @@ openPage(window.logicRequestedStartingPage, {
     document.getElementById("adminHomeTiles").hidden =
       !window.logicIsAdmin;
 document.body.style.visibility = "visible";
-  
-    if (window.logicIsAdmin) {
-  await window.loadAdminHomeCounts();
+  if (window.logicIsAdmin) {
+  window.loadAdminHomeCounts().catch(error => {
+    console.error("Admin counts loading failed:", error);
+  });
   }
   
     const profileRef = doc(db, "users", user.uid);
