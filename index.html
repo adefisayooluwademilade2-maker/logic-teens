@@ -7366,8 +7366,8 @@ window.renderEventEditMediaPreview = function() {
     more.style.cssText =
       "height:70px;background:#1b1d2c;color:#d6b779;border:1px solid #36384a;border-radius:8px;font-size:20px;font-weight:bold;";
 
-    more.addEventListener("click", () => {
-      window.openEventMediaGallery(allItems.slice(3));
+        more.addEventListener("click", () => {
+      window.openEventMediaGallery(allItems, 3);
     });
 
     preview.appendChild(more);
