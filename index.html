@@ -6897,7 +6897,8 @@ if (requestedAnnouncementId) {
       }
 
     badge.textContent = unread;
-
+badge.hidden = unread === 0;
+  
   }, error => {
     console.error("Notification error:", error);
     notificationList.innerHTML =
