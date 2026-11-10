@@ -7089,16 +7089,13 @@ window.openEventMediaGallery = function(items, startIndex = 0) {
   let touchStartY = 0;
   const generatedUrls = [];
 
-    const overlay = document.createElement("div");
+      const overlay = document.createElement("div");
   overlay.style.cssText =
-    "position:fixed;inset:0;z-index:100002;background:rgba(0,0,0,.68);display:flex;align-items:center;justify-content:center;padding:22px;box-sizing:border-box;";
+    "position:fixed;inset:0;z-index:100002;background:rgba(0,0,0,.48);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;";
 
-  const popup = document.createElement("div");
-  popup.style.cssText =
-    "width:100%;max-width:560px;background:#141622;border:1px solid #292b3b;border-radius:18px;padding:12px;box-sizing:border-box;box-shadow:0 15px 50px rgba(0,0,0,.5);";
   const viewer = document.createElement("div");
   viewer.style.cssText =
-    "width:100%;max-width:680px;display:flex;flex-direction:column;gap:12px;";
+    "width:100%;max-width:560px;display:flex;flex-direction:column;gap:12px;background:transparent;";
 
   const header = document.createElement("div");
   header.style.cssText =
@@ -7114,8 +7111,7 @@ window.openEventMediaGallery = function(items, startIndex = 0) {
 
   const stage = document.createElement("div");
   stage.style.cssText =
-    "position:relative;width:100%;height:min(70vh,680px);min-height:240px;display:flex;align-items:center;justify-content:center;background:#141622;border-radius:14px;overflow:hidden;touch-action:pan-y;";
-
+    "position:relative;width:100%;height:min(58vh,520px);min-height:180px;display:flex;align-items:center;justify-content:center;background:transparent;border-radius:14px;overflow:hidden;touch-action:pan-y;";
   const makeArrow = (symbol, side) => {
     const button = document.createElement("button");
     button.type = "button";
