@@ -7186,19 +7186,39 @@ window.openEventMediaGallery = function(items, startIndex = 0) {
       playButton.style.cssText =
         "position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border:1px solid #d6b779;border-radius:50%;background:rgba(9,10,18,.85);color:#d6b779;font-size:23px;z-index:2;";
 
-      const toggleVideo = () => {
+            const toggleVideo = () => {
         if (media.paused) {
-          media.play().then(() => {
-            playButton.textContent = "Ⅱ";
-          }).catch(() => {
-            playButton.textContent = "▶";
+          media.play().catch(() => {
+            playButton.style.display = "block";
           });
         } else {
           media.pause();
-          playButton.textContent = "▶";
         }
       };
 
+      playButton.addEventListener("click", event => {
+        event.stopPropagation();
+        toggleVideo();
+      });
+
+      media.addEventListener("click", toggleVideo);
+
+      media.addEventListener("play", () => {
+        playButton.style.display = "none";
+      });
+
+      media.addEventListener("pause", () => {
+        playButton.style.display = "block";
+        playButton.textContent = "▶";
+      });
+
+      media.addEventListener("ended", () => {
+        playButton.style.display = "block";
+        playButton.textContent = "▶";
+      });
+
+      stage.append(media, playButton);
+      
             playButton.addEventListener("click", () => {
         media.play().then(() => {
           playButton.style.display = "none";
