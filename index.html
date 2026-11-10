@@ -3759,10 +3759,22 @@ function loadNotificationSettings() {
 function saveAllNotificationPreference(enabled) {
   localStorage.setItem("logicAllNotificationsEnabled", String(enabled));
 
+  const notificationList = document.getElementById("notificationList");
+  const badge = document.getElementById("unreadNotificationCount");
+
+  if (notificationList) {
+    notificationList.style.display = enabled ? "" : "none";
+  }
+
+  if (badge) {
+    badge.hidden = !enabled;
+    if (!enabled) badge.textContent = "0";
+  }
+
   if (window.saveNotificationSettingsToFirebase) {
     window.saveNotificationSettingsToFirebase();
   }
-}
+  }
 
 
 loadNotificationSettings();
