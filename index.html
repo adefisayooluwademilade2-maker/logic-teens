@@ -7714,10 +7714,46 @@ async function toggleSavedEvent(eventId) {
   }
 }
 
-document.getElementById("eventFilter").addEventListener(
-  "change",
-  renderLogicEvents
-);
+const eventFilter = document.getElementById("eventFilter");
+const eventFilterTrigger = document.getElementById("eventFilterTrigger");
+const eventFilterOptions = document.getElementById("eventFilterOptions");
+const eventFilterLabel = document.getElementById("eventFilterLabel");
+const eventFilterArrow = document.getElementById("eventFilterArrow");
+
+eventFilterTrigger.addEventListener("click", () => {
+  const isOpen = eventFilterOptions.classList.toggle("show");
+  eventFilterArrow.textContent = isOpen ? "⌃" : "⌄";
+});
+
+eventFilterOptions.querySelectorAll("button").forEach(option => {
+  option.addEventListener("click", () => {
+    const value = option.dataset.filter;
+
+    eventFilter.value = value;
+    eventFilterLabel.textContent = option.textContent.trim();
+
+    eventFilterOptions.querySelectorAll("button").forEach(button => {
+      button.classList.toggle("selected", button === option);
+    });
+
+    eventFilterOptions.classList.remove("show");
+    eventFilterArrow.textContent = "⌄";
+
+    renderLogicEvents();
+  });
+});
+
+document.addEventListener("click", event => {
+  if (!event.target.closest(".logic-event-filter")) {
+    eventFilterOptions.classList.remove("show");
+    eventFilterArrow.textContent = "⌄";
+  }
+});
+
+eventFilter.addEventListener("change", renderLogicEvents);
+
+eventFilterOptions.querySelector('[data-filter="all"]')
+  .classList.add("selected");
 
 
 function startLogicEvents() {
