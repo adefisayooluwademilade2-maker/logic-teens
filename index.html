@@ -8231,7 +8231,9 @@ onAuthStateChanged(auth, async user => {
     }
   );
   
-  window.loadTeamApplicationStatus(user);
+  window.loadTeamApplicationStatus(user).catch(error => {
+  console.error("Team application status failed:", error);
+});
 
   try {
     
