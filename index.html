@@ -7089,10 +7089,13 @@ window.openEventMediaGallery = function(items, startIndex = 0) {
   let touchStartY = 0;
   const generatedUrls = [];
 
-  const overlay = document.createElement("div");
+    const overlay = document.createElement("div");
   overlay.style.cssText =
-    "position:fixed;inset:0;z-index:100002;background:rgba(9,10,18,.98);display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;";
+    "position:fixed;inset:0;z-index:100002;background:rgba(0,0,0,.68);display:flex;align-items:center;justify-content:center;padding:22px;box-sizing:border-box;";
 
+  const popup = document.createElement("div");
+  popup.style.cssText =
+    "width:100%;max-width:560px;background:#141622;border:1px solid #292b3b;border-radius:18px;padding:12px;box-sizing:border-box;box-shadow:0 15px 50px rgba(0,0,0,.5);";
   const viewer = document.createElement("div");
   viewer.style.cssText =
     "width:100%;max-width:680px;display:flex;flex-direction:column;gap:12px;";
