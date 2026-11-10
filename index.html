@@ -7088,7 +7088,8 @@ window.openEventMediaGallery = function(items, startIndex = 0) {
   let touchStartX = 0;
   let touchStartY = 0;
   const generatedUrls = [];
-
+let activeVideo = null;
+  
       const overlay = document.createElement("div");
   overlay.style.cssText =
     "position:fixed;inset:0;z-index:100002;background:rgba(0,0,0,.48);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;";
