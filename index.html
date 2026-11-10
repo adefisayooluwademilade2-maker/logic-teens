@@ -6781,10 +6781,6 @@ onSnapshot(notificationsQuery, snapshot => {
     badge.hidden = !allNotificationsEnabled;
   }
 
-  if (!allNotificationsEnabled) {
-    return;
-  }
-
   notificationList.innerHTML = "";
   let unread = 0;
 
@@ -6882,7 +6878,7 @@ if (requestedAnnouncementId) {
       }
 
     badge.textContent = unread;
-    badge.hidden = unread === 0;
+        badge.hidden = !allNotificationsEnabled || unread === 0;
 
   }, error => {
     console.error("Notification error:", error);
