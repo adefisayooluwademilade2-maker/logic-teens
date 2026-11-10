@@ -3790,16 +3790,7 @@ function saveAllNotificationPreference(enabled) {
     input.disabled = !enabled;
   });
 
-  const notificationList = document.getElementById("notificationList");
-  const badge = document.getElementById("unreadNotificationCount");
-
-  if (notificationList) {
-    notificationList.style.display = enabled ? "" : "none";
-  }
-
-  if (badge) {
-    badge.hidden = !enabled || badge.textContent === "0";
-  }
+  
 
   if (window.saveNotificationSettingsToFirebase) {
     window.saveNotificationSettingsToFirebase();
@@ -6808,9 +6799,6 @@ onSnapshot(notificationsQuery, snapshot => {
   notificationList.style.display =
     allNotificationsEnabled ? "" : "none";
 
-  if (badge) {
-    badge.hidden = !allNotificationsEnabled;
-  }
 
   notificationList.innerHTML = "";
   let unread = 0;
@@ -8474,10 +8462,6 @@ if (masterInput && typeof savedNotifications.enabled === "boolean") {
   if (notificationList) {
     notificationList.style.display =
       savedNotifications.enabled === false ? "none" : "";
-  }
-
-  if (notificationBadge) {
-    notificationBadge.hidden = savedNotifications.enabled === false;
   }
 
 [
