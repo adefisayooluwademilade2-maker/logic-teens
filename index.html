@@ -3737,9 +3737,11 @@ function loadNotificationSettings() {
   const masterToggle = document.getElementById("masterNotifications");
   const phoneToggle = document.getElementById("phoneNotifications");
 
+  const masterEnabled =
+    localStorage.getItem("logicAllNotificationsEnabled") !== "false";
+
   if (masterToggle) {
-    const savedMaster = localStorage.getItem("logicAllNotificationsEnabled");
-    masterToggle.checked = savedMaster === null ? true : savedMaster === "true";
+    masterToggle.checked = masterEnabled;
   }
 
   if (phoneToggle) {
@@ -3752,10 +3754,13 @@ function loadNotificationSettings() {
     if (!input) return;
 
     const saved = localStorage.getItem("logicNotification_" + key);
-    input.checked = saved === null ? true : saved === "true";
-  });
-}
 
+    input.checked = masterEnabled &&
+      (saved === null || saved === "true");
+
+    input.disabled = !masterEnabled;
+  });
+  }
   function saveNotificationPreference(key, enabled) {
   if (!notificationKeys.includes(key)) return;
 
