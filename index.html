@@ -7112,13 +7112,16 @@ let activeVideo = null;
 
   const stage = document.createElement("div");
   stage.style.cssText =
-    "position:relative;width:100%;height:min(58vh,520px);min-height:180px;display:flex;align-items:center;justify-content:center;background:transparent;border-radius:14px;overflow:hidden;touch-action:pan-y;";
+    const mediaRow = document.createElement("div");
+mediaRow.style.cssText =
+  "display:flex;align-items:center;justify-content:center;gap:8px;width:100%;";
+  "position:relative;flex:1;min-width:0;height:min(58vh,520px);min-height:180px;display:flex;align-items:center;justify-content:center;background:transparent;overflow:hidden;touch-action:pan-y;";
   const makeArrow = (symbol, side) => {
     const button = document.createElement("button");
     button.type = "button";
     button.textContent = symbol;
     button.style.cssText =
-      `position:absolute;top:50%;${side}:12px;transform:translateY(-50%);z-index:10;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border:2px solid #d6b779;border-radius:50%;background:#090a12;color:#ffffff;font-size:32px;font-weight:bold;opacity:1;`;
+      `position:static;flex-shrink:0;width:42px;height:42px;display:flex;align-items:center;justify-content:center;border:2px solid #d6b779;border-radius:50%;background:#090a12;color:#ffffff;font-size:30px;font-weight:bold;opacity:1;`;
     return button;
   };
 
@@ -7225,7 +7228,6 @@ let activeVideo = null;
       media.addEventListener("contextmenu", event => event.preventDefault());
       stage.appendChild(media);
     }
-   stage.append(previous, next);
 
     previous.disabled = currentIndex === 0;
     next.disabled = currentIndex === items.length - 1;
@@ -7273,14 +7275,14 @@ let activeVideo = null;
   }, {passive:true});
 
   header.append(counter, close);
-  stage.append(previous, next);
+  mediaRow.append(previous, stage, next);
     viewer.style.maxWidth = "100%";
   stage.style.height = "min(58vh,520px)";
   stage.style.minHeight = "180px";
 
     viewer.style.maxWidth = "100%";
 
-  viewer.append(header, stage);
+  viewer.append(header, mediaRow);
   overlay.appendChild(viewer);
   document.body.appendChild(overlay);
 
