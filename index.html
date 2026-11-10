@@ -3732,8 +3732,15 @@ const notificationKeys = [
   "ministryUpdates"
 ];
 
+
 function loadNotificationSettings() {
+  const masterToggle = document.getElementById("masterNotifications");
   const phoneToggle = document.getElementById("phoneNotifications");
+
+  if (masterToggle) {
+    const savedMaster = localStorage.getItem("logicAllNotificationsEnabled");
+    masterToggle.checked = savedMaster === null ? true : savedMaster === "true";
+  }
 
   if (phoneToggle) {
     phoneToggle.checked =
@@ -3749,17 +3756,14 @@ function loadNotificationSettings() {
   });
 }
 
-window.updateNotificationControls = function() {
-  // Each notification category works independently.
-};
-
-function saveNotificationPreference(key, enabled) {
-  localStorage.setItem("logicNotification_" + key, String(enabled));
+function saveAllNotificationPreference(enabled) {
+  localStorage.setItem("logicAllNotificationsEnabled", String(enabled));
 
   if (window.saveNotificationSettingsToFirebase) {
     window.saveNotificationSettingsToFirebase();
   }
 }
+
 
 loadNotificationSettings();
 </script>
@@ -6716,7 +6720,8 @@ window.saveNotificationSettingsToFirebase = async function() {
   if (!user) return;
 
   const settings = {
-    enabled: true,
+    enabled:
+  document.getElementById("masterNotifications")?.checked !== false,
     churchAnnouncements:
       document.getElementById("churchAnnouncements")?.checked !== false,
     bibleNotifications:
