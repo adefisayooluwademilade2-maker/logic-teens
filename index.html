@@ -6897,7 +6897,6 @@ if (requestedAnnouncementId) {
       }
 
     badge.textContent = unread;
-        badge.hidden = !allNotificationsEnabled || unread === 0;
 
   }, error => {
     console.error("Notification error:", error);
