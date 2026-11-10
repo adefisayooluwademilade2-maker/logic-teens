@@ -4978,20 +4978,24 @@ const profilesById = new Map(
   ])
 );
 
-const appointedIds = new Set(
-  adminsSnapshot.docs.map(item => item.id)
-);
+const accountsById = new Map();
 
-const members = usersSnapshot.docs
-  .map(item => ({
+usersSnapshot.docs.forEach(item => {
+  accountsById.set(item.id, {
     userId: item.id,
+    ...item.data()
+  });
+});
+
+profilesSnapshot.docs.forEach(item => {
+  accountsById.set(item.id, {
+    ...(accountsById.get(item.id) || {}),
     ...item.data(),
-    ...(profilesById.get(item.id) || {})
-  }))
-  .filter(member =>
-    !appointedIds.has(member.userId) &&
-    member.isAdmin !== true
-  )
+    userId: item.id
+  });
+});
+
+const members = Array.from(accountsById.values())
   .sort((a, b) =>
     (a.fullName || "").localeCompare(b.fullName || "")
   );
