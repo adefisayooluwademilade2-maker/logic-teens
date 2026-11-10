@@ -3774,6 +3774,16 @@ function loadNotificationSettings() {
 function saveAllNotificationPreference(enabled) {
   localStorage.setItem("logicAllNotificationsEnabled", String(enabled));
 
+  notificationKeys.forEach(key => {
+    const input = document.getElementById(key);
+    if (!input) return;
+
+    const saved = localStorage.getItem("logicNotification_" + key);
+    input.checked = enabled
+      ? (saved === null ? true : saved === "true")
+      : false;
+  });
+
   const notificationList = document.getElementById("notificationList");
   const badge = document.getElementById("unreadNotificationCount");
 
@@ -3787,7 +3797,7 @@ function saveAllNotificationPreference(enabled) {
 
   if (window.saveNotificationSettingsToFirebase) {
     window.saveNotificationSettingsToFirebase();
-    }
+  }
   }
 
 
