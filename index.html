@@ -6761,6 +6761,20 @@ window.startNotificationListener = function(user) {
 
 onSnapshot(notificationsQuery, snapshot => {
     notificationList.innerHTML = "";
+      const allNotificationsEnabled =
+      localStorage.getItem("logicAllNotificationsEnabled") !== "false";
+
+    notificationList.style.display =
+      allNotificationsEnabled ? "" : "none";
+
+    if (badge) {
+      badge.hidden = !allNotificationsEnabled;
+    }
+
+    if (!allNotificationsEnabled) {
+      if (badge) badge.textContent = "0";
+      return;
+  }
     let unread = 0;
 
     if (snapshot.empty) {
