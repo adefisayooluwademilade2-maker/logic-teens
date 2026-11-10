@@ -6772,22 +6772,22 @@ window.startNotificationListener = function(user) {
 );
 
 onSnapshot(notificationsQuery, snapshot => {
-    notificationList.innerHTML = "";
-      const allNotificationsEnabled =
-      localStorage.getItem("logicAllNotificationsEnabled") !== "false";
+  const allNotificationsEnabled =
+    localStorage.getItem("logicAllNotificationsEnabled") !== "false";
 
-    notificationList.style.display =
-      allNotificationsEnabled ? "" : "none";
+  notificationList.style.display =
+    allNotificationsEnabled ? "" : "none";
 
-    if (badge) {
-      badge.hidden = !allNotificationsEnabled;
-    }
-
-    if (!allNotificationsEnabled) {
-      if (badge) badge.textContent = "0";
-      return;
+  if (badge) {
+    badge.hidden = !allNotificationsEnabled;
   }
-    let unread = 0;
+
+  if (!allNotificationsEnabled) {
+    return;
+  }
+
+  notificationList.innerHTML = "";
+  let unread = 0;
 
     if (snapshot.empty) {
       notificationList.innerHTML =
