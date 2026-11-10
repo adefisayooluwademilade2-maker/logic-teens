@@ -7265,43 +7265,6 @@ window.openEventMediaGallery = function(items) {
   showItem();
 };
 
-window.addEventListener("popstate", closeGallery);
-
-close.addEventListener("click", () => history.back());
-
-  header.append(heading, close);
-  overlay.appendChild(header);
-
-  const grid = document.createElement("div");
-  grid.style.cssText =
-    "display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;";
-
-  items.forEach(item => {
-    const url = item.url || URL.createObjectURL(item);
-    const type = item.type || eventFileKind(item);
-
-    const media = type === "video"
-      ? document.createElement("video")
-      : document.createElement("img");
-
-    media.src = url;
-
-    if (type === "video") {
-      media.controls = true;
-      media.playsInline = true;
-    } else {
-      media.alt = "Event photo";
-    }
-
-    media.style.cssText =
-      "width:100%;height:150px;object-fit:cover;border-radius:9px;background:#141622;";
-
-    grid.appendChild(media);
-  });
-
-  overlay.appendChild(grid);
-  document.body.appendChild(overlay);
-};
 
 window.renderEventEditMediaPreview = function() {
   const preview = document.getElementById("eventMediaPreview");
@@ -8293,7 +8256,6 @@ openPage(window.logicRequestedStartingPage, {
   replaceHistory: true
 });
 
-document.body.style.visibility = "visible";
     
   document.getElementById("adminManagementPanel").hidden =
   window.logicCanManageAdmins !== true;
