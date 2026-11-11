@@ -6846,22 +6846,45 @@ message.textContent = fullMessage.length > 55
 
       card.appendChild(button);
 
-      card.onclick = async () => {
-  if (!isRead) {
-    await updateDoc(
-      doc(db, "users", user.uid, "notifications", id),
-      { read: true }
-    );
-  }
+            card.onclick = async () => {
+        if (!isRead) {
+          await updateDoc(
+            doc(db, "users", user.uid, "notifications", id),
+            { read: true }
+          );
+        }
 
-  document.getElementById("notificationDetailTitle").textContent =
-    item.title || "Notification";
+        if (item.type === "event" && item.eventId) {
+          const eventSnap = await getDoc(
+            doc(db, "events", item.eventId)
+          );
 
-  document.getElementById("notificationDetailMessage").textContent =
-    item.message || "";
+          if (eventSnap.exists()) {
+            openLogicEventDetails({
+              ...eventSnap.data(),
+              id: item.eventId
+            });
+            return;
+          }
 
-  openPage("notificationDetails");
-};
+          document.getElementById("notificationDetailTitle").textContent =
+            item.title || "Event";
+
+          document.getElementById("notificationDetailMessage").textContent =
+            "This event is no longer available.";
+
+          openPage("notificationDetails");
+          return;
+        }
+
+        document.getElementById("notificationDetailTitle").textContent =
+          item.title || "Notification";
+
+        document.getElementById("notificationDetailMessage").textContent =
+          item.message || "";
+
+        openPage("notificationDetails");
+      };
 
       notificationList.appendChild(card);
     });
@@ -8300,8 +8323,8 @@ uploadedMedia.splice(insertionIndex, 0, ...newlyUploadedMedia);
             );
 
             batch.set(notificationRef, {
-              title: "New Event",
-              message: title,
+              title: title,
+message: "Tap to view event details",
               type: "event",
               eventId: eventRef.id,
               read: false,
