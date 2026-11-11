@@ -8271,7 +8271,7 @@ uploadedMedia.splice(insertionIndex, 0, ...newlyUploadedMedia);
           createdAt: serverTimestamp()
         });
 
-                // CREATE IN-APP EVENT NOTIFICATIONS
+                        // CREATE IN-APP EVENT NOTIFICATIONS
         const eventUsersSnapshot = await getDocs(
           collection(db, "users")
         );
@@ -8285,6 +8285,11 @@ uploadedMedia.splice(insertionIndex, 0, ...newlyUploadedMedia);
               settings.eventReminders !== false;
           })
           .map(userDoc => userDoc.id);
+
+        window.logicNotify(
+          "Event notification recipients found: " +
+          eventRecipients.length
+        );
 
         for (let i = 0; i < eventRecipients.length; i += 450) {
           const batch = writeBatch(db);
@@ -8305,8 +8310,7 @@ uploadedMedia.splice(insertionIndex, 0, ...newlyUploadedMedia);
           });
 
           await batch.commit();
-        }
-
+  }
         // SEND EVENT PHONE NOTIFICATIONS
         try {
           const idToken = await auth.currentUser.getIdToken(true);
