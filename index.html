@@ -7666,39 +7666,50 @@ window.cancelEventEdit = function() {
   addDetail("EVENT LOCATION", event.location);
   addDetail("ABOUT THIS EVENT", event.description);
 
+    
   // EVENT REGISTRATION
+  let registrationPanel = null;
+  let adminCount = null;
+
   window.logicStopEventRegistrations();
 
   const user = window.logicCurrentUser;
 
   if (event.registrationEnabled === true && user) {
-    const registrationPanel = document.createElement("div");
+    registrationPanel = document.createElement("div");
     registrationPanel.style.cssText =
-      "background:#141622;border:1px solid #292b3b;border-radius:15px;padding:17px;margin:18px 0;";
+      "background:#141622;border:1px solid #292b3b;border-radius:12px;padding:11px;margin:12px 0;";
 
-    const registrationHeading = document.createElement("h2");
+    const registrationHeader = document.createElement("div");
+    registrationHeader.style.cssText =
+      "display:flex;align-items:center;justify-content:space-between;gap:10px;";
+
+    const registrationHeading = document.createElement("strong");
     registrationHeading.textContent = "Event Registration";
     registrationHeading.style.cssText =
-      "margin:0 0 12px;color:#d6b779;";
+      "color:#d6b779;font-size:14px;";
+
+    adminCount = document.createElement("span");
+    adminCount.textContent = "0 registered";
+    adminCount.style.cssText =
+      "color:#d6b779;font-size:12px;cursor:pointer;white-space:nowrap;";
+
+    if (window.logicIsAdmin === true) {
+      adminCount.addEventListener("click", () => {
+        window.openEventRegistrationMembers(event);
+      });
+      registrationHeader.append(registrationHeading, adminCount);
+    } else {
+      registrationHeader.append(registrationHeading);
+    }
 
     const registrationButton = document.createElement("button");
     registrationButton.type = "button";
-    registrationButton.textContent = "Checking registration...";
+    registrationButton.textContent = "Checking...";
     registrationButton.style.cssText =
-      "width:100%;padding:13px;background:#d6b779;color:#090a12;border:0;border-radius:10px;font-weight:bold;";
+      "width:auto;min-width:105px;padding:8px 15px;margin-top:9px;background:#d6b779;color:#090a12;border:0;border-radius:8px;font-size:13px;font-weight:bold;";
 
-    const registrationStatus = document.createElement("p");
-    registrationStatus.textContent = "Checking your registration...";
-    registrationStatus.style.cssText =
-      "color:#aaa;font-size:12px;margin:10px 0 0;";
-
-    registrationPanel.append(
-      registrationHeading,
-      registrationButton,
-      registrationStatus
-    );
-
-    page.appendChild(registrationPanel);
+    registrationPanel.append(registrationHeader, registrationButton);
 
     const myRegistrationRef = doc(
       db,
@@ -7709,6 +7720,20 @@ window.cancelEventEdit = function() {
     );
 
     let registrationBusy = false;
+
+    const updateRegistrationButton = myRegistered => {
+      registrationButton.textContent = myRegistered
+        ? "Cancel Registration"
+        : "Register";
+
+      registrationButton.style.background = myRegistered
+        ? "#292b3b"
+        : "#d6b779";
+
+      registrationButton.style.color = myRegistered
+        ? "#ffffff"
+        : "#090a12";
+    };
 
     registrationButton.addEventListener("click", async () => {
       if (registrationBusy) return;
@@ -7721,12 +7746,14 @@ window.cancelEventEdit = function() {
 
         if (currentRegistration.exists()) {
           await deleteDoc(myRegistrationRef);
+          updateRegistrationButton(false);
           window.logicNotify("Registration cancelled.");
         } else {
           await setDoc(myRegistrationRef, {
             userId: user.uid,
             registeredAt: serverTimestamp()
           });
+          updateRegistrationButton(true);
           window.logicNotify("You are registered for this event!");
         }
       } catch (error) {
@@ -7747,44 +7774,6 @@ window.cancelEventEdit = function() {
       "registrations"
     );
 
-    
-    const adminCount = document.createElement("p");
-    adminCount.style.cssText =
-      "color:#d6b779;font-size:13px;margin:18px 0 10px;";
-
-    const viewMembersButton = document.createElement("button");
-    viewMembersButton.type = "button";
-    viewMembersButton.textContent = "View Registered Members";
-    viewMembersButton.style.cssText =
-      "width:100%;padding:13px;background:#292b3b;color:#d6b779;border:1px solid #44465a;border-radius:10px;font-weight:bold;margin-top:8px;";
-
-    if (window.logicIsAdmin === true) {
-      registrationPanel.append(adminCount, viewMembersButton);
-      viewMembersButton.addEventListener("click", () => {
-        window.openEventRegistrationMembers(event);
-      });
-    }
-
-
-    const updateRegistrationButton = myRegistered => {
-      registrationButton.textContent = myRegistered
-        ? "Cancel Registration"
-        : "Register";
-
-      registrationButton.style.background = myRegistered
-        ? "#292b3b"
-        : "#d6b779";
-
-      registrationButton.style.color = myRegistered
-        ? "#ffffff"
-        : "#090a12";
-
-      registrationStatus.textContent = myRegistered
-        ? "You are registered for this event."
-        : "You have not registered for this event.";
-    };
-
-
     if (window.logicIsAdmin === true) {
       stopEventRegistrations = onSnapshot(
         registrationsRef,
@@ -7794,19 +7783,12 @@ window.cancelEventEdit = function() {
           );
 
           adminCount.textContent =
-            "Total registrations: " + snapshot.size;
-
-          viewMembersButton.textContent =
-            "View Registered Members (" + snapshot.size + ")";
+            snapshot.size + " registered";
         },
         error => {
           console.error("Registration listener error:", error);
-          registrationStatus.textContent =
-            "Unable to load registration information.";
         }
       );
-  
-  
     } else {
       stopEventRegistrations = onSnapshot(
         myRegistrationRef,
@@ -7815,13 +7797,11 @@ window.cancelEventEdit = function() {
         },
         error => {
           console.error("My registration listener error:", error);
-          registrationStatus.textContent =
-            "Unable to load your registration.";
         }
       );
     }
-
   }
+  
   
     const mediaItems = (event.media || []).filter(item =>
     item.url && item.url !== event.coverUrl
