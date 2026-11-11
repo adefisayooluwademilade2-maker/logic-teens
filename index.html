@@ -7784,63 +7784,6 @@ window.cancelEventEdit = function() {
         : "You have not registered for this event.";
     };
 
-    if (window.logicIsAdmin === true) {
-      stopEventRegistrations = onSnapshot(
-        registrationsRef,
-        async snapshot => {
-          updateRegistrationButton(
-            snapshot.docs.some(item => item.id === user.uid)
-          );
-
-          adminCount.textContent =
-            "Total registrations: " + snapshot.size;
-
-          registeredMembers.replaceChildren();
-
-          if (!snapshot.size) {
-            registeredMembers.textContent =
-              "No members have registered yet.";
-            registeredMembers.style.color = "#9999aa";
-            registeredMembers.style.fontSize = "13px";
-            return;
-          }
-
-          for (const registration of snapshot.docs) {
-            const profileSnapshot = await getDoc(
-              doc(db, "publicProfiles", registration.id)
-            );
-
-            const profile = profileSnapshot.exists()
-              ? profileSnapshot.data()
-              : {};
-
-            const row = document.createElement("div");
-            row.style.cssText =
-              "display:flex;align-items:center;gap:11px;padding:11px 0;border-top:1px solid #292b3b;";
-
-            const photo = document.createElement("img");
-            photo.src = profile.photoURL ||
-              "https://www.gravatar.com/avatar/?d=mp";
-            photo.alt = "";
-            photo.style.cssText =
-              "width:40px;height:40px;border-radius:50%;object-fit:cover;background:#292b3b;";
-
-            const name = document.createElement("strong");
-            name.textContent =
-              profile.fullName || profile.username || "LOGIC Teens Member";
-            name.style.cssText = "font-size:13px;";
-
-            row.append(photo, name);
-            registeredMembers.appendChild(row);
-          }
-        },
-        error => {
-          console.error("Registration listener error:", error);
-          registrationStatus.textContent =
-            "Unable to load registration information.";
-        }
-      );
-
 
     if (window.logicIsAdmin === true) {
       stopEventRegistrations = onSnapshot(
