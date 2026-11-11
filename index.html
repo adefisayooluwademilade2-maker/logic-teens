@@ -896,6 +896,26 @@ body.event-details-open main {
   <div id="logicEventDetailsContent"></div>
   </section>
 
+
+<section class="page" id="eventRegistrationMembersPage">
+  <button class="directory-back"
+    onclick="window.backToEventRegistrationDetails()">
+    ←
+  </button>
+
+  <div class="eyebrow">EVENT REGISTRATION</div>
+  <h1 id="eventRegistrationMembersTitle">Registered Members</h1>
+  <p id="eventRegistrationMembersCount"
+    style="color:#d6b779;font-size:13px;">
+    Loading registrations...
+  </p>
+
+  <div id="eventRegistrationMembersList">
+    <div class="directory-empty">Loading members...</div>
+  </div>
+</section>
+  
+  
   <section class="page" id="adminEventManager">
   <button class="directory-back" onclick="openPage('adminDashboard')"
     style="background:transparent;border:0;color:white;padding:8px 0;">
@@ -4413,7 +4433,8 @@ document.body.classList.toggle(
   "adminApprovedPeople",
   "ministryDirectory",
   "membersDirectory",
-  "ministryMemberProfile"
+    "ministryMemberProfile",
+  "eventRegistrationMembersPage"
 ].includes(page)
 
 );
