@@ -4373,6 +4373,13 @@ if (
   const target = document.getElementById(page);
   if (!target) return;
 
+  if (
+    currentPage === "logicEventDetailsPage" &&
+    page !== currentPage
+  ) {
+    window.logicStopEventRegistrations?.();
+  }
+  
     if (currentPage === "logicEventDetailsPage" && page !== currentPage) {
     document
       .querySelectorAll("#logicEventDetailsContent video")
@@ -7149,6 +7156,15 @@ let logicEvents = [];
 let stopLogicEvents = null;
 
 
+let stopEventRegistrations = null;
+
+window.logicStopEventRegistrations = function() {
+  if (stopEventRegistrations) {
+    stopEventRegistrations();
+    stopEventRegistrations = null;
+  }
+};
+  
 let logicSavedEventIds = new Set();
 let stopSavedEvents = null;
 
@@ -7583,6 +7599,172 @@ window.cancelEventEdit = function() {
   addDetail("EVENT LOCATION", event.location);
   addDetail("ABOUT THIS EVENT", event.description);
 
+  // EVENT REGISTRATION
+  window.logicStopEventRegistrations();
+
+  const user = window.logicCurrentUser;
+
+  if (event.registrationEnabled === true && user) {
+    const registrationPanel = document.createElement("div");
+    registrationPanel.style.cssText =
+      "background:#141622;border:1px solid #292b3b;border-radius:15px;padding:17px;margin:18px 0;";
+
+    const registrationHeading = document.createElement("h2");
+    registrationHeading.textContent = "Event Registration";
+    registrationHeading.style.cssText =
+      "margin:0 0 12px;color:#d6b779;";
+
+    const registrationButton = document.createElement("button");
+    registrationButton.type = "button";
+    registrationButton.textContent = "Checking registration...";
+    registrationButton.style.cssText =
+      "width:100%;padding:13px;background:#d6b779;color:#090a12;border:0;border-radius:10px;font-weight:bold;";
+
+    const registrationStatus = document.createElement("p");
+    registrationStatus.textContent = "Checking your registration...";
+    registrationStatus.style.cssText =
+      "color:#aaa;font-size:12px;margin:10px 0 0;";
+
+    registrationPanel.append(
+      registrationHeading,
+      registrationButton,
+      registrationStatus
+    );
+
+    page.appendChild(registrationPanel);
+
+    const myRegistrationRef = doc(
+      db,
+      "events",
+      event.id,
+      "registrations",
+      user.uid
+    );
+
+    let registrationBusy = false;
+
+    registrationButton.addEventListener("click", async () => {
+      if (registrationBusy) return;
+
+      registrationBusy = true;
+      registrationButton.disabled = true;
+
+      try {
+        const currentRegistration = await getDoc(myRegistrationRef);
+
+        if (currentRegistration.exists()) {
+          await deleteDoc(myRegistrationRef);
+          window.logicNotify("Registration cancelled.");
+        } else {
+          await setDoc(myRegistrationRef, {
+            userId: user.uid,
+            registeredAt: serverTimestamp()
+          });
+          window.logicNotify("You are registered for this event!");
+        }
+      } catch (error) {
+        console.error("Event registration error:", error);
+        window.logicNotify(
+          error.message || "Registration could not be updated."
+        );
+      } finally {
+        registrationBusy = false;
+        registrationButton.disabled = false;
+      }
+    });
+
+    const registrationsRef = collection(
+      db,
+      "events",
+      event.id,
+      "registrations"
+    );
+
+    const adminCount = document.createElement("p");
+    adminCount.style.cssText =
+      "color:#d6b779;font-size:13px;margin:18px 0 10px;";
+
+    const registeredMembers = document.createElement("div");
+
+    if (window.logicIsAdmin === true) {
+      registrationPanel.append(adminCount, registeredMembers);
+    }
+
+    stopEventRegistrations = onSnapshot(
+      registrationsRef,
+      async snapshot => {
+        const myRegistration = snapshot.docs.some(
+          item => item.id === user.uid
+        );
+
+        registrationButton.textContent = myRegistration
+          ? "Cancel Registration"
+          : "Register";
+
+        registrationButton.style.background = myRegistration
+          ? "#292b3b"
+          : "#d6b779";
+
+        registrationButton.style.color = myRegistration
+          ? "#ffffff"
+          : "#090a12";
+
+        registrationStatus.textContent = myRegistration
+          ? "You are registered for this event."
+          : "You have not registered for this event.";
+
+        if (window.logicIsAdmin !== true) return;
+
+        adminCount.textContent =
+          "Total registrations: " + snapshot.size;
+
+        registeredMembers.replaceChildren();
+
+        if (!snapshot.size) {
+          registeredMembers.textContent =
+            "No members have registered yet.";
+          registeredMembers.style.color = "#9999aa";
+          registeredMembers.style.fontSize = "13px";
+          return;
+        }
+
+        for (const registration of snapshot.docs) {
+          const profileSnapshot = await getDoc(
+            doc(db, "publicProfiles", registration.id)
+          );
+
+          const profile = profileSnapshot.exists()
+            ? profileSnapshot.data()
+            : {};
+
+          const row = document.createElement("div");
+          row.style.cssText =
+            "display:flex;align-items:center;gap:11px;padding:11px 0;border-top:1px solid #292b3b;";
+
+          const photo = document.createElement("img");
+          photo.src = profile.photoURL ||
+            "https://www.gravatar.com/avatar/?d=mp";
+          photo.alt = "";
+          photo.style.cssText =
+            "width:40px;height:40px;border-radius:50%;object-fit:cover;background:#292b3b;";
+
+          const name = document.createElement("strong");
+          name.textContent =
+            profile.fullName || profile.username || "LOGIC Teens Member";
+          name.style.cssText = "font-size:13px;";
+
+          row.append(photo, name);
+          registeredMembers.appendChild(row);
+        }
+      },
+      error => {
+        console.error("Registration listener error:", error);
+        registrationStatus.textContent =
+          "Unable to load registration information.";
+      }
+    );
+  }
+  
     const mediaItems = (event.media || []).filter(item =>
     item.url && item.url !== event.coverUrl
   );
