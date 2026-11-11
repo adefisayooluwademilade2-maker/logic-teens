@@ -5274,6 +5274,37 @@ window.loadMembersDirectory = async function() {
       (a.fullName || "").localeCompare(b.fullName || "")
     );
   
+        if (window.logicIsAdmin === true) {
+      const eventsSnapshot = await getDocs(collection(db, "events"));
+      const registrationsByUser = new Map();
+
+      for (const eventDoc of eventsSnapshot.docs) {
+        const eventData = eventDoc.data();
+        if (eventData.registrationEnabled !== true) continue;
+
+        const registrationsSnapshot = await getDocs(
+          collection(db, "events", eventDoc.id, "registrations")
+        );
+
+        registrationsSnapshot.docs.forEach(registration => {
+          const userId = registration.id;
+
+          if (!registrationsByUser.has(userId)) {
+            registrationsByUser.set(userId, []);
+          }
+
+          registrationsByUser.get(userId).push(
+            eventData.title || "Untitled event"
+          );
+        });
+      }
+
+      window.logicMembersDirectoryCache.forEach(member => {
+        member.registeredEvents =
+          registrationsByUser.get(member.userId) || [];
+      });
+    }
+
     window.renderMembersDirectory();
 
   } catch (error) {
@@ -5431,7 +5462,22 @@ window.renderMembersDirectory = function() {
     username.style.cssText =
       "color:var(--muted);font-size:12px;margin-top:4px";
 
-    info.append(name, role, username);
+        info.append(name, role, username);
+
+    if (window.logicIsAdmin === true) {
+      const registrationInfo = document.createElement("div");
+
+      registrationInfo.textContent =
+        member.registeredEvents?.length
+          ? "Registered for: " + member.registeredEvents.join(", ")
+          : "No event registrations";
+
+      registrationInfo.style.cssText =
+        "color:#d6b779;font-size:11px;margin-top:6px;line-height:1.5;";
+
+      info.appendChild(registrationInfo);
+  }
+    
     card.append(photo, fallback, info);
 
     card.onclick = () => {
