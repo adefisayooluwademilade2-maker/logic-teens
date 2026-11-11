@@ -2620,9 +2620,22 @@ body.management-page-open #ministryMemberProfile {
       if (!confirmed) return;
 
       try {
-        await deleteDoc(
-          doc(db, "departmentMembers", departmentMembershipId)
-        );
+        const removalBatch = writeBatch(db);
+
+removalBatch.delete(
+  doc(db, "departmentMembers", departmentMembershipId)
+);
+
+removalBatch.update(
+  doc(db, "teamApplications", departmentMembershipId),
+  {
+    status: "removed",
+    reviewedAt: serverTimestamp(),
+    reviewedBy: auth.currentUser.uid
+  }
+);
+
+await removalBatch.commit();
 
                 await window.logicSendMemberNotification(
           userId,
@@ -5755,9 +5768,22 @@ window.loadDepartmentMembers = async function(department) {
           if (!confirmed) return;
 
           try {
-            await deleteDoc(
-              doc(db, "departmentMembers", memberDoc.id)
-            );
+          const removalBatch = writeBatch(db);
+
+removalBatch.delete(
+  doc(db, "departmentMembers", memberDoc.id)
+);
+
+removalBatch.update(
+  doc(db, "teamApplications", memberDoc.id),
+  {
+    status: "removed",
+    reviewedAt: serverTimestamp(),
+    reviewedBy: auth.currentUser.uid
+  }
+);
+
+await removalBatch.commit();
 
             await window.logicSendMemberNotification(
               userId,
@@ -6689,7 +6715,8 @@ window.rejectTeamApplication = async function(applicationId) {
 };
 
   
-  window.applyTeam = async function(team, button) {
+  
+window.applyTeam = async function(team, button) {
   const user = auth.currentUser;
 
   if (!user) {
@@ -6702,37 +6729,61 @@ window.rejectTeamApplication = async function(applicationId) {
 
   try {
     const teamId = team.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-    const applicationRef = doc(db, "teamApplications", user.uid + "_" + teamId);
+    const applicationRef = doc(
+      db,
+      "teamApplications",
+      user.uid + "_" + teamId
+    );
+
     const existing = await getDoc(applicationRef);
 
-    if (existing.exists()) {
-  const application = existing.data();
-
-  if (application.status === "approved") {
-    button.textContent = "Approved";
-  } else if (application.status === "rejected") {
-    button.textContent = "Not approved";
-  } else {
-    button.textContent = "Request sent";
-  }
-
-  button.disabled = true;
-  return;
-  }
     const notificationRef = doc(
       collection(db, "users", user.uid, "notifications")
     );
 
     const batch = writeBatch(db);
 
-    batch.set(applicationRef, {
-      userId: user.uid,
-      memberName: window.logicProfileData?.fullName || user.displayName || "Member",
-      email: String(user.email || "").trim().toLowerCase(),
-      team: team,
-      status: "pending",
-      createdAt: serverTimestamp()
-    });
+    if (existing.exists()) {
+      const application = existing.data();
+
+      if (application.status === "approved") {
+        button.textContent = "Approved";
+        button.disabled = true;
+        return;
+      }
+
+      if (application.status === "pending") {
+        button.textContent = "Request sent";
+        button.disabled = true;
+        return;
+      }
+
+      if (
+        application.status === "rejected" ||
+        application.status === "removed"
+      ) {
+        batch.update(applicationRef, {
+          status: "pending"
+        });
+      } else {
+        button.textContent = "Request sent";
+        button.disabled = true;
+        return;
+      }
+
+    } else {
+      batch.set(applicationRef, {
+        userId: user.uid,
+        memberName:
+          window.logicProfileData?.fullName ||
+          user.displayName ||
+          "Member",
+        email: String(user.email || "").trim().toLowerCase(),
+        team: team,
+        status: "pending",
+        createdAt: serverTimestamp()
+      });
+    }
 
     batch.set(notificationRef, {
       title: "Ministry Team Request",
@@ -6743,6 +6794,12 @@ window.rejectTeamApplication = async function(applicationId) {
 
     await batch.commit();
 
+    const statusLabel = button.parentElement?.querySelector(
+      ".application-status-label"
+    );
+
+    if (statusLabel) statusLabel.remove();
+
     button.textContent = "Request sent";
     button.disabled = true;
 
@@ -6750,11 +6807,14 @@ window.rejectTeamApplication = async function(applicationId) {
     console.error("Team application error:", error);
     button.disabled = false;
     button.textContent = "Apply to join";
-    window.logicNotify("Your request couldn't be sent. Please try again.");
+    window.logicNotify(
+      "Your request couldn't be sent. Please try again."
+    );
   }
 };
 
-  window.loadTeamApplicationStatus = async function(user) {
+
+window.loadTeamApplicationStatus = async function(user) {
   const buttons = document.querySelectorAll(
     '#ministry button[onclick^="applyTeam("]'
   );
@@ -6778,6 +6838,14 @@ window.rejectTeamApplication = async function(applicationId) {
 
       const applicationSnap = await getDoc(applicationRef);
 
+      const actions = button.closest(".ministry-actions");
+
+      let statusLabel = actions?.querySelector(
+        ".application-status-label"
+      );
+
+      if (statusLabel) statusLabel.remove();
+
       if (!applicationSnap.exists()) {
         button.textContent = "Apply to join";
         button.disabled = false;
@@ -6789,12 +6857,30 @@ window.rejectTeamApplication = async function(applicationId) {
       if (application.status === "approved") {
         button.textContent = "Approved";
         button.disabled = true;
-      } else if (application.status === "rejected") {
-        button.textContent = "Not approved";
-        button.disabled = true;
-      } else {
+
+      } else if (application.status === "pending") {
         button.textContent = "Request sent";
         button.disabled = true;
+
+      } else if (application.status === "rejected") {
+        button.textContent = "Apply to join";
+        button.disabled = false;
+
+        statusLabel = document.createElement("span");
+        statusLabel.className = "application-status-label";
+        statusLabel.textContent = "Not Approved";
+        statusLabel.style.cssText =
+          "grid-column:1 / -1;color:#999;opacity:0.55;font-size:11px;";
+
+        actions?.appendChild(statusLabel);
+
+      } else if (application.status === "removed") {
+        button.textContent = "Apply to join";
+        button.disabled = false;
+
+      } else {
+        button.textContent = "Apply to join";
+        button.disabled = false;
       }
 
     } catch (error) {
@@ -6802,6 +6888,7 @@ window.rejectTeamApplication = async function(applicationId) {
     }
   }
 };
+
 
   window.logicSendMemberNotification = async function(userId, title, message) {
   if (!userId) {
