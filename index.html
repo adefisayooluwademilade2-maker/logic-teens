@@ -7691,78 +7691,95 @@ window.cancelEventEdit = function() {
     }
 
     stopEventRegistrations = onSnapshot(
-      registrationsRef,
-      async snapshot => {
-        const myRegistration = snapshot.docs.some(
-          item => item.id === user.uid
-        );
 
-        registrationButton.textContent = myRegistration
-          ? "Cancel Registration"
-          : "Register";
+    const updateRegistrationButton = myRegistered => {
+      registrationButton.textContent = myRegistered
+        ? "Cancel Registration"
+        : "Register";
 
-        registrationButton.style.background = myRegistration
-          ? "#292b3b"
-          : "#d6b779";
+      registrationButton.style.background = myRegistered
+        ? "#292b3b"
+        : "#d6b779";
 
-        registrationButton.style.color = myRegistration
-          ? "#ffffff"
-          : "#090a12";
+      registrationButton.style.color = myRegistered
+        ? "#ffffff"
+        : "#090a12";
 
-        registrationStatus.textContent = myRegistration
-          ? "You are registered for this event."
-          : "You have not registered for this event.";
+      registrationStatus.textContent = myRegistered
+        ? "You are registered for this event."
+        : "You have not registered for this event.";
+    };
 
-        if (window.logicIsAdmin !== true) return;
-
-        adminCount.textContent =
-          "Total registrations: " + snapshot.size;
-
-        registeredMembers.replaceChildren();
-
-        if (!snapshot.size) {
-          registeredMembers.textContent =
-            "No members have registered yet.";
-          registeredMembers.style.color = "#9999aa";
-          registeredMembers.style.fontSize = "13px";
-          return;
-        }
-
-        for (const registration of snapshot.docs) {
-          const profileSnapshot = await getDoc(
-            doc(db, "publicProfiles", registration.id)
+    if (window.logicIsAdmin === true) {
+      stopEventRegistrations = onSnapshot(
+        registrationsRef,
+        async snapshot => {
+          updateRegistrationButton(
+            snapshot.docs.some(item => item.id === user.uid)
           );
 
-          const profile = profileSnapshot.exists()
-            ? profileSnapshot.data()
-            : {};
+          adminCount.textContent =
+            "Total registrations: " + snapshot.size;
 
-          const row = document.createElement("div");
-          row.style.cssText =
-            "display:flex;align-items:center;gap:11px;padding:11px 0;border-top:1px solid #292b3b;";
+          registeredMembers.replaceChildren();
 
-          const photo = document.createElement("img");
-          photo.src = profile.photoURL ||
-            "https://www.gravatar.com/avatar/?d=mp";
-          photo.alt = "";
-          photo.style.cssText =
-            "width:40px;height:40px;border-radius:50%;object-fit:cover;background:#292b3b;";
+          if (!snapshot.size) {
+            registeredMembers.textContent =
+              "No members have registered yet.";
+            registeredMembers.style.color = "#9999aa";
+            registeredMembers.style.fontSize = "13px";
+            return;
+          }
 
-          const name = document.createElement("strong");
-          name.textContent =
-            profile.fullName || profile.username || "LOGIC Teens Member";
-          name.style.cssText = "font-size:13px;";
+          for (const registration of snapshot.docs) {
+            const profileSnapshot = await getDoc(
+              doc(db, "publicProfiles", registration.id)
+            );
 
-          row.append(photo, name);
-          registeredMembers.appendChild(row);
+            const profile = profileSnapshot.exists()
+              ? profileSnapshot.data()
+              : {};
+
+            const row = document.createElement("div");
+            row.style.cssText =
+              "display:flex;align-items:center;gap:11px;padding:11px 0;border-top:1px solid #292b3b;";
+
+            const photo = document.createElement("img");
+            photo.src = profile.photoURL ||
+              "https://www.gravatar.com/avatar/?d=mp";
+            photo.alt = "";
+            photo.style.cssText =
+              "width:40px;height:40px;border-radius:50%;object-fit:cover;background:#292b3b;";
+
+            const name = document.createElement("strong");
+            name.textContent =
+              profile.fullName || profile.username || "LOGIC Teens Member";
+            name.style.cssText = "font-size:13px;";
+
+            row.append(photo, name);
+            registeredMembers.appendChild(row);
+          }
+        },
+        error => {
+          console.error("Registration listener error:", error);
+          registrationStatus.textContent =
+            "Unable to load registration information.";
         }
-      },
-      error => {
-        console.error("Registration listener error:", error);
-        registrationStatus.textContent =
-          "Unable to load registration information.";
-      }
-    );
+      );
+    } else {
+      stopEventRegistrations = onSnapshot(
+        myRegistrationRef,
+        snapshot => {
+          updateRegistrationButton(snapshot.exists());
+        },
+        error => {
+          console.error("My registration listener error:", error);
+          registrationStatus.textContent =
+            "Unable to load your registration.";
+        }
+      );
+    }
+
   }
   
     const mediaItems = (event.media || []).filter(item =>
