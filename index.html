@@ -8270,6 +8270,82 @@ uploadedMedia.splice(insertionIndex, 0, ...newlyUploadedMedia);
           createdBy: window.logicCurrentUser.uid,
           createdAt: serverTimestamp()
         });
+
+                // CREATE IN-APP EVENT NOTIFICATIONS
+        const eventUsersSnapshot = await getDocs(
+          collection(db, "users")
+        );
+
+        const eventRecipients = eventUsersSnapshot.docs
+          .filter(userDoc => {
+            const settings =
+              userDoc.data().notificationSettings || {};
+
+            return settings.enabled !== false &&
+              settings.eventReminders !== false;
+          })
+          .map(userDoc => userDoc.id);
+
+        for (let i = 0; i < eventRecipients.length; i += 450) {
+          const batch = writeBatch(db);
+
+          eventRecipients.slice(i, i + 450).forEach(uid => {
+            const notificationRef = doc(
+              collection(db, "users", uid, "notifications")
+            );
+
+            batch.set(notificationRef, {
+              title: "New Event",
+              message: title,
+              type: "event",
+              eventId: eventRef.id,
+              read: false,
+              createdAt: serverTimestamp()
+            });
+          });
+
+          await batch.commit();
+        }
+
+        // SEND EVENT PHONE NOTIFICATIONS
+        try {
+          const idToken = await auth.currentUser.getIdToken(true);
+          let cursor = null;
+
+          do {
+            const response = await fetch(
+              "https://logic-teens-push.adefisayooluwademilade2.workers.dev/send",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": "Bearer " + idToken
+                },
+                body: JSON.stringify({
+                  title: "LOGIC TEENS CHURCH",
+                  body: title,
+                  url: "https://adefisayooluwademilade2-maker.github.io/logic-teens/#event",
+                  cursor: cursor
+                })
+              }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+              throw new Error(
+                result.error || "Event phone notifications failed."
+              );
+            }
+
+            cursor = result.nextCursor || null;
+
+          } while (cursor);
+
+        } catch (pushError) {
+          console.error("Event phone notification error:", pushError);
+    }
+  
       }
 
             window.cancelEventEdit();
