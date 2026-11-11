@@ -7747,15 +7747,24 @@ window.cancelEventEdit = function() {
       "registrations"
     );
 
+    
     const adminCount = document.createElement("p");
     adminCount.style.cssText =
       "color:#d6b779;font-size:13px;margin:18px 0 10px;";
 
-    const registeredMembers = document.createElement("div");
+    const viewMembersButton = document.createElement("button");
+    viewMembersButton.type = "button";
+    viewMembersButton.textContent = "View Registered Members";
+    viewMembersButton.style.cssText =
+      "width:100%;padding:13px;background:#292b3b;color:#d6b779;border:1px solid #44465a;border-radius:10px;font-weight:bold;margin-top:8px;";
 
     if (window.logicIsAdmin === true) {
-      registrationPanel.append(adminCount, registeredMembers);
+      registrationPanel.append(adminCount, viewMembersButton);
+      viewMembersButton.addEventListener("click", () => {
+        window.openEventRegistrationMembers(event);
+      });
     }
+
 
     const updateRegistrationButton = myRegistered => {
       registrationButton.textContent = myRegistered
@@ -7831,6 +7840,30 @@ window.cancelEventEdit = function() {
             "Unable to load registration information.";
         }
       );
+
+
+    if (window.logicIsAdmin === true) {
+      stopEventRegistrations = onSnapshot(
+        registrationsRef,
+        snapshot => {
+          updateRegistrationButton(
+            snapshot.docs.some(item => item.id === user.uid)
+          );
+
+          adminCount.textContent =
+            "Total registrations: " + snapshot.size;
+
+          viewMembersButton.textContent =
+            "View Registered Members (" + snapshot.size + ")";
+        },
+        error => {
+          console.error("Registration listener error:", error);
+          registrationStatus.textContent =
+            "Unable to load registration information.";
+        }
+      );
+  
+  
     } else {
       stopEventRegistrations = onSnapshot(
         myRegistrationRef,
@@ -7912,6 +7945,90 @@ window.cancelEventEdit = function() {
   openPage("logicEventDetailsPage");
 }
 
+
+window.openEventRegistrationMembers = function(event) {
+  window.logicCurrentRegistrationEvent = event;
+  window.logicStopEventRegistrations();
+
+  document.getElementById("eventRegistrationMembersTitle")
+    .textContent = event.title + " — Registered Members";
+
+  const list = document.getElementById("eventRegistrationMembersList");
+  const count = document.getElementById("eventRegistrationMembersCount");
+
+  list.innerHTML = '<div class="directory-empty">Loading members...</div>';
+
+  openPage("eventRegistrationMembersPage");
+
+  const registrationsRef = collection(
+    db,
+    "events",
+    event.id,
+    "registrations"
+  );
+
+  stopEventRegistrations = onSnapshot(
+    registrationsRef,
+    async snapshot => {
+      count.textContent = snapshot.size + " registered";
+
+      list.replaceChildren();
+
+      if (!snapshot.size) {
+        list.textContent = "No members have registered yet.";
+        list.style.color = "#9999aa";
+        return;
+      }
+
+      for (const registration of snapshot.docs) {
+        const profileSnapshot = await getDoc(
+          doc(db, "publicProfiles", registration.id)
+        );
+
+        if (
+          !document.getElementById("eventRegistrationMembersPage")
+            .classList.contains("active")
+        ) return;
+
+        const profile = profileSnapshot.exists()
+          ? profileSnapshot.data()
+          : {};
+
+        const row = document.createElement("div");
+        row.style.cssText =
+          "display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #292b3b;";
+
+        const photo = document.createElement("img");
+        photo.src = profile.photoURL ||
+          "https://www.gravatar.com/avatar/?d=mp";
+        photo.alt = "";
+        photo.style.cssText =
+          "width:45px;height:45px;border-radius:50%;object-fit:cover;background:#292b3b;";
+
+        const name = document.createElement("strong");
+        name.textContent =
+          profile.fullName || profile.username || "LOGIC Teens Member";
+
+        row.append(photo, name);
+        list.appendChild(row);
+      }
+    },
+    error => {
+      console.error("Registered members page error:", error);
+      list.textContent = "Unable to load registered members.";
+    }
+  );
+};
+
+window.backToEventRegistrationDetails = function() {
+  window.logicStopEventRegistrations();
+
+  if (window.logicCurrentRegistrationEvent) {
+    openLogicEventDetails(window.logicCurrentRegistrationEvent);
+  }
+};
+      
+    
 function renderLogicEvents() {
   const memberList = document.getElementById("eventsList");
   const adminList = document.getElementById("adminEventsList");
