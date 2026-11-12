@@ -327,6 +327,10 @@ $("googleSignIn").addEventListener("click", async () => {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
 
+    if (typeof gtag === "function") {
+  gtag("event", "login", {method: "Google"});
+    }
+
     const fullName = user.displayName || user.email.split("@")[0];
     const joinedAt = user.metadata.creationTime || new Date().toISOString();
 
@@ -399,6 +403,9 @@ await setDoc(doc(db, "publicProfiles", result.user.uid), {
   ...newMemberProfile,
   isAdmin: false
 });
+      if (typeof gtag === "function") {
+  gtag("event", "sign_up", {method: "Email"});
+  }
 
       try {
         await sendEmailVerification(result.user);
@@ -422,7 +429,10 @@ await setDoc(doc(db, "publicProfiles", result.user.uid), {
         return;
       }
 
-
+if (typeof gtag === "function") {
+  gtag("event", "login", {method: "Email"});
+}
+      
       window.location.href = "index.html";
     }
 
