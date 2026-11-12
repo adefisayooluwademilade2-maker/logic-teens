@@ -9881,6 +9881,122 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 
+  <style>
+.logic-auto-link {
+  color: #d6b779;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+</style>
+
+<script>
+(function () {
+  const urlPattern = /\b(?:https?:\/\/|www\.)[^\s<>"']+/gi;
+  const excluded = "a,script,style,textarea,input,button,select,option,code,pre,noscript";
+
+  function linkify(node) {
+    if (!node || node.nodeType !== Node.TEXT_NODE) return;
+
+    const parent = node.parentElement;
+    if (!parent || parent.closest(excluded)) return;
+
+    const value = node.nodeValue;
+    const matches = [...value.matchAll(urlPattern)];
+
+    if (!matches.length) return;
+
+    const fragment = document.createDocumentFragment();
+    let position = 0;
+
+    matches.forEach(match => {
+      const start = match.index;
+      let url = match[0];
+
+      const trailing = url.match(/[.,!?;:)\]}]+$/);
+      const ending = trailing ? trailing[0] : "";
+
+      if (ending) url = url.slice(0, -ending.length);
+      if (!url) return;
+
+      fragment.appendChild(
+        document.createTextNode(value.slice(position, start))
+      );
+
+      const link = document.createElement("a");
+      link.className = "logic-auto-link";
+      link.textContent = url;
+      link.href = /^www\./i.test(url) ? "https://" + url : url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+
+      fragment.appendChild(link);
+
+      if (ending) {
+        fragment.appendChild(document.createTextNode(ending));
+      }
+
+      position = start + match[0].length;
+    });
+
+    fragment.appendChild(
+      document.createTextNode(value.slice(position))
+    );
+
+    node.replaceWith(fragment);
+  }
+
+  function scan(root) {
+    if (!root) return;
+
+    if (root.nodeType === Node.TEXT_NODE) {
+      linkify(root);
+      return;
+    }
+
+    if (root.nodeType !== Node.ELEMENT_NODE &&
+        root.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) return;
+
+    if (root.nodeType === Node.ELEMENT_NODE &&
+        root.closest(excluded)) return;
+
+    const walker = document.createTreeWalker(
+      root,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode(node) {
+          return node.parentElement &&
+            !node.parentElement.closest(excluded)
+              ? NodeFilter.FILTER_ACCEPT
+              : NodeFilter.FILTER_REJECT;
+        }
+      }
+    );
+
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(linkify);
+  }
+
+  scan(document.body);
+
+  const observer = new MutationObserver(changes => {
+    changes.forEach(change => {
+      if (change.type === "characterData") {
+        linkify(change.target);
+      }
+
+      change.addedNodes?.forEach(node => scan(node));
+    });
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+    characterData: true
+  });
+})();
+</script>
   
 </body>
 </html>
