@@ -5780,21 +5780,14 @@ window.loadDepartmentMembers = async function(department) {
   doc(db, "departmentMembers", memberDoc.id)
 );
 
-const applicationQuery = query(
-  collection(db, "teamApplications"),
-  where("userId", "==", userId),
-  where("team", "==", department)
-);
-
-const applicationSnapshot = await getDocs(applicationQuery);
-
-applicationSnapshot.forEach((applicationDoc) => {
-  removalBatch.update(applicationDoc.ref, {
+removalBatch.update(
+  doc(db, "teamApplications", memberDoc.id),
+  {
     status: "removed",
     reviewedAt: serverTimestamp(),
     reviewedBy: auth.currentUser.uid
-  });
-});
+  }
+);
 
 await removalBatch.commit();
 
