@@ -6746,6 +6746,7 @@ window.rejectTeamApplication = async function(applicationId) {
 
   
   
+
 window.applyTeam = async function(team, button) {
   const user = auth.currentUser;
 
@@ -6759,10 +6760,12 @@ window.applyTeam = async function(team, button) {
 
   try {
     const teamId = team.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    const applicationId = user.uid + "_" + teamId;
+
     const applicationRef = doc(
       db,
       "teamApplications",
-      user.uid + "_" + teamId
+      applicationId
     );
 
     const existing = await getDoc(applicationRef);
@@ -6777,24 +6780,38 @@ window.applyTeam = async function(team, button) {
       const application = existing.data();
 
       if (application.status === "approved") {
-        button.textContent = "Approved";
-        button.disabled = true;
-        return;
-      }
+        const membershipSnap = await getDoc(
+          doc(db, "departmentMembers", applicationId)
+        );
 
-      if (application.status === "pending") {
+        if (
+          membershipSnap.exists() &&
+          membershipSnap.data().status === "approved"
+        ) {
+          button.textContent = "Approved";
+          button.disabled = true;
+          return;
+        }
+
+        batch.update(applicationRef, {
+          status: "pending",
+          createdAt: serverTimestamp()
+        });
+
+      } else if (application.status === "pending") {
         button.textContent = "Request sent";
         button.disabled = true;
         return;
-      }
 
-      if (
+      } else if (
         application.status === "rejected" ||
         application.status === "removed"
       ) {
         batch.update(applicationRef, {
-          status: "pending"
+          status: "pending",
+          createdAt: serverTimestamp()
         });
+
       } else {
         button.textContent = "Request sent";
         button.disabled = true;
@@ -6824,9 +6841,8 @@ window.applyTeam = async function(team, button) {
 
     await batch.commit();
 
-    const statusLabel = button.parentElement?.querySelector(
-      ".application-status-label"
-    );
+    const statusLabel = button.closest(".ministry-actions")
+      ?.querySelector(".application-status-label");
 
     if (statusLabel) statusLabel.remove();
 
@@ -6842,7 +6858,6 @@ window.applyTeam = async function(team, button) {
     );
   }
 };
-
 
 
 window.loadTeamApplicationStatus = async function(user) {
