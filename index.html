@@ -2622,18 +2622,21 @@ body.management-page-open #ministryMemberProfile {
       try {
         const removalBatch = writeBatch(db);
 
-removalBatch.delete(
-  doc(db, "departmentMembers", departmentMembershipId)
+const applicationQuery = query(
+  collection(db, "teamApplications"),
+  where("userId", "==", userId),
+  where("team", "==", departmentName)
 );
 
-removalBatch.update(
-  doc(db, "teamApplications", departmentMembershipId),
-  {
+const applicationSnapshot = await getDocs(applicationQuery);
+
+applicationSnapshot.forEach((applicationDoc) => {
+  removalBatch.update(applicationDoc.ref, {
     status: "removed",
     reviewedAt: serverTimestamp(),
     reviewedBy: auth.currentUser.uid
-  }
-);
+  });
+});
 
 await removalBatch.commit();
 
