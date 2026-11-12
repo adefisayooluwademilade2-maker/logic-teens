@@ -5773,18 +5773,21 @@ window.loadDepartmentMembers = async function(department) {
           try {
           const removalBatch = writeBatch(db);
 
-removalBatch.delete(
-  doc(db, "departmentMembers", memberDoc.id)
+const applicationQuery = query(
+  collection(db, "teamApplications"),
+  where("userId", "==", userId),
+  where("team", "==", department)
 );
 
-removalBatch.update(
-  doc(db, "teamApplications", memberDoc.id),
-  {
+const applicationSnapshot = await getDocs(applicationQuery);
+
+applicationSnapshot.forEach((applicationDoc) => {
+  removalBatch.update(applicationDoc.ref, {
     status: "removed",
     reviewedAt: serverTimestamp(),
     reviewedBy: auth.currentUser.uid
-  }
-);
+  });
+});
 
 await removalBatch.commit();
 
