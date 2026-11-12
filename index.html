@@ -9777,18 +9777,24 @@ window.openDailyVerse = async function() {
 
 
 
+
 <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     let currentCommit = null;
-    let updateAvailable = false;
+    let checking = false;
+    let refreshing = false;
 
     try {
       const registration = await navigator.serviceWorker.register(
-        "./service-worker.js"
+        "./service-worker.js",
+        { updateViaCache: "none" }
       );
 
       const checkForUpdates = async () => {
+        if (checking || refreshing) return;
+        checking = true;
+
         try {
           await registration.update();
 
@@ -9804,21 +9810,60 @@ if ("serviceWorker" in navigator) {
 
           const latestCommit = commits[0].sha;
 
-                    if (currentCommit === null) {
+          if (currentCommit === null) {
             currentCommit = latestCommit;
-          } else if (latestCommit !== currentCommit) {
-            currentCommit = latestCommit;
+            return;
+          }
 
-            console.log("LOGIC TEENS update detected. Refreshing app...");
-            window.location.reload();
-                    }
+          if (latestCommit === currentCommit) return;
+
+          const cacheBuster = "?updateCheck=" + Date.now();
+
+          const [liveResponse, sourceResponse] = await Promise.all([
+            fetch("./index.html" + cacheBuster, {
+              cache: "no-store"
+            }),
+            fetch(
+              "https://raw.githubusercontent.com/adefisayooluwademilade2-maker/logic-teens/main/index.html" + cacheBuster,
+              { cache: "no-store" }
+            )
+          ]);
+
+          if (!liveResponse.ok || !sourceResponse.ok) return;
+
+          const [liveHTML, sourceHTML] = await Promise.all([
+            liveResponse.text(),
+            sourceResponse.text()
+          ]);
+
+          // Wait until GitHub Pages has finished deploying.
+          if (liveHTML !== sourceHTML) return;
+
+          // Avoid interrupting someone who is typing.
+          const active = document.activeElement;
+          const isTyping = active && (
+            active.tagName === "INPUT" ||
+            active.tagName === "TEXTAREA" ||
+            active.isContentEditable
+          );
+
+          if (isTyping) return;
+
+          currentCommit = latestCommit;
+          refreshing = true;
+
+          console.log("LOGIC TEENS update is ready.");
+          window.location.reload();
 
         } catch (error) {
           console.log("Automatic update check will retry.");
+        } finally {
+          checking = false;
         }
       };
 
       await checkForUpdates();
+
       setInterval(checkForUpdates, 300000);
 
       document.addEventListener("visibilitychange", () => {
