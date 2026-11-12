@@ -299,6 +299,17 @@ function openEmailForm(selectedMode) {
   $("switchText").style.display = "block";
 }
 
+  $("backToWelcome").addEventListener("click", () => {
+  clearMessage();
+  $("authForm").style.display = "none";
+  $("switchText").style.display = "none";
+  $("backToWelcome").style.display = "none";
+  $("welcomeChoices").style.display = "flex";
+  $("googleSignIn").style.display = "flex";
+  document.querySelector(".divider").style.display = "flex";
+  $("heading").textContent = "Stay Rooted in the Love of God in Christ";
+});
+  
 $("emailLoginChoice").addEventListener("click", () => {
   openEmailForm("login");
 });
