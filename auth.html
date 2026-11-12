@@ -7,7 +7,11 @@
 <title>Account Access</title>
 <style>
 *{box-sizing:border-box}
+  html{
+  background:#090a10;
+  }
 body{
+  visibility:hidden;
   margin:0;min-height:100vh;padding:24px 16px;
   display:flex;align-items:center;justify-content:center;
   background:#090a10;color:#f5f2eb;
@@ -201,6 +205,8 @@ function setMode(newMode) {
   });
 }
   setMode(mode);
+
+  document.body.style.visibility = "visible";
 
 $("signupTab").addEventListener("click", () => setMode("signup"));
 $("loginTab").addEventListener("click", () => setMode("login"));
