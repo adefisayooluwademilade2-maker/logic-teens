@@ -2632,16 +2632,15 @@ const applicationQuery = query(
   where("team", "==", departmentName)
 );
 
-const applicationSnapshot = await getDocs(applicationQuery);
-
-applicationSnapshot.forEach((applicationDoc) => {
-  removalBatch.update(applicationDoc.ref, {
+removalBatch.update(
+  doc(db, "teamApplications", departmentMembershipId),
+  {
     status: "removed",
     reviewedAt: serverTimestamp(),
     reviewedBy: auth.currentUser.uid
-  });
-});
-
+  }
+);
+        
 await removalBatch.commit();
 
                 await window.logicSendMemberNotification(
