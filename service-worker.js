@@ -1,4 +1,3 @@
-
 importScripts(
   "https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"
 );
@@ -42,50 +41,51 @@ self.addEventListener("install", event => {
 // ACTIVATE
 self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(key =>
-            key.startsWith(CACHE_PREFIX) &&
-            key !== CACHE_NAME
-          )
-          .map(key => caches.delete(key))
+    caches.keys()
+      .then(keys =>
+        Promise.all(
+          keys
+            .filter(key =>
+              key.startsWith(CACHE_PREFIX) &&
+              key !== CACHE_NAME
+            )
+            .map(key => caches.delete(key))
+        )
       )
-    ).then(() => self.clients.claim())
+      .then(() => self.clients.claim())
   );
 });
 
+// BACKGROUND PUSH NOTIFICATIONS
+messaging.onBackgroundMessage(payload => {
+  const data = payload.data || {};
+  const notification = payload.notification || {};
 
-  // BACKGROUND PUSH NOTIFICATIONS
-  messaging.onBackgroundMessage(payload => {
-    const data = payload.data || {};
-    const notification = payload.notification || {};
+  const title = "LOGIC TEENS CHURCH";
 
-    const title = "LOGIC TEENS CHURCH";
+  const body =
+    data.title ||
+    notification.title ||
+    notification.body ||
+    data.body ||
+    "You have a new notification.";
 
-    const body =
-  data.title ||
-  notification.title ||
-  notification.body ||
-  data.body ||
-  "You have a new notification.";
+  const targetUrl = data.url || "./";
 
-    const targetUrl = data.url || "./";
+  const appIcon = new URL(
+    "./logic-app-icon.png",
+    self.registration.scope
+  ).href;
 
-    const appIcon = new URL(
-      "./logic-app-icon.png",
-      self.registration.scope
-    ).href;
-
-    return self.registration.showNotification(title, {
-      body: body,
-      icon: appIcon,
-      badge: appIcon,
-      data: {
-        url: targetUrl
-      }
-    });
+  return self.registration.showNotification(title, {
+    body: body,
+    icon: appIcon,
+    badge: appIcon,
+    data: {
+      url: targetUrl
+    }
   });
+});
 
 // NOTIFICATION CLICK
 self.addEventListener("notificationclick", event => {
@@ -142,7 +142,6 @@ self.addEventListener("fetch", event => {
   const url = new URL(event.request.url);
 
   if (url.origin !== self.location.origin) return;
-
   if (event.request.mode !== "navigate") return;
 
   event.respondWith(
@@ -151,8 +150,9 @@ self.addEventListener("fetch", event => {
         if (response.ok) {
           const copy = response.clone();
 
-          caches.open(CACHE_NAME).then(cache =>
-            cache.put(event.request, copy)
+          event.waitUntil(
+            caches.open(CACHE_NAME)
+              .then(cache => cache.put(event.request, copy))
           );
         }
 
@@ -166,4 +166,3 @@ self.addEventListener("fetch", event => {
       })
   );
 });
-    
