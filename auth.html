@@ -19,7 +19,23 @@ body{
   display:flex;
   align-items:stretch;
   justify-content:stretch;
-  background:#090a10;
+    background-color:#090a10;
+  background-image:
+    linear-gradient(#d6b779,#d6b779),
+    linear-gradient(#d6b779,#d6b779),
+    linear-gradient(90deg,#090a10 0%,rgba(9,10,16,.88) 35%,rgba(9,10,16,.25) 100%),
+    url('./_MG_1139.JPG');
+  background-size:
+    8px 180px,
+    110px 8px,
+    100% 100%,
+    auto 100%;
+  background-position:
+    18% center,
+    18% 46%,
+    center,
+    right center;
+  background-repeat:no-repeat;
   color:#f5f2eb;
   font-family:Arial,sans-serif;
 }
@@ -31,7 +47,9 @@ body{
   min-height:100svh;
   margin:0;
   padding:clamp(28px,7vh,65px) 25px;
-  background:#090a10;
+    background:transparent;
+  position:relative;
+  z-index:1;
   border:0;
   border-radius:0;
   display:flex;
@@ -151,12 +169,15 @@ button{cursor:pointer}
 }
   #backToWelcome{
   display:none;
+  width:auto;
+  align-self:flex-start;
+  margin:0 auto 16px 0;
+  padding:0;
   border:0;
   background:transparent;
   color:#d6b779;
-  padding:0;
-  margin:0 0 16px;
   font-size:22px;
+  text-align:left;
   }
   /* Keep the heading in place; lower the welcome options slightly */
 #googleSignIn,
