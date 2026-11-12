@@ -34,6 +34,7 @@ body{
   padding:clamp(28px,7vh,65px) 25px;
     background:transparent;
   position:relative;
+  isolation:isolate;
   z-index:1;
   border:0;
   border-radius:0;
@@ -177,12 +178,14 @@ button{cursor:pointer}
   color:#d6b779;
   font-size:22px;
   text-align:left;
-                                          }/* Move welcome choices visibly downward */
-#googleSignIn,
-.divider,
-#welcomeChoices{
-  transform:translateY(45px);
-      }
+                                          #welcomeActions{
+  position:relative;
+  top:60px !important;
+  width:100%;
+  max-width:480px;
+  margin-left:auto;
+  margin-right:auto;
+    }
 </style>
 
 <!-- Google Analytics -->
