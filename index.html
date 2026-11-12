@@ -6397,6 +6397,7 @@ window.loadAdminApprovedMembers = async function() {
 };
   
   
+
 window.removeAdminMember = async function(memberId, memberName) {
   if (!window.logicIsAdmin) {
     window.logicNotify("You are not authorised to remove members.");
@@ -6412,7 +6413,29 @@ window.removeAdminMember = async function(memberId, memberName) {
   if (!confirmed) return;
 
   try {
-    await deleteDoc(doc(db, "departmentMembers", memberId));
+    const removalBatch = writeBatch(db);
+
+    removalBatch.delete(
+      doc(db, "departmentMembers", memberId)
+    );
+
+    const applicationRef = doc(
+      db,
+      "teamApplications",
+      memberId
+    );
+
+    const applicationSnap = await getDoc(applicationRef);
+
+    if (applicationSnap.exists()) {
+      removalBatch.update(applicationRef, {
+        status: "removed",
+        reviewedAt: serverTimestamp(),
+        reviewedBy: auth.currentUser.uid
+      });
+    }
+
+    await removalBatch.commit();
 
     window.logicNotify("Member removed successfully.");
 
@@ -6424,6 +6447,7 @@ window.removeAdminMember = async function(memberId, memberName) {
     window.logicNotify("Could not remove this member. Please try again.");
   }
 };
+
 
   
   window.loadAdminHomeCounts = async function() {
