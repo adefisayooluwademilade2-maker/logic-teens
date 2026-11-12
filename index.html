@@ -6844,6 +6844,7 @@ window.applyTeam = async function(team, button) {
 };
 
 
+
 window.loadTeamApplicationStatus = async function(user) {
   const buttons = document.querySelectorAll(
     '#ministry button[onclick^="applyTeam("]'
@@ -6858,16 +6859,16 @@ window.loadTeamApplicationStatus = async function(user) {
 
     const team = match[1];
     const teamId = team.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    const applicationId = user.uid + "_" + teamId;
 
     try {
       const applicationRef = doc(
         db,
         "teamApplications",
-        user.uid + "_" + teamId
+        applicationId
       );
 
       const applicationSnap = await getDoc(applicationRef);
-
       const actions = button.closest(".ministry-actions");
 
       let statusLabel = actions?.querySelector(
@@ -6885,8 +6886,20 @@ window.loadTeamApplicationStatus = async function(user) {
       const application = applicationSnap.data();
 
       if (application.status === "approved") {
-        button.textContent = "Approved";
-        button.disabled = true;
+        const membershipSnap = await getDoc(
+          doc(db, "departmentMembers", applicationId)
+        );
+
+        if (
+          membershipSnap.exists() &&
+          membershipSnap.data().status === "approved"
+        ) {
+          button.textContent = "Approved";
+          button.disabled = true;
+        } else {
+          button.textContent = "Apply to join";
+          button.disabled = false;
+        }
 
       } else if (application.status === "pending") {
         button.textContent = "Request sent";
@@ -6903,10 +6916,6 @@ window.loadTeamApplicationStatus = async function(user) {
           "grid-column:1 / -1;color:#999;opacity:0.55;font-size:11px;";
 
         actions?.appendChild(statusLabel);
-
-      } else if (application.status === "removed") {
-        button.textContent = "Apply to join";
-        button.disabled = false;
 
       } else {
         button.textContent = "Apply to join";
