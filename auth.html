@@ -216,6 +216,39 @@ $("showPassword").addEventListener("click", () => {
   $("showPassword").textContent = show ? "Hide" : "Show";
 });
 
+$("googleSignIn").addEventListener("click", async () => {
+  const button = $("googleSignIn");
+  button.disabled = true;
+  button.textContent = "Connecting to Google...";
+
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+
+    const fullName = user.displayName || user.email.split("@")[0];
+    const joinedAt = user.metadata.creationTime || new Date().toISOString();
+
+    const profile = {
+      fullName,
+      email: user.email || "",
+      username: "",
+      photoURL: user.photoURL || "",
+      about: "",
+      joinedAt
+    };
+
+    await setDoc(doc(db, "users", user.uid), profile, { merge: true });
+    await setDoc(doc(db, "publicProfiles", user.uid), profile, { merge: true });
+
+    window.location.href = "index.html";
+  } catch (error) {
+    showMessage(error.message || "Google sign-in failed. Please try again.");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Continue with Google";
+  }
+});
+  
 $("authForm").addEventListener("submit", async e => {
   e.preventDefault();
   clearMessage();
