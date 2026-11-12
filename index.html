@@ -2622,6 +2622,10 @@ body.management-page-open #ministryMemberProfile {
       try {
         const removalBatch = writeBatch(db);
 
+        removalBatch.delete(
+  doc(db, "departmentMembers", departmentMembershipId)
+);
+
 const applicationQuery = query(
   collection(db, "teamApplications"),
   where("userId", "==", userId),
