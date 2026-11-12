@@ -29,7 +29,7 @@ body{
 }
 .tabs button.active{background:#c9a65e;color:#111}
 h1{font-size:27px;margin:0 0 12px}
-.intro{color:#b8b8c3;font-size:14px;line-height:1.6;margin-bottom:24px}
+.intro{display:none;color:#b8b8c3;font-size:14px;line-height:1.6;margin-bottom:24px}
 label{display:block;margin:17px 0 8px;font-size:14px;color:#e4e1da}
 input{
   width:100%;padding:14px;background:#202330;
@@ -307,6 +307,7 @@ function openEmailForm(selectedMode) {
   $("authForm").style.display = "block";
   $("switchText").style.display = "block";
   $("backToWelcome").style.display = "block";
+  $("intro").style.display = "block";
 }
 
   $("backToWelcome").addEventListener("click", () => {
