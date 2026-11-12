@@ -29,7 +29,7 @@ body{
     8px 180px,
     110px 8px,
     100% 100%,
-    auto 100%;
+    auto 115%;
   background-position:
     18% center,
     18% 46%,
@@ -178,14 +178,12 @@ button{cursor:pointer}
   color:#d6b779;
   font-size:22px;
   text-align:left;
-  }
-  /* Keep the heading in place; lower the welcome options slightly */
+                                          }/* Move welcome choices visibly downward */
 #googleSignIn,
 .divider,
 #welcomeChoices{
-  position:relative;
-  top:24px;
-}
+  transform:translateY(45px);
+      }
 </style>
 
 <!-- Google Analytics -->
