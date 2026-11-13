@@ -33,10 +33,10 @@ body{
   margin:0;
   padding:clamp(28px,7vh,65px) 25px;
     background-color:#090a10;
-  background-image:url('./cross.jpg');
-background-size:52% auto;
-background-position:left top;
-background-repeat:no-repeat; 
+background-image:none;
+background-size:auto;
+background-position:initial;
+background-repeat:no-repeat;
 background-blend-mode:screen;
   position:relative;
   isolation:isolate;
@@ -186,8 +186,7 @@ button{cursor:pointer}
 
 .card::before{
   content:"";
-  position:absolute;
-  top:0;
+  width:74%;
   right:0;
   width:65%;
 clip-path:polygon(18% 0,100% 0,100% 100%,0 100%);
