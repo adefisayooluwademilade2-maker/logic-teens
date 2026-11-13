@@ -464,8 +464,12 @@ $("googleSignIn").addEventListener("click", async () => {
 
     window.location.href = "index.html";
   } catch (error) {
-    showMessage(error.message || "Google sign-in failed. Please try again.");
-  } finally {
+    if (error.code !== "auth/popup-closed-by-user" &&
+        error.code !== "auth/cancelled-popup-request") {
+      showMessage("Unable to sign in right now. Please try again.");
+    } else {
+      clearMessage();
+  }
     button.disabled = false;
   }
 });
