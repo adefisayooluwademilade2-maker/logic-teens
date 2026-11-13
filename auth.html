@@ -437,6 +437,7 @@ $("showPassword").addEventListener("click", () => {
 
 $("googleSignIn").addEventListener("click", async () => {
   const button = $("googleSignIn");
+    clearMessage();
   button.disabled = true;
 
   try {
