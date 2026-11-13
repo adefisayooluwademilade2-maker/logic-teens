@@ -561,7 +561,7 @@ if (typeof gtag === "function") {
       "auth/too-many-requests": "Too many attempts. Please try again later."
     };
 
-    showMessage(messages[error.code] || error.message || "Something went wrong. Please try again.");
+showMessage(messages[error.code] || "Unable to complete this request. Please try again.");
   } finally {
     button.disabled = false;
     button.textContent = mode === "signup" ? "Create Account" : "Login";
