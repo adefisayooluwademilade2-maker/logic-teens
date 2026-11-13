@@ -182,11 +182,19 @@ button{cursor:pointer}
 
 
 #welcomeActions{
-  position:relative;
-  width:100%;
+  position:absolute;
+  left:25px;
+  right:25px;
+  bottom:20px;
+  width:auto;
   max-width:480px;
   margin:0 auto;
-  transform:translateY(90px);
+}
+
+.card::after{
+  content:"";
+  display:block;
+  flex:0 0 205px;
     }
 </style>
 
