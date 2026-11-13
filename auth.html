@@ -187,36 +187,37 @@ button{cursor:pointer}
 .card::before{
   content:"";
   position:absolute;
-top:0;
-right:0;
-width:74%;
+  top:0;
+  right:0;
+  width:74%;
   height:min(44vh,340px);
-    background-image:
+  background-image:
     linear-gradient(90deg,#090a10 0%,rgba(9,10,16,.35) 25%,transparent 75%),
     linear-gradient(0deg,#090a10 0%,transparent 55%),
-    linear-gradient(rgba(9,10,16,.12),rgba(9,10,16,.12)),
+    linear-gradient(rgba(9,10,16,.35),rgba(9,10,16,.35)),
     url('./woman-photo.jpg');
   background-size:100% 100%,100% 100%,100% 100%,cover;
   background-position:center,center,center,left top;
   background-repeat:no-repeat;
+  mix-blend-mode:multiply;
   z-index:0;
   pointer-events:none;
-  } 
+}
 
 .cross-art{
   position:absolute;
   top:0;
   left:-15px;
-  width:64%;
-  height:350px;
+  width:70%;
+  height:380px;
   background:url('./cross.png') center/contain no-repeat;
   transform:rotate(-9deg);
   mix-blend-mode:screen;
-  -webkit-mask-image:radial-gradient(ellipse at center, #000 48%, transparent 78%);
-  mask-image:radial-gradient(ellipse at center, #000 48%, transparent 78%);
+  -webkit-mask-image:radial-gradient(ellipse at center, #000 52%, transparent 82%);
+  mask-image:radial-gradient(ellipse at center, #000 52%, transparent 82%);
   z-index:0;
   pointer-events:none;
-}
+  }
     
 .card::after{
   content:"";
