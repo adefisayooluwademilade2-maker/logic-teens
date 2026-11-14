@@ -5084,7 +5084,7 @@ window.logicMembersDirectoryCache = [];
       } catch (error) {
         console.error("Account role removal error:", error);
         window.logicNotify(
-          "Removal failed: " + (error.message || "Please try again.")
+          "Could not remove this role. Please try again."
         );
         removeButton.disabled = false;
       }
