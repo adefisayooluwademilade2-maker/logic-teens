@@ -2605,7 +2605,7 @@ body.management-page-open #ministryMemberProfile {
       } catch (error) {
         console.error("Department profile edit error:", error);
         window.logicNotify(
-          "Save error: " + (error.code || error.message || "Unknown error")
+          "Could not save department details. Please try again."
         );
       }
     };
@@ -4960,7 +4960,7 @@ if (!logicForegroundListenerStarted) {
     localStorage.setItem("logicPhoneNotificationsEnabled", "false");
 
     if (status) {
-      status.textContent = error.message || "Could not enable phone notifications.";
+      status.textContent = "Could not enable phone notifications. Please try again.";
     }
 
   } finally {
