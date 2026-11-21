@@ -19,14 +19,17 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 // CACHE VERSION
-const CACHE_NAME = "logic-teens-v5";
+const CACHE_NAME = "logic-teens-v6";
 const CACHE_PREFIX = "logic-teens-";
 
 const APP_FILES = [
   "./",
   "./index.html",
   "./auth.html",
-  "./manifest.json"
+  "./manifest.json",
+  "./woman-photo.jpg",
+  "./cross.png",
+  "./logic-app-icon.png"
 ];
 
 // INSTALL
