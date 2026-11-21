@@ -4,6 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preload" as="image" href="./woman-photo.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="./cross.png" fetchpriority="high">
 <meta name="theme-color" content="#090a12">
 <title>LOGIC Teens Church Lounge</title>
 <style>
@@ -7138,7 +7140,7 @@ badge.hidden = unread === 0;
     console.error("Notification error:", error);
     notificationList.innerHTML =
       '<div class="empty">Could not load notifications: ' +
-      error.message + '</div>';
+      'Please try again.</div>';
   });
 };
   
@@ -7213,7 +7215,7 @@ window.submitEmailChange = async function() {
       message.textContent = "Please log out and log in again, then retry.";
     } else {
       message.textContent =
-        error.message || "Unable to change email. Please try again.";
+        "Unable to change email. Please try again.";
     }
   }
 };
@@ -7325,7 +7327,7 @@ window.saveProfilePreview = async function() {
   } catch (error) {
     console.error("Profile save error:", error);
     window.logicNotify(
-      "Save failed: " + (error.code || error.message || "Please try again.")
+      "Profile could not be saved. Please try again."
     );
   }
 };
@@ -7897,7 +7899,7 @@ window.cancelEventEdit = function() {
       } catch (error) {
         console.error("Event registration error:", error);
         window.logicNotify(
-          error.message || "Registration could not be updated."
+          "Registration could not be updated. Please try again."
         );
       } finally {
         registrationBusy = false;
