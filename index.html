@@ -8837,7 +8837,7 @@ message: "Tap to view event details",
 
     } catch (error) {
       console.error("Event save failed:", error);
-      window.logicNotify(error.message || "Could not save event.");
+      window.logicNotify("Could not save event. Please try again.");
     } finally {
       button.disabled = false;
       button.textContent = "Create Event";
@@ -9467,8 +9467,8 @@ document.getElementById("sendAnnouncementButton")
       console.error("Announcement sending error:", error);
 
       status.textContent = inAppSaved
-        ? "In-app announcement was sent, but phone notifications stopped: " + error.message
-        : error.message || "Announcement could not be sent. Please try again.";
+        ? "Announcement sent, but phone notifications could not be completed."
+: "Announcement could not be sent. Please try again.";
     }
 
     button.disabled = false;
