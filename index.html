@@ -5252,8 +5252,7 @@ const appointedIds = new Set(
         } catch (error) {
           console.error("Account role appointment error:", error);
           window.logicNotify(
-            "Appointment failed: " +
-            (error.message || "Please try again.")
+            "Could not appoint this member. Please try again."
           );
           addButton.disabled = false;
         }
@@ -5266,7 +5265,7 @@ const appointedIds = new Set(
   } catch (error) {
     console.error("Account role members error:", error);
     list.textContent =
-      "Could not load members: " + (error.message || "Please try again.");
+      "Could not load members. Please try again.";
   }
 };
 
@@ -5357,8 +5356,7 @@ window.loadMembersDirectory = async function() {
     `;
 
     document.getElementById("membersDirectoryError").textContent =
-      (error.code || "Error") + ": " +
-      (error.message || "Unknown error");
+      "Could not load members. Please try again.";
   }
 };
   window.toggleMembersFilter = function() {
@@ -5995,7 +5993,7 @@ window.loadAdminManageMembers = async function() {
     list.innerHTML = `
       <div class="directory-empty">
         <h3>Couldn't load members</h3>
-        <p>${error.code || error.message || "Unknown error"}</p>
+        <p>Could not load members. Please try again.</p>
       </div>
     `;
                   }
